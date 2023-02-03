@@ -1,3 +1,3 @@
 export default function Category() {
-  return <div>Category</div>;
+  return <div className="p-5">Category</div>;
 }

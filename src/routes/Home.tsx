@@ -1,9 +1,7 @@
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
-import { meAtom } from "../atoms";
-import { firebaseDB } from "../firebase";
+import useFirebaseDocs from "../firebase/hooks/useFirebaseDocs";
+
+import { getProducts } from "../firebase/utils";
 
 export interface IProduct {
   title: string;
@@ -11,43 +9,20 @@ export interface IProduct {
   description: string;
   quantity: number;
   price: number;
+  categoryId: string;
   imageUrls: string[];
   id: string;
 }
 
 export default function Home() {
-  const [products, setProducts] = useState<IProduct[]>([]);
-
-  const getProducts = async () => {
-    const q = query(
-      collection(firebaseDB, "products")
-      // orderBy("createdAt", "desc")
-    );
-
-    try {
-      const querySnapshot = await getDocs(q);
-
-      const allProducts = querySnapshot.docs.map((doc) => {
-        return {
-          ...doc.data(),
-          id: doc.id,
-        } as IProduct;
-      });
-      setProducts(allProducts);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getProducts();
-  }, []);
+  const products = useFirebaseDocs<IProduct[]>(getProducts);
 
   return (
-    <div>
+    <div className="p-5">
       <h1>Home</h1>
 
-      {!!products.length &&
+      {products &&
+        !!products.length &&
         products.map((product) => (
           <li key={product.id}>
             <Link to={`/products/${product.id}`}>

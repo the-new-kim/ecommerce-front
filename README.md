@@ -1,19 +1,38 @@
-global
-/
-/cart
-/wishlist
-/search
-/products/:category
-/products/:category/:id
+### Todos...
 
-loggedIn?
+- [x] Beautiful dnd for images
+- [ ] Multiple files upload
+- [ ] Admin Menu
+- [ ] Category
+- [ ] Wishlist
+- [ ] Cart
+- [ ] Payment(stripe)
 
-/users/:id
+### Routes
 
-!loggedIn?
+## global
 
-/auth
+- /
+- /cart
+- /wishlist
+- /search
+- /products/:category
+- /products/:category/:id
 
-isAdmin?
+## loggedIn?
 
-/admin
+- /users/:id
+
+## !loggedIn?
+
+- /auth
+
+## isAdmin?
+
+- /admin
+- /admin/products
+- /admin/products/add
+- /admin/products/:productId
+- /admin/users/
+- /admin/users/add
+- /admin/users/:userId

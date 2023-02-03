@@ -3,8 +3,9 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
-import { meAtom } from "../../atoms";
-import { firebaseAuth } from "../../firebase";
+import { meAtom } from "../../libs/atoms";
+import { firebaseAuth } from "../../firebase/config";
+import { getUserData } from "../../firebase/utils";
 
 interface ISignInForm {
   email: string;
@@ -18,21 +19,27 @@ export default function SignInForm() {
   const { register, handleSubmit } = useForm<ISignInForm>();
 
   const onSubmit = async ({ email, password }: ISignInForm) => {
+    let userData;
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password);
     } catch (error) {
       console.log("ERROR:::", error);
     }
-    if (firebaseAuth.currentUser)
+    if (firebaseAuth.currentUser) {
+      userData = await getUserData(firebaseAuth.currentUser.uid);
+
       setMe({
+        docId: "",
         uid: firebaseAuth.currentUser!.uid,
         displayName: firebaseAuth.currentUser!.displayName || "Anonym",
         email,
         phoneNumber: firebaseAuth.currentUser!.phoneNumber,
         photoURL: firebaseAuth.currentUser!.photoURL,
         isAdmin: false,
+        cart: [],
+        wishlist: [],
       });
-
+    }
     navigate("/");
   };
 

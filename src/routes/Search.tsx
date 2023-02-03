@@ -1,3 +1,3 @@
 export default function Search() {
-  return <div>Search</div>;
+  return <div className="p-5">Search</div>;
 }

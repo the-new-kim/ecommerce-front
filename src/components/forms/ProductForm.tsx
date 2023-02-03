@@ -6,20 +6,33 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-import { firebaseDB, firebaseStorage } from "../../firebase";
+import { firebaseDB, firebaseStorage } from "../../firebase/config";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
+
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
+
 import { IProduct } from "../../routes/Home";
+import { cls } from "../../libs/utils";
+import { ArrowsHorizontal, Trash, XCircle } from "phosphor-react";
+
+interface ICategory {
+  id: string;
+  name: string;
+}
 
 export default function ProductForm() {
   const navigate = useNavigate();
-  //   const [attachment, setAttachment] = useState<string | null>(null);
-
   const [attachments, setAttachments] = useState<string[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
 
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<IProduct>();
@@ -57,7 +70,6 @@ export default function ProductForm() {
     }
 
     try {
-      console.log("ADD NEW PRODUCT");
       addedDoc = await addDoc(collection(firebaseDB, "products"), {
         createdAt: Date.now(),
         title,
@@ -101,8 +113,23 @@ export default function ProductForm() {
   const onClearAttachment = (index: number) => {
     setAttachments((prev) => {
       const newArray = prev;
-
       newArray.splice(index, 1);
+
+      return newArray;
+    });
+  };
+
+  const getCategories = async () => {};
+
+  const onDragEnd = ({ destination, source }: DropResult) => {
+    if (!destination || destination.index === source.index) return;
+
+    setAttachments((prev) => {
+      const newArray = [...prev];
+      const draggingItem = newArray[source.index];
+
+      newArray.splice(source.index, 1);
+      newArray.splice(destination.index, 0, draggingItem);
 
       return newArray;
     });
@@ -114,6 +141,7 @@ export default function ProductForm() {
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col"
         onSubmit={handleSubmit(onSubmit)}
       >
+        {/* TITLE */}
         <label className="text-gray-700 text-sm font-bold mb-2">
           Title
           <input
@@ -128,6 +156,7 @@ export default function ProductForm() {
           )}
         </label>
 
+        {/* LABEL */}
         <label className="text-gray-700 text-sm font-bold mb-2">
           Label
           <input
@@ -142,6 +171,7 @@ export default function ProductForm() {
           )}
         </label>
 
+        {/* DESCRIPTION */}
         <label className="text-gray-700 text-sm font-bold mb-2">
           Description
           <textarea
@@ -162,6 +192,22 @@ export default function ProductForm() {
           )}
         </label>
 
+        {/* CATEGORY */}
+        <label className="text-gray-700 text-sm font-bold mb-2">
+          Category
+          <input
+            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
+            type="text"
+            {...register("categoryId", { required: "This field is required" })}
+          />
+          {errors.categoryId && (
+            <small className="text-red-300 font-medium">
+              * {errors.categoryId.message}
+            </small>
+          )}
+        </label>
+
+        {/* PRICE & QUANTITY */}
         <div className="flex">
           <label className="text-gray-700 text-sm font-bold mb-2 mr-2">
             Price
@@ -198,6 +244,7 @@ export default function ProductForm() {
           </label>
         </div>
 
+        {/* IMAGES */}
         <label className="text-gray-700 text-sm font-bold mb-2">
           Images
           <input
@@ -218,20 +265,58 @@ export default function ProductForm() {
           )}
         </label>
 
-        {/* {attachment && (
-          <div>
-            <img width={100} src={attachment} />
-            <button onClick={onClearAttachment}>Clear</button>
-          </div>
-        )} */}
-
-        {!!attachments.length &&
+        {/* {!!attachments.length &&
           attachments.map((attachment, index) => (
             <div key={"attachment" + index}>
               <img width={100} src={attachment} />
               <button onClick={() => onClearAttachment(index)}>Clear</button>
             </div>
-          ))}
+          ))} */}
+
+        {!!attachments.length && (
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="images" direction="horizontal">
+              {(magic) => (
+                <div
+                  className="flex justify-start items-center bg-white border shadow-sm border-slate-300 rounded-md p-3 overflow-x-scroll"
+                  ref={magic.innerRef}
+                  {...magic.droppableProps}
+                >
+                  {attachments.map((attachment, index) => (
+                    <Draggable
+                      draggableId={"attachment" + index}
+                      key={"attachment" + index}
+                      index={index}
+                    >
+                      {(magic) => (
+                        <div
+                          className={`${cls(index === 0 ? "ml-0" : "ml-3")}
+                          flex flex-col h-full w-60 bg-white border shadow-sm border-slate-300 rounded-md aspect-square overflow-hidden`}
+                          ref={magic.innerRef}
+                          {...magic.draggableProps}
+                          {...magic.dragHandleProps}
+                        >
+                          <div className="text-xl p-2 flex justify-between items-center">
+                            <ArrowsHorizontal />
+                            <Trash
+                              className="cursor-pointer"
+                              onClick={() => onClearAttachment(index)}
+                            />
+                          </div>
+                          <img
+                            className="w-full h-full object-cover"
+                            src={attachment}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {magic.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        )}
 
         <input
           className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

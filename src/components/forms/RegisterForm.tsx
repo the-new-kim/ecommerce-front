@@ -4,8 +4,8 @@ import { addDoc, collection } from "firebase/firestore";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
-import { meAtom } from "../../atoms";
-import { firebaseAuth, firebaseDB } from "../../firebase";
+import { meAtom } from "../../libs/atoms";
+import { firebaseAuth, firebaseDB } from "../../firebase/config";
 
 interface IRegisterForm {
   email: string;
@@ -25,14 +25,8 @@ export default function RegisterForm() {
     formState: { errors },
   } = useForm<IRegisterForm>();
 
-  const onSubmit = async ({
-    email,
-    name,
-    password,
-    passwordRepeat,
-  }: IRegisterForm) => {
-    console.log(password, passwordRepeat);
-
+  const onSubmit = async ({ email, name, password }: IRegisterForm) => {
+    let docId = "";
     try {
       const response = await createUserWithEmailAndPassword(
         firebaseAuth,
@@ -40,31 +34,44 @@ export default function RegisterForm() {
         password
       );
 
+      console.log("RESPONSE USER:::", response.user);
+      console.log("AUTH CURRENT USER:::", firebaseAuth.currentUser);
+
       await updateProfile(response.user, {
         displayName: name,
       });
 
-      await addDoc(collection(firebaseDB, "users"), {
-        userId: response.user.uid,
+      const addedDoc = await addDoc(collection(firebaseDB, "users"), {
+        uid: response.user.uid,
         email: response.user.email,
         displayName: response.user.displayName,
         phoneNumber: response.user.phoneNumber,
         photoURL: response.user.photoURL,
         isAdmin: false,
         createdAt: Date.now(),
+        wishlist: [],
+        cart: [],
       });
+
+      docId = addedDoc.id;
+
+      console.log("ADDED USER ID:::", addedDoc.id);
     } catch (error) {
       console.log("ERROR:::", error);
     }
     if (firebaseAuth.currentUser)
       setMe({
+        docId,
         uid: firebaseAuth.currentUser!.uid,
         displayName: firebaseAuth.currentUser!.displayName || "Anonym",
         email,
         phoneNumber: firebaseAuth.currentUser!.phoneNumber,
         photoURL: firebaseAuth.currentUser!.photoURL,
         isAdmin: false,
+        wishlist: [],
+        cart: [],
       });
+    console.log("AUTH CURRENT USER:::", firebaseAuth.currentUser);
 
     navigate("/");
   };

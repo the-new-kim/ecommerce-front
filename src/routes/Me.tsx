@@ -1,8 +1,8 @@
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { meAtom } from "../atoms";
-import { firebaseAuth } from "../firebase";
+import { meAtom } from "../libs/atoms";
+import { firebaseAuth } from "../firebase/config";
 
 export default function Me() {
   const [me] = useRecoilState(meAtom);
@@ -14,7 +14,7 @@ export default function Me() {
   };
 
   return (
-    <div>
+    <div className="p-5">
       <div>{me?.displayName}'s Profile</div>
       <button
         className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

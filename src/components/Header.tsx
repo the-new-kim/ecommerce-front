@@ -4,17 +4,30 @@ import {
   ShoppingCart,
   Star,
   User,
-  UserCircle,
 } from "phosphor-react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
-import { meAtom } from "../atoms";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { headerHeightAtom, meAtom } from "../libs/atoms";
+import useElementSize from "../libs/hooks/useElementSize";
 
 export default function Header() {
   const me = useRecoilValue(meAtom);
+  const setHeaderHeight = useSetRecoilState(headerHeightAtom);
+
+  const ref = useRef<HTMLElement>(null);
+  const { clientHeight } = useElementSize(ref);
+
+  useEffect(() => {
+    if (clientHeight === 0) return;
+    setHeaderHeight(clientHeight);
+  }, [clientHeight]);
 
   return (
-    <header className="flex justify-between items-center ">
+    <header
+      ref={ref}
+      className="fixed top-0 left-0 z-50 bg-white flex justify-between items-center p-5 shadow-sm"
+    >
       <Link to="/">Home</Link>
 
       <nav>

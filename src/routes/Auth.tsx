@@ -2,11 +2,11 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { meAtom } from "../atoms";
+import { meAtom } from "../libs/atoms";
 import RegisterForm from "../components/forms/RegisterForm";
 import SiginInForm from "../components/forms/SignInForm";
 
-import { firebaseAuth } from "../firebase";
+import { firebaseAuth } from "../firebase/config";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function Auth() {
   const toggleAccount = () => setNewAccount((prev) => !prev);
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center p-5">
       {newAccount ? <RegisterForm /> : <SiginInForm />}
 
       <button className="underline" onClick={toggleAccount}>

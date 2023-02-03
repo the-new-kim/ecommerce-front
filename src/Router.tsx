@@ -4,7 +4,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { IMe, meAtom } from "./atoms";
+import { IMe, meAtom } from "./libs/atoms";
 
 import Layout from "./Layout";
 import NotFound from "./routes/NotFound";
@@ -17,27 +17,43 @@ import Wishlist from "./routes/Wishlist";
 import Search from "./routes/Search";
 import Category from "./routes/Category";
 import Product from "./routes/Product";
-import Admin from "./routes/Admin";
 import Me from "./routes/Me";
+import AdminHome from "./routes/Admin/AdminHome";
+import Users from "./routes/Admin/Users";
+import Products from "./routes/Admin/Products";
+import AdminLayout from "./routes/Admin/AdminLayout";
+import Settings from "./routes/Admin/Settings";
 
 const adminOnlyRoutes: RouteObject[] = [
-  { path: "/admin", element: <Admin /> },
-  { path: "/users/:id", element: <User /> },
+  {
+    path: "admin",
+    element: <AdminLayout />,
+    children: [
+      { element: <AdminHome />, index: true },
+      { path: "products", element: <Products /> },
+      { path: "users", element: <Users /> },
+      { path: "settings", element: <Settings /> },
+    ],
+  },
+  { path: "users/:id", element: <User /> },
 ];
 
-const publicOnlyRoutes: RouteObject[] = [{ path: "/auth", element: <Auth /> }];
+const publicOnlyRoutes: RouteObject[] = [{ path: "auth", element: <Auth /> }];
 
-const protectedRoutes: RouteObject[] = [{ path: "/users/me", element: <Me /> }];
+const protectedRoutes: RouteObject[] = [{ path: "users/me", element: <Me /> }];
 
 const globalRoutes: RouteObject[] = [
-  { path: "/", element: <Home /> },
+  { element: <Home />, index: true },
   {
-    path: "/cart",
+    path: "cart",
     element: <Cart />,
   },
-  { path: "/wishlist", element: <Wishlist /> },
-  { path: "/search", element: <Search /> },
-  { path: "/products/:productId", element: <Product /> },
+  { path: "wishlist", element: <Wishlist /> },
+  { path: "search", element: <Search /> },
+  {
+    path: "products",
+    children: [{ path: ":productId", element: <Product /> }],
+  },
   // { path: "/products/:category", element: <Category /> },
   // { path: "/products/:category/:productId", element: <Product /> },
 ];
