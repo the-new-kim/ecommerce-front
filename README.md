@@ -10,8 +10,6 @@
 - [ ] Payment(stripe)
 - [ ] Delete stripe files
 
-### Routes
-
 ## global
 
 - /
