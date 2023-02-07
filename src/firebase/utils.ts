@@ -78,7 +78,6 @@ export const getProductsByMultiplIds = async (ids: string[]) => {
 //GET USERS ⚠️ Auth & Users collection
 
 interface IUserData {
-  docId: string;
   uid: User["uid"];
   displayName: User["displayName"];
   photoURL: User["photoURL"];
@@ -96,6 +95,5 @@ export const getUserData = async (uid: string) => {
 
   return {
     ...querySnapshot.docs[0].data(),
-    docId: querySnapshot.docs[0].id,
   } as IUserData;
 };

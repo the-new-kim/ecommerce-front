@@ -29,7 +29,6 @@ export default function SignInForm() {
       userData = await getUserData(firebaseAuth.currentUser.uid);
 
       setMe({
-        docId: "",
         uid: firebaseAuth.currentUser!.uid,
         displayName: firebaseAuth.currentUser!.displayName || "Anonym",
         email,

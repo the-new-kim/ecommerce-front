@@ -7,7 +7,6 @@ export interface ICartProduct {
 }
 
 export interface IMe {
-  docId: string;
   uid: User["uid"];
   displayName: User["displayName"];
   photoURL: User["photoURL"];
@@ -26,4 +25,9 @@ export const meAtom = atom<IMe | null>({
 export const headerHeightAtom = atom<number>({
   key: "headerHeightState",
   default: 0,
+});
+
+export const checkoutOptionAtom = atom<object | null>({
+  key: "checkoutOptionState",
+  default: null,
 });

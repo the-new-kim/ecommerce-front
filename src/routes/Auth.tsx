@@ -21,8 +21,12 @@ export default function Auth() {
     }
 
     if (!provider) return;
-
-    await signInWithPopup(firebaseAuth, provider);
+    try {
+      const popup = await signInWithPopup(firebaseAuth, provider);
+      console.log("POPUP USER:::", popup.user);
+    } catch (error) {
+      console.log("ERROR::::", error);
+    }
   };
 
   const toggleAccount = () => setNewAccount((prev) => !prev);

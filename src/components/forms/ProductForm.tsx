@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { addDoc, collection } from "firebase/firestore";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -17,23 +17,22 @@ import {
 } from "react-beautiful-dnd";
 
 import { IProduct } from "../../routes/Home";
-import { cls } from "../../libs/utils";
-import { ArrowsHorizontal, Trash, XCircle } from "phosphor-react";
+import { cls, fixPrice } from "../../libs/utils";
+import { ArrowsHorizontal, Trash } from "phosphor-react";
 
-interface ICategory {
-  id: string;
-  name: string;
-}
+import { createStripeProduct } from "../../libs/api";
+import Message from "../Message";
 
 export default function ProductForm() {
   const navigate = useNavigate();
   const [attachments, setAttachments] = useState<string[]>([]);
-  const [categories, setCategories] = useState<ICategory[]>([]);
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<IProduct>();
 
@@ -43,8 +42,12 @@ export default function ProductForm() {
     description,
     price,
     quantity,
+    active,
   }: IProduct) => {
-    let addedDoc = null;
+    setIsUploading(true);
+
+    const fixedPrice = fixPrice(price);
+
     let attachmentUrls = [];
 
     if (!!attachments.length) {
@@ -65,27 +68,41 @@ export default function ProductForm() {
       } catch (error) {
         console.log("ERROR:::", error);
       }
-
-      setValue("imageUrls", attachmentUrls);
     }
 
     try {
-      addedDoc = await addDoc(collection(firebaseDB, "products"), {
+      const newProduct = await addDoc(collection(firebaseDB, "products"), {
         createdAt: Date.now(),
         title,
         label,
         description,
         imageUrls: attachmentUrls,
-        price,
+        price: fixedPrice,
         quantity,
+        active,
       });
+
+      const default_price_data = {
+        unit_amount: Number(fixedPrice) * 100,
+        currency: "usd",
+      };
+
+      const stripeProductResult = await createStripeProduct({
+        name: title,
+        id: newProduct.id,
+        images: [],
+        default_price_data,
+        active,
+      });
+
+      console.log("STRIPE PRODUCT::", stripeProductResult);
+
+      navigate(`/products/${newProduct.id}`);
     } catch (error) {
       console.log("ERROR:::", error);
     }
 
-    if (addedDoc) {
-      navigate(`/products/${addedDoc.id}`);
-    }
+    setIsUploading(false);
   };
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,8 +136,6 @@ export default function ProductForm() {
     });
   };
 
-  const getCategories = async () => {};
-
   const onDragEnd = ({ destination, source }: DropResult) => {
     if (!destination || destination.index === source.index) return;
 
@@ -137,7 +152,9 @@ export default function ProductForm() {
 
   return (
     <>
+      {isUploading && <Message>Uploading...</Message>}
       <form
+        ref={formRef}
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col"
         onSubmit={handleSubmit(onSubmit)}
       >
@@ -193,7 +210,7 @@ export default function ProductForm() {
         </label>
 
         {/* CATEGORY */}
-        <label className="text-gray-700 text-sm font-bold mb-2">
+        {/* <label className="text-gray-700 text-sm font-bold mb-2">
           Category
           <input
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
@@ -205,18 +222,23 @@ export default function ProductForm() {
               * {errors.categoryId.message}
             </small>
           )}
-        </label>
+        </label> */}
 
-        {/* PRICE & QUANTITY */}
+        {/* PRICE & QUANTITY & ACTIVE */}
         <div className="flex">
           <label className="text-gray-700 text-sm font-bold mb-2 mr-2">
             Price
             <input
               className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
               type="number"
+              step="0.01"
+              defaultValue={9.99}
               placeholder="Price"
               {...register("price", {
                 required: "This field is required",
+                onBlur(event) {
+                  event.target.value = fixPrice(event.target.value);
+                },
               })}
             />
             {errors.price && (
@@ -231,14 +253,32 @@ export default function ProductForm() {
             <input
               className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
               type="number"
+              min={1}
+              defaultValue={100}
               placeholder="Quantity"
               {...register("quantity", {
                 required: "This field is required",
+                min: { value: 1, message: "The value should be bigger than 1" },
               })}
             />
             {errors.quantity && (
               <small className="text-red-300 font-medium">
                 * {errors.quantity.message}
+              </small>
+            )}
+          </label>
+
+          <label className="text-gray-700 text-sm font-bold mb-2">
+            Active
+            <input
+              className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
+              type="checkbox"
+              defaultChecked
+              {...register("active")}
+            />
+            {errors.active && (
+              <small className="text-red-300 font-medium">
+                * {errors.active.message}
               </small>
             )}
           </label>
@@ -251,8 +291,6 @@ export default function ProductForm() {
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
             type="file"
             accept="image/*"
-            // onChange={onFileChange}
-
             {...register("imageUrls", {
               onChange: onFileChange,
               validate: () => attachments.length > 0 || "No Images",
@@ -264,14 +302,6 @@ export default function ProductForm() {
             </small>
           )}
         </label>
-
-        {/* {!!attachments.length &&
-          attachments.map((attachment, index) => (
-            <div key={"attachment" + index}>
-              <img width={100} src={attachment} />
-              <button onClick={() => onClearAttachment(index)}>Clear</button>
-            </div>
-          ))} */}
 
         {!!attachments.length && (
           <DragDropContext onDragEnd={onDragEnd}>

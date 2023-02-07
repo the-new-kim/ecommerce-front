@@ -6,7 +6,9 @@
 - [ ] Category
 - [ ] Wishlist
 - [ ] Cart
+- [x] CRUD product with stripe api
 - [ ] Payment(stripe)
+- [ ] Delete stripe files
 
 ### Routes
 

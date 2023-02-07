@@ -23,6 +23,7 @@ import Users from "./routes/Admin/Users";
 import Products from "./routes/Admin/Products";
 import AdminLayout from "./routes/Admin/AdminLayout";
 import Settings from "./routes/Admin/Settings";
+import Checkout from "./routes/Checkout";
 
 const adminOnlyRoutes: RouteObject[] = [
   {
@@ -54,6 +55,7 @@ const globalRoutes: RouteObject[] = [
     path: "products",
     children: [{ path: ":productId", element: <Product /> }],
   },
+  { path: "checkout", element: <Checkout /> },
   // { path: "/products/:category", element: <Category /> },
   // { path: "/products/:category/:productId", element: <Product /> },
 ];

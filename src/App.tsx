@@ -2,10 +2,10 @@ import { onAuthStateChanged, User } from "firebase/auth";
 
 import { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
-import { ICartProduct, IMe, meAtom } from "./libs/atoms";
-import { firebaseAuth } from "./firebase/config";
+import { IMe, meAtom } from "./libs/atoms";
+import { firebaseAuth, firebaseDB } from "./firebase/config";
 import Router from "./Router";
-import { getUserData } from "./firebase/utils";
+import { doc, getDoc } from "firebase/firestore";
 
 function App() {
   const [firebaseInit, setFirebaseInit] = useState(false);
@@ -17,18 +17,19 @@ function App() {
       if (user) {
         const userCopy = JSON.parse(JSON.stringify(user)) as User; //https://github.com/firebase/firebase-js-sdk/issues/5722 📝 Firebase Recoil Issue...
 
-        const userData = await getUserData(userCopy.uid);
+        const docRef = doc(firebaseDB, "users", userCopy.uid);
+        const docSnap = await getDoc(docRef);
 
         const me: IMe = {
-          docId: userData.docId,
           uid: userCopy.uid,
           displayName: userCopy.displayName,
           photoURL: userCopy.photoURL,
           email: userCopy.email,
           phoneNumber: userCopy.phoneNumber,
-          isAdmin: userData.isAdmin,
-          wishlist: userData.wishlist,
-          cart: userData.cart.map((item) => JSON.parse(item)),
+          isAdmin: docSnap.data()?.isAdmin || false,
+          wishlist: docSnap.data()?.wishlist || [],
+          cart:
+            docSnap.data()?.cart.map((item: string) => JSON.parse(item)) || [],
         };
 
         setMe(me);

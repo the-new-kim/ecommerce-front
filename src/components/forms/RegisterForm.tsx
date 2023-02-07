@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +26,6 @@ export default function RegisterForm() {
   } = useForm<IRegisterForm>();
 
   const onSubmit = async ({ email, name, password }: IRegisterForm) => {
-    let docId = "";
     try {
       const response = await createUserWithEmailAndPassword(
         firebaseAuth,
@@ -41,27 +40,38 @@ export default function RegisterForm() {
         displayName: name,
       });
 
-      const addedDoc = await addDoc(collection(firebaseDB, "users"), {
-        uid: response.user.uid,
-        email: response.user.email,
-        displayName: response.user.displayName,
-        phoneNumber: response.user.phoneNumber,
-        photoURL: response.user.photoURL,
-        isAdmin: false,
-        createdAt: Date.now(),
-        wishlist: [],
-        cart: [],
-      });
+      // const addedDoc = await addDoc(collection(firebaseDB, "users"), {
+      //   uid: response.user.uid,
+      //   email: response.user.email,
+      //   displayName: response.user.displayName,
+      //   phoneNumber: response.user.phoneNumber,
+      //   photoURL: response.user.photoURL,
+      //   isAdmin: false,
+      //   createdAt: Date.now(),
+      //   wishlist: [],
+      //   cart: [],
+      // });
 
-      docId = addedDoc.id;
+      const settedDoc = await setDoc(
+        doc(firebaseDB, "users", response.user.uid),
+        {
+          email: response.user.email,
+          displayName: response.user.displayName,
+          phoneNumber: response.user.phoneNumber,
+          photoURL: response.user.photoURL,
+          isAdmin: false,
+          createdAt: Date.now(),
+          wishlist: [],
+          cart: [],
+        }
+      );
 
-      console.log("ADDED USER ID:::", addedDoc.id);
+      console.log("ADDED USER ID:::", settedDoc);
     } catch (error) {
       console.log("ERROR:::", error);
     }
     if (firebaseAuth.currentUser)
       setMe({
-        docId,
         uid: firebaseAuth.currentUser!.uid,
         displayName: firebaseAuth.currentUser!.displayName || "Anonym",
         email,

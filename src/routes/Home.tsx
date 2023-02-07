@@ -12,6 +12,7 @@ export interface IProduct {
   categoryId: string;
   imageUrls: string[];
   id: string;
+  active: boolean;
 }
 
 export default function Home() {
