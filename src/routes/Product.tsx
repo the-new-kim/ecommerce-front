@@ -7,6 +7,7 @@ import { firebaseDB } from "../firebase/config";
 import { IProduct } from "./Home";
 import H1 from "../components/typos/H1";
 import H3 from "../components/typos/H3";
+import { centToDollor } from "../libs/utils";
 
 export default function Product() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function Product() {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setProduct(docSnap.data() as IProduct);
+        setProduct({ ...docSnap.data(), id: docSnap.id } as IProduct);
       } else {
         // redirect or show error message
       }
@@ -131,7 +132,7 @@ export default function Product() {
           <H1>{product.title}</H1>
           <H3>{product.label}</H3>
           <div>
-            <span>${product.price}</span>
+            <span>{centToDollor(product.price)}</span>
             <hr />
             <span>{quantity}</span>
           </div>

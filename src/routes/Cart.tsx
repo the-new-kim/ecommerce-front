@@ -1,29 +1,40 @@
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useNavigate } from "react-router-dom";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import CartProduct from "../components/CartProduct";
+import Table from "../components/table/Table";
+
+import THead from "../components/table/THead";
+import THeadRow from "../components/table/THeadRow";
 
 import H1 from "../components/typos/H1";
 import { firebaseDB } from "../firebase/config";
 import { createStripePaymentIntent } from "../libs/api";
 
 import { checkoutOptionAtom, meAtom } from "../libs/atoms";
+import { centToDollor } from "../libs/utils";
 import { IProduct } from "./Home";
 
 export default function Cart() {
   const navgate = useNavigate();
-  const [me, setMe] = useRecoilState(meAtom);
-  const [cartItems, setCartItems] = useState<IProduct[]>([]);
+
+  const me = useRecoilValue(meAtom);
+  const [cartProducts, setCartProducts] = useState<IProduct[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const setCheckoutOptions = useSetRecoilState(checkoutOptionAtom);
 
   useEffect(() => {
+    console.log(cartProducts);
+  }, [cartProducts]);
+
+  useEffect(() => {
+    if (!me || !me.cart.length) return;
+
     (async () => {
       let myCart: IProduct[] = [];
 
-      if (!me?.cart.length) return setCartItems(myCart);
-
-      for (let i = 0; i <= me.cart.map.length; i++) {
+      for (let i = 0; i < me.cart.length; i++) {
         try {
           const docRef = doc(firebaseDB, "products", me.cart[i].productId);
           const docSnap = await getDoc(docRef);
@@ -45,49 +56,18 @@ export default function Cart() {
       }
       setTotalAmount(
         myCart
-          .map((item) => Number(item.price) * Number(item.quantity))
+          .map((product) => product.price * product.quantity)
           .reduce((accumulator, currentValue) => accumulator + currentValue)
       );
-      setCartItems(myCart);
+      setCartProducts(myCart);
     })();
-  }, [me, me?.cart]);
-
-  const onRemoveClick = async (id: string) => {
-    //1️⃣ Filter cart items
-
-    const filteredCart = me!.cart.filter((item) => item.productId !== id);
-
-    //2️⃣ Stringify before update firestore document
-    const stringifiedCart = filteredCart.map((item) => {
-      return JSON.stringify(item);
-    });
-
-    //3️⃣ Update document
-    const docRef = doc(firebaseDB, "users", me!.uid);
-    await updateDoc(docRef, {
-      cart: stringifiedCart,
-    });
-
-    //2️⃣ update recoil state
-
-    setMe((oldMe) => {
-      if (!oldMe) return oldMe;
-
-      const newMe = { ...oldMe, cart: filteredCart };
-
-      return newMe;
-    });
-  };
-
-  const onProductClick = (id: string) => {
-    navgate(`/products/${id}`);
-  };
+  }, [me]);
 
   const onCheckoutClick = async () => {
     // 1️⃣ Create payment intent
 
     const stripePaymentIntentResult = await createStripePaymentIntent({
-      amount: totalAmount * 100,
+      amount: totalAmount,
       currency: "usd",
       automatic_payment_methods: { enabled: true },
     });
@@ -106,61 +86,31 @@ export default function Cart() {
   return (
     <div className="p-5 ">
       <H1>Cart</H1>
-      {!!cartItems.length && (
+      {!!cartProducts.length && (
         <>
-          <table className="text-start mt-5 w-full">
-            <thead>
-              <tr className="[&>*]:p-3 border-b-2 border-black">
+          <Table>
+            <THead>
+              <THeadRow>
                 <th className="w-[60%] text-start">Item</th>
                 <th className="text-center">Quantity</th>
                 <th className="text-right">Subtotal</th>
-              </tr>
-            </thead>
+              </THeadRow>
+            </THead>
             <tbody>
-              {cartItems.map((item, index) => (
-                <tr
-                  key={"cartItem" + index}
-                  className="[&>*]:p-3 border-b-[1px] border-black"
-                >
-                  <td className="flex justify-start items-center group">
-                    <span className="relative w-20 max-w-[40%] aspect-square mr-3 overflow-hidden">
-                      <img
-                        className="object-cover w-full h-full"
-                        src={item.imageUrls[0]}
-                      />
-                      <button
-                        onClick={() => onRemoveClick(item.id)}
-                        className="absolute top-1 left-1 w-5 h-5 rounded-full bg-red-400 flex justify-center items-center opacity-0 group-hover:opacity-100"
-                      >
-                        X
-                      </button>
-                    </span>
-                    <span className="hover:underline">
-                      <Link to={`/products/${item.id}`}>{item.title}</Link>
-                    </span>
-                  </td>
-                  <td className="text-center">
-                    <button>+</button>
-                    {item.quantity}
-                    <button>-</button>
-                  </td>
-                  <td className="text-right">
-                    $ {Number(item.quantity) * Number(item.price)}
-                  </td>
-                </tr>
+              {cartProducts.map((cartProduct, index) => (
+                <CartProduct
+                  key={`cart-product${index}`}
+                  cartProduct={cartProduct}
+                />
               ))}
-
               <tr className="[&>*]:p-3">
                 <td>Subtotal includes:</td>
                 <td></td>
-                <td className="text-right">$ {totalAmount}</td>
+                <td className="text-right">{centToDollor(totalAmount)}</td>
               </tr>
             </tbody>
-          </table>
+          </Table>
 
-          {/* <Link to="/checkout" className="p-3 bg-blue-200">
-            Checkout
-          </Link> */}
           <button className="p-3 bg-blue-200" onClick={onCheckoutClick}>
             Checkout
           </button>

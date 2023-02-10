@@ -43,7 +43,7 @@ export const createStripeProduct = async ({
       body: JSON.stringify({
         name,
         id,
-        url: `${process.env.REACT_APP_ROOT_PATH}/products/${id}`,
+        url: `${window.location.origin}/products/${id}`,
         images,
         default_price_data,
         active,
@@ -107,7 +107,7 @@ export const createStripePaymentIntent = async ({
 }: ICreateStripePaymentIntentProps) => {
   const result = await (
     await fetch(
-      `${process.env.REACT_APP_BACKEND_BASE_URL}/payment_intents/create`,
+      `${process.env.REACT_APP_BACKEND_BASE_URL}/payment-intents/create`,
       {
         method: "POST",
         headers: {

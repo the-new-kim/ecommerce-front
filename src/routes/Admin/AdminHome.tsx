@@ -1,12 +1,20 @@
 import ProductForm from "../../components/forms/ProductForm";
 
-export default function AdminHome() {
-  return (
-    <div className="p-5">
-      <h1>Admin</h1>
+import useFirebaseDocs from "../../firebase/hooks/useFirebaseDocs";
+import { getFirebaseDocs } from "../../firebase/utils";
+import { IOrder } from "../../libs/atoms";
 
-      <h3>Add New Product</h3>
-      <ProductForm />
+export default function AdminHome() {
+  const orders = useFirebaseDocs<IOrder[]>(() => getFirebaseDocs("orders"));
+
+  console.log(
+    "ORDERS:::",
+    orders?.map((order) => order.orderer)
+  );
+
+  return (
+    <div>
+      <h1>Dash board</h1>
     </div>
   );
 }

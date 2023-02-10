@@ -17,7 +17,11 @@ export const extractStripeImages = (
 export const fixPrice = (price: number | string) => {
   if (Number.isNaN(price)) return "0.00";
   if (typeof price === "string") {
-    return (price = Number(price)).toFixed(2);
+    return (price = parseFloat(price)).toFixed(2);
   }
   return price.toFixed(2);
+};
+
+export const centToDollor = (cent: number) => {
+  return `$ ${cent * 0.01}`;
 };

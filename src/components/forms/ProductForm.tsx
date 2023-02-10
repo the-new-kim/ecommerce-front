@@ -45,7 +45,7 @@ export default function ProductForm() {
     active,
   }: IProduct) => {
     setIsUploading(true);
-
+    console.log("Quantity:::", typeof quantity);
     const fixedPrice = fixPrice(price);
 
     let attachmentUrls = [];
@@ -77,13 +77,14 @@ export default function ProductForm() {
         label,
         description,
         imageUrls: attachmentUrls,
-        price: fixedPrice,
-        quantity,
+        price: parseFloat(fixedPrice) * 100,
+        quantity: typeof quantity === "string" ? parseInt(quantity) : quantity,
         active,
+        sold: 0,
       });
 
       const default_price_data = {
-        unit_amount: Number(fixedPrice) * 100,
+        unit_amount: parseFloat(fixedPrice) * 100,
         currency: "usd",
       };
 

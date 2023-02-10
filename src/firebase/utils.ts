@@ -14,23 +14,51 @@ export const getProducts = async () => {
   let results: IProduct[] = [];
   const q = query(collection(firebaseDB, "products"));
 
-  try {
-    const querySnapshot = await getDocs(q);
+  const querySnapshot = await getDocs(q);
 
-    const allProducts = querySnapshot.docs.map((doc) => {
-      return {
-        ...doc.data(),
-        id: doc.id,
-      } as IProduct;
-    });
+  const allProducts = querySnapshot.docs.map((doc) => {
+    return {
+      ...doc.data(),
+      id: doc.id,
+    } as IProduct;
+  });
 
-    results = allProducts;
-  } catch (error) {
-    console.log(error);
-  }
+  results = allProducts;
 
   return results;
 };
+
+//////////
+//////////
+//////////
+//////////
+//////////
+
+export const getFirebaseDoc = async <T>(name: string, id: string) => {
+  const docRef = doc(firebaseDB, name, id);
+  const docSnap = await getDoc(docRef);
+
+  return { ...docSnap.data(), id: docSnap.id } as T;
+};
+
+export const getFirebaseDocs = async <T>(name: string) => {
+  const q = query(collection(firebaseDB, name));
+
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map((doc) => {
+    return {
+      ...doc.data(),
+      id: doc.id,
+    } as T;
+  });
+};
+
+///////////
+///////////
+///////////
+///////////
+///////////
 
 export const getProductsById = async (id: string) => {
   let results: IProduct[] = [];
@@ -54,7 +82,7 @@ export const getProductsById = async (id: string) => {
   return results;
 };
 
-export const getProductsByMultiplIds = async (ids: string[]) => {
+export const getProductsByMultipleIds = async (ids: string[]) => {
   const results: IProduct[] = [];
 
   for (let i = 0; i < ids.length; i++) {
@@ -86,6 +114,7 @@ interface IUserData {
   isAdmin: boolean;
   wishlist: string[];
   cart: string[];
+  orders: string[];
 }
 
 export const getUserData = async (uid: string) => {

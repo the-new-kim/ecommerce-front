@@ -2,10 +2,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-import { meAtom } from "../../libs/atoms";
 import { firebaseAuth } from "../../firebase/config";
-import { getUserData } from "../../firebase/utils";
 
 interface ISignInForm {
   email: string;
@@ -14,32 +11,31 @@ interface ISignInForm {
 
 export default function SignInForm() {
   const navigate = useNavigate();
-  const setMe = useSetRecoilState(meAtom);
 
-  const { register, handleSubmit } = useForm<ISignInForm>();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<ISignInForm>();
 
   const onSubmit = async ({ email, password }: ISignInForm) => {
-    let userData;
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, password);
     } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.includes("password")) {
+          setError("password", { message: "Wrong password." });
+        }
+        if (error.message.includes("user")) {
+          setError("email", { message: "User not found." });
+        }
+      }
       console.log("ERROR:::", error);
     }
     if (firebaseAuth.currentUser) {
-      userData = await getUserData(firebaseAuth.currentUser.uid);
-
-      setMe({
-        uid: firebaseAuth.currentUser!.uid,
-        displayName: firebaseAuth.currentUser!.displayName || "Anonym",
-        email,
-        phoneNumber: firebaseAuth.currentUser!.phoneNumber,
-        photoURL: firebaseAuth.currentUser!.photoURL,
-        isAdmin: false,
-        cart: [],
-        wishlist: [],
-      });
+      navigate("/");
     }
-    navigate("/");
   };
 
   return (
@@ -55,6 +51,11 @@ export default function SignInForm() {
             type="email"
             {...register("email", { required: true })}
           />
+          {errors.email && (
+            <small className="text-red-300 font-medium">
+              * {errors.email.message}
+            </small>
+          )}
         </label>
         <label className="block text-gray-700 text-sm font-bold mb-2">
           Password
@@ -64,6 +65,11 @@ export default function SignInForm() {
             placeholder="Password"
             {...register("password", { required: true })}
           />
+          {errors.password && (
+            <small className="text-red-300 font-medium">
+              * {errors.password.message}
+            </small>
+          )}
         </label>
         <input
           className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

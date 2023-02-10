@@ -29,7 +29,11 @@ function App() {
           isAdmin: docSnap.data()?.isAdmin || false,
           wishlist: docSnap.data()?.wishlist || [],
           cart:
-            docSnap.data()?.cart.map((item: string) => JSON.parse(item)) || [],
+            docSnap
+              .data()
+              ?.cart.map((cartProduct: string) => JSON.parse(cartProduct)) ||
+            [],
+          orders: docSnap.data()?.orders || [],
         };
 
         setMe(me);

@@ -6,6 +6,13 @@ export interface ICartProduct {
   quantity: number;
 }
 
+export interface IOrder {
+  products: ICartProduct[];
+  orderer: string;
+  shipping: boolean;
+  total: number;
+}
+
 export interface IMe {
   uid: User["uid"];
   displayName: User["displayName"];
@@ -15,6 +22,7 @@ export interface IMe {
   isAdmin: boolean;
   wishlist: string[];
   cart: ICartProduct[];
+  orders: string[];
 }
 
 export const meAtom = atom<IMe | null>({

@@ -8,7 +8,6 @@ import { IMe, meAtom } from "./libs/atoms";
 
 import Layout from "./Layout";
 import NotFound from "./routes/NotFound";
-
 import Home from "./routes/Home";
 import User from "./routes/User";
 import Auth from "./routes/Auth";
@@ -18,12 +17,16 @@ import Search from "./routes/Search";
 import Category from "./routes/Category";
 import Product from "./routes/Product";
 import Me from "./routes/Me";
-import AdminHome from "./routes/Admin/AdminHome";
-import Users from "./routes/Admin/Users";
-import Products from "./routes/Admin/Products";
-import AdminLayout from "./routes/Admin/AdminLayout";
-import Settings from "./routes/Admin/Settings";
+import AdminHome from "./routes/admin/AdminHome";
+import ProductsHome from "./routes/admin/products/ProductsHome";
+import AdminLayout from "./routes/admin/AdminLayout";
+import Settings from "./routes/admin/Settings";
 import Checkout from "./routes/Checkout";
+import Completion from "./routes/Completion";
+import CreateProduct from "./routes/admin/products/CreateProduct";
+import UsersHome from "./routes/admin/users/UsersHome";
+import OrdersHome from "./routes/admin/orders/OrdersHome";
+import EditProduct from "./routes/admin/products/EditProduct";
 
 const adminOnlyRoutes: RouteObject[] = [
   {
@@ -31,8 +34,16 @@ const adminOnlyRoutes: RouteObject[] = [
     element: <AdminLayout />,
     children: [
       { element: <AdminHome />, index: true },
-      { path: "products", element: <Products /> },
-      { path: "users", element: <Users /> },
+      {
+        path: "products",
+        children: [
+          { element: <ProductsHome />, index: true },
+          { path: "create", element: <CreateProduct /> },
+          { path: ":id", element: <EditProduct /> },
+        ],
+      },
+      { path: "users", children: [{ element: <UsersHome />, index: true }] },
+      { path: "orders", children: [{ element: <OrdersHome />, index: true }] },
       { path: "settings", element: <Settings /> },
     ],
   },
@@ -56,6 +67,8 @@ const globalRoutes: RouteObject[] = [
     children: [{ path: ":productId", element: <Product /> }],
   },
   { path: "checkout", element: <Checkout /> },
+  { path: "completion", element: <Completion /> },
+
   // { path: "/products/:category", element: <Category /> },
   // { path: "/products/:category/:productId", element: <Product /> },
 ];

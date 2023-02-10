@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import AdminNav from "../../components/AdminNav";
-import ProductForm from "../../components/forms/ProductForm";
 
 export default function AdminLayout() {
   return (
@@ -8,7 +7,7 @@ export default function AdminLayout() {
       <div className="col-span-2">
         <AdminNav />
       </div>
-      <div className="col-span-10 col-start-3">
+      <div className="col-span-10 col-start-3 flex flex-col p-5 justify-start items-start">
         <Outlet />
       </div>
     </div>

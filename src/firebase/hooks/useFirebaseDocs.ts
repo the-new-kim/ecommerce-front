@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 
-export default function useFirebaseDocs<T>(getFunction: () => Promise<T>) {
+export default function useFirebaseDocs<T>(callback: () => Promise<T>) {
   const [docs, setDocs] = useState<T>();
 
   useEffect(() => {
     (async () => {
-      const results = await getFunction();
-      setDocs(results);
+      try {
+        const results = await callback();
+        setDocs(results);
+      } catch (error) {
+        console.log("Error::::", error);
+      }
     })();
   }, []);
 

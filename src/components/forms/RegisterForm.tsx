@@ -63,6 +63,7 @@ export default function RegisterForm() {
           createdAt: Date.now(),
           wishlist: [],
           cart: [],
+          orders: [],
         }
       );
 
@@ -80,6 +81,7 @@ export default function RegisterForm() {
         isAdmin: false,
         wishlist: [],
         cart: [],
+        orders: [],
       });
     console.log("AUTH CURRENT USER:::", firebaseAuth.currentUser);
 

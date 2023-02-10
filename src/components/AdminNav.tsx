@@ -13,6 +13,9 @@ export default function AdminNav() {
         <li>
           <Link to="/admin/products">Products</Link>
         </li>
+        <li>
+          <Link to="/admin/orders">Orders</Link>
+        </li>
         <hr />
         <li>
           <Link to="/admin/settings">Settings</Link>
