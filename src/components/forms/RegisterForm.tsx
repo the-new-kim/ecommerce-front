@@ -1,10 +1,10 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
-import { meAtom } from "../../libs/atoms";
+import { userAtom } from "../../libs/atoms";
 import { firebaseAuth, firebaseDB } from "../../firebase/config";
 
 interface IRegisterForm {
@@ -16,7 +16,7 @@ interface IRegisterForm {
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const setMe = useSetRecoilState(meAtom);
+  const setUser = useSetRecoilState(userAtom);
 
   const {
     register,
@@ -40,25 +40,13 @@ export default function RegisterForm() {
         displayName: name,
       });
 
-      // const addedDoc = await addDoc(collection(firebaseDB, "users"), {
-      //   uid: response.user.uid,
-      //   email: response.user.email,
-      //   displayName: response.user.displayName,
-      //   phoneNumber: response.user.phoneNumber,
-      //   photoURL: response.user.photoURL,
-      //   isAdmin: false,
-      //   createdAt: Date.now(),
-      //   wishlist: [],
-      //   cart: [],
-      // });
-
       const settedDoc = await setDoc(
         doc(firebaseDB, "users", response.user.uid),
         {
-          email: response.user.email,
-          displayName: response.user.displayName,
-          phoneNumber: response.user.phoneNumber,
-          photoURL: response.user.photoURL,
+          // email: response.user.email,
+          // displayName: response.user.displayName,
+          // phoneNumber: response.user.phoneNumber,
+          // photoURL: response.user.photoURL,
           isAdmin: false,
           createdAt: Date.now(),
           wishlist: [],
@@ -72,12 +60,12 @@ export default function RegisterForm() {
       console.log("ERROR:::", error);
     }
     if (firebaseAuth.currentUser)
-      setMe({
-        uid: firebaseAuth.currentUser!.uid,
-        displayName: firebaseAuth.currentUser!.displayName || "Anonym",
+      setUser({
+        id: firebaseAuth.currentUser.uid,
+        displayName: firebaseAuth.currentUser.displayName || "Anonym",
         email,
-        phoneNumber: firebaseAuth.currentUser!.phoneNumber,
-        photoURL: firebaseAuth.currentUser!.photoURL,
+        phoneNumber: firebaseAuth.currentUser.phoneNumber,
+        photoURL: firebaseAuth.currentUser.photoURL,
         isAdmin: false,
         wishlist: [],
         cart: [],

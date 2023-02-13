@@ -2,16 +2,17 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { headerHeightAtom, ICartProduct, meAtom } from "../libs/atoms";
+import { headerHeightAtom, userAtom } from "../libs/atoms";
 import { firebaseDB } from "../firebase/config";
-import { IProduct } from "./Home";
+
 import H1 from "../components/typos/H1";
 import H3 from "../components/typos/H3";
 import { centToDollor } from "../libs/utils";
+import { ICartProduct, IProductDoc } from "../firebase/types";
 
 export default function Product() {
   const navigate = useNavigate();
-  const [me, setMe] = useRecoilState(meAtom);
+  const [me, setUser] = useRecoilState(userAtom);
 
   const { productId } = useParams();
 
@@ -19,24 +20,26 @@ export default function Product() {
 
   // const product = useFirebaseSingleDoc()
 
-  const [product, setProduct] = useState<IProduct>();
+  const [product, setProduct] = useState<IProductDoc>();
 
   const [quantity, setQuantity] = useState(1);
 
   const getProduct = async () => {
-    if (!productId) return;
+    if (productId) {
+      try {
+        const docRef = doc(firebaseDB, "products", productId);
+        const docSnap = await getDoc(docRef);
 
-    try {
-      const docRef = doc(firebaseDB, "products", productId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        setProduct({ ...docSnap.data(), id: docSnap.id } as IProduct);
-      } else {
-        // redirect or show error message
+        if (docSnap.exists()) {
+          setProduct({ ...docSnap.data(), id: docSnap.id } as IProductDoc);
+        } else {
+          // redirect or show error message
+        }
+      } catch (error) {
+        console.log("ERROR:::", error);
       }
-    } catch (error) {
-      console.log("ERROR:::", error);
+    } else {
+      // redirect or show error message
     }
   };
 
@@ -81,31 +84,30 @@ export default function Product() {
       return { ...item };
     });
 
-    const stringifiedCart = cartCopy.map((item) => {
+    const newCart = cartCopy.map((item) => {
       if (item.productId === cartProduct.productId) {
         item.quantity += cartProduct.quantity;
         matched = true;
       }
 
-      return JSON.stringify(item);
+      return item;
     });
 
     if (!matched) {
-      stringifiedCart.push(JSON.stringify(cartProduct));
+      newCart.push(cartProduct);
     }
 
-    setMe((prev) => {
+    setUser((prev) => {
       if (!prev) return prev;
       const newMe = { ...prev };
-      const parsedCart = stringifiedCart.map((item) => JSON.parse(item));
-      newMe.cart = parsedCart;
 
+      newMe.cart = newCart;
       return newMe;
     });
 
-    const docRef = doc(firebaseDB, "users", me.uid);
+    const docRef = doc(firebaseDB, "users", me.id);
     await updateDoc(docRef, {
-      cart: stringifiedCart,
+      cart: newCart,
     });
 
     // ON SUCCESS MESSAGE
@@ -143,15 +145,6 @@ export default function Product() {
             Add to Cart
           </button>
           <p>{product.description}</p>
-
-          {me?.isAdmin && (
-            <button
-              className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              // onClick={onDeleteClick}
-            >
-              {product.active ? "Deactivate Product" : "Activate Product"}
-            </button>
-          )}
         </div>
       </div>
     </>

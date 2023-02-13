@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -10,17 +10,17 @@ import THeadRow from "../components/table/THeadRow";
 
 import H1 from "../components/typos/H1";
 import { firebaseDB } from "../firebase/config";
+import { IProductDoc } from "../firebase/types";
 import { createStripePaymentIntent } from "../libs/api";
 
-import { checkoutOptionAtom, meAtom } from "../libs/atoms";
+import { checkoutOptionAtom, userAtom } from "../libs/atoms";
 import { centToDollor } from "../libs/utils";
-import { IProduct } from "./Home";
 
 export default function Cart() {
   const navgate = useNavigate();
 
-  const me = useRecoilValue(meAtom);
-  const [cartProducts, setCartProducts] = useState<IProduct[]>([]);
+  const me = useRecoilValue(userAtom);
+  const [cartProducts, setCartProducts] = useState<IProductDoc[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const setCheckoutOptions = useSetRecoilState(checkoutOptionAtom);
 
@@ -32,7 +32,9 @@ export default function Cart() {
     if (!me || !me.cart.length) return;
 
     (async () => {
-      let myCart: IProduct[] = [];
+      let myCart: IProductDoc[] = [];
+
+      if (!me.cart.length) return;
 
       for (let i = 0; i < me.cart.length; i++) {
         try {
@@ -44,7 +46,7 @@ export default function Cart() {
               ...docSnap.data(),
               quantity: me.cart[i].quantity,
               id: docSnap.id,
-            } as IProduct;
+            } as IProductDoc;
 
             myCart.push(foundItem);
           } else {
@@ -54,6 +56,8 @@ export default function Cart() {
           console.log("ERROR:::", error);
         }
       }
+
+      if (!myCart.length) return;
       setTotalAmount(
         myCart
           .map((product) => product.price * product.quantity)
@@ -67,7 +71,7 @@ export default function Cart() {
     // 1️⃣ Create payment intent
 
     const stripePaymentIntentResult = await createStripePaymentIntent({
-      amount: totalAmount,
+      amount: totalAmount, //TO CORRECT ⚠️⚠️⚠️ USE STRIPE PRICE ...
       currency: "usd",
       automatic_payment_methods: { enabled: true },
     });

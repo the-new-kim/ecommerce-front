@@ -1,69 +1,84 @@
 import { v4 as uuidv4 } from "uuid";
-
-import { addDoc, collection } from "firebase/firestore";
-import { useRef, useState } from "react";
-
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-
-import { firebaseDB, firebaseStorage } from "../../firebase/config";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
-
+import { firebaseDB, firebaseStorage } from "../../../firebase/config";
 import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadString,
+} from "firebase/storage";
 
-import { IProduct } from "../../routes/Home";
-import { cls, fixPrice } from "../../libs/utils";
-import { ArrowsHorizontal, Trash } from "phosphor-react";
+import { fixPrice } from "../../../libs/utils";
+import {
+  createStripePrice,
+  createStripeProduct,
+  updateStripePrice,
+  updateStripeProduct,
+} from "../../../libs/api";
+import Message from "../../Message";
+import { IProductDoc } from "../../../firebase/types";
+import AttachmentDND from "./AttachmentDND";
 
-import { createStripeProduct } from "../../libs/api";
-import Message from "../Message";
+interface IProductFormProps {
+  defaultValue?: IProductDoc;
+}
 
-export default function ProductForm() {
+export default function ProductForm({ defaultValue }: IProductFormProps) {
   const navigate = useNavigate();
-  const [attachments, setAttachments] = useState<string[]>([]);
+  const [attachments, setAttachments] = useState<string[]>(
+    defaultValue?.imageUrls || []
+  );
 
   const formRef = useRef<HTMLFormElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<IProduct>();
+    watch,
 
-  const onSubmit = async ({
+    formState: { errors, isDirty, dirtyFields },
+  } = useForm<IProductDoc>();
+
+  useEffect(() => {
+    if (!disabled) return;
+    watch();
+  }, [disabled]);
+
+  useEffect(() => {
+    console.log("DIRTY:::", dirtyFields);
+    console.log("PRICE DIRTY:::", !!dirtyFields.price);
+  }, [dirtyFields]);
+
+  const onCreate = async ({
     title,
     label,
     description,
     price,
     quantity,
     active,
-  }: IProduct) => {
+  }: IProductDoc) => {
     setIsUploading(true);
-    console.log("Quantity:::", typeof quantity);
+
     const fixedPrice = fixPrice(price);
 
-    let attachmentUrls = [];
+    let imageUrls: string[] = [];
 
     if (!!attachments.length) {
-      const fileRefs = attachments.map((_) =>
-        ref(firebaseStorage, `products/${uuidv4()}`)
-      );
-
       try {
         for (let i = 0; i < attachments.length; i++) {
+          const fileRef = ref(firebaseStorage, `products/${uuidv4()}`);
           const response = await uploadString(
-            fileRefs[i],
+            fileRef,
             attachments[i],
             "data_url"
           );
-          const attachmentUrl = await getDownloadURL(response.ref);
-          attachmentUrls.push(attachmentUrl);
+          const downloadUrl = await getDownloadURL(response.ref);
+          imageUrls.push(downloadUrl);
         }
       } catch (error) {
         console.log("ERROR:::", error);
@@ -76,7 +91,7 @@ export default function ProductForm() {
         title,
         label,
         description,
-        imageUrls: attachmentUrls,
+        imageUrls,
         price: parseFloat(fixedPrice) * 100,
         quantity: typeof quantity === "string" ? parseInt(quantity) : quantity,
         active,
@@ -91,7 +106,6 @@ export default function ProductForm() {
       const stripeProductResult = await createStripeProduct({
         name: title,
         id: newProduct.id,
-        images: [],
         default_price_data,
         active,
       });
@@ -102,6 +116,133 @@ export default function ProductForm() {
     } catch (error) {
       console.log("ERROR:::", error);
     }
+
+    setIsUploading(false);
+  };
+
+  const onUpdate = async ({
+    title,
+    label,
+    description,
+    price,
+    quantity,
+    active,
+  }: IProductDoc) => {
+    if (!defaultValue) return;
+    setIsUploading(true);
+
+    // ⭐️ Handle Attachment
+
+    // 1️⃣ Compare defaultValue.imageUrls & attachments
+    const imageUrlsToDelete = defaultValue?.imageUrls.filter(
+      (imageUrl) => !attachments.includes(imageUrl)
+    );
+
+    // console.log("To Delete:::", imageUrlsToDelete);
+
+    // 2️⃣ Delete Image from FireStorage
+    if (imageUrlsToDelete && !!imageUrlsToDelete.length) {
+      for (let i = 0; i < imageUrlsToDelete.length; i++) {
+        // console.log("ITEM TO DEL:::", imageUrlsToDelete[i]);
+        const imageUrl = imageUrlsToDelete[i];
+        const imageRef = ref(firebaseStorage, imageUrl);
+        try {
+          await deleteObject(imageRef);
+        } catch (error) {
+          console.log("ERROR:::", error);
+        }
+      }
+    }
+
+    // 3️⃣ Upload Image to FireStorage
+    let imageUrls: string[] = [];
+
+    for (let i = 0; i < attachments.length; i++) {
+      let attachment = attachments[i];
+      if (!attachment.includes("firebase")) {
+        try {
+          const fileRef = ref(firebaseStorage, `products/${uuidv4()}`);
+          const response = await uploadString(fileRef, attachment, "data_url");
+          attachment = await getDownloadURL(response.ref);
+          imageUrls.push(attachment);
+        } catch (error) {
+          console.log("ERROR:::", error);
+        }
+      } else {
+        imageUrls.push(attachment);
+      }
+    }
+
+    // ⭐️ Handle update Firestore & Stripe Product
+
+    //1️⃣ Update Firebase Doc
+    const fixedPrice = Math.round(parseFloat(fixPrice(price)) * 100);
+
+    // Compare old and new prices...
+
+    let default_price = "";
+
+    if (fixedPrice !== defaultValue.price) {
+      // create new stripe price
+
+      const newPrice = {
+        unit_amount: fixedPrice,
+        currency: "usd",
+        product: defaultValue.id,
+      };
+
+      const newStripePriceResult = await createStripePrice({ ...newPrice });
+
+      console.log("STRIPE NEW PRICE RESULT::", newStripePriceResult);
+    }
+
+    try {
+      await updateDoc(doc(firebaseDB, "products", defaultValue.id), {
+        title,
+        label,
+        description,
+        imageUrls,
+        price: fixedPrice,
+        quantity: typeof quantity === "string" ? parseInt(quantity) : quantity,
+        active,
+      });
+    } catch (error) {
+      console.log("ERROR:::", error);
+    }
+
+    // 2️⃣ Stripe
+
+    const stripeUpdateProductResult = await updateStripeProduct({
+      name: title,
+      id: defaultValue.id,
+      active,
+      default_price,
+    });
+
+    console.log("Stripe Update Result::::", stripeUpdateProductResult);
+
+    // if !!dirtyFields.price Deactivate old price & Create new price
+    // if (!!dirtyFields.price) {
+    //   if (stripeUpdateProductResult.ok && stripeUpdateProductResult.data) {
+    //     const newPrice = {
+    //       unit_amount: fixedPrice,
+    //       currency: "usd",
+    //       product: defaultValue.id,
+    //     };
+
+    //     const newStripePriceResult = await createStripePrice({ ...newPrice });
+
+    //     console.log("STRIPE NEW PRICE RESULT::", newStripePriceResult);
+
+    //     const oldPriceId: string = stripeUpdateProductResult.data.default_price;
+
+    //     const stripeUpdatePriceResult = await updateStripePrice(
+    //       oldPriceId,
+    //       false
+    //     );
+    //     console.log("STRIPE Old Price Reulst:::", stripeUpdatePriceResult);
+    //   }
+    // }
 
     setIsUploading(false);
   };
@@ -128,36 +269,15 @@ export default function ProductForm() {
     reader.readAsDataURL(file);
   };
 
-  const onClearAttachment = (index: number) => {
-    setAttachments((prev) => {
-      const newArray = prev;
-      newArray.splice(index, 1);
-
-      return newArray;
-    });
-  };
-
-  const onDragEnd = ({ destination, source }: DropResult) => {
-    if (!destination || destination.index === source.index) return;
-
-    setAttachments((prev) => {
-      const newArray = [...prev];
-      const draggingItem = newArray[source.index];
-
-      newArray.splice(source.index, 1);
-      newArray.splice(destination.index, 0, draggingItem);
-
-      return newArray;
-    });
-  };
-
   return (
     <>
       {isUploading && <Message>Uploading...</Message>}
       <form
         ref={formRef}
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={
+          defaultValue ? handleSubmit(onUpdate) : handleSubmit(onCreate)
+        }
       >
         {/* TITLE */}
         <label className="text-gray-700 text-sm font-bold mb-2">
@@ -165,6 +285,7 @@ export default function ProductForm() {
           <input
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
+            defaultValue={defaultValue?.title || undefined}
             {...register("title", { required: "This field is required" })}
           />
           {errors.title && (
@@ -180,6 +301,7 @@ export default function ProductForm() {
           <input
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
+            defaultValue={defaultValue?.label || undefined}
             {...register("label", { required: "This field is required" })}
           />
           {errors.label && (
@@ -195,6 +317,7 @@ export default function ProductForm() {
           <textarea
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
             placeholder="Description"
+            defaultValue={defaultValue?.description || undefined}
             {...register("description", {
               required: "This field is required",
               minLength: {
@@ -233,7 +356,11 @@ export default function ProductForm() {
               className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
               type="number"
               step="0.01"
-              defaultValue={9.99}
+              defaultValue={
+                defaultValue?.price
+                  ? fixPrice(defaultValue?.price! * 0.01)
+                  : 9.99
+              }
               placeholder="Price"
               {...register("price", {
                 required: "This field is required",
@@ -255,7 +382,7 @@ export default function ProductForm() {
               className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
               type="number"
               min={1}
-              defaultValue={100}
+              defaultValue={defaultValue?.quantity || 100}
               placeholder="Quantity"
               {...register("quantity", {
                 required: "This field is required",
@@ -269,19 +396,16 @@ export default function ProductForm() {
             )}
           </label>
 
-          <label className="text-gray-700 text-sm font-bold mb-2">
+          <label className="text-gray-700 text-sm font-bold mb-2 flex flex-col">
             Active
-            <input
-              className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
-              type="checkbox"
-              defaultChecked
-              {...register("active")}
-            />
-            {errors.active && (
-              <small className="text-red-300 font-medium">
-                * {errors.active.message}
-              </small>
-            )}
+            <div className="w-full h-full flex justify-center items-center">
+              <input
+                className="mt-1 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 rounded-md sm:text-sm focus:ring-1"
+                type="checkbox"
+                defaultChecked={defaultValue?.active === false ? false : true}
+                {...register("active")}
+              />
+            </div>
           </label>
         </div>
 
@@ -305,54 +429,18 @@ export default function ProductForm() {
         </label>
 
         {!!attachments.length && (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="images" direction="horizontal">
-              {(magic) => (
-                <div
-                  className="flex justify-start items-center bg-white border shadow-sm border-slate-300 rounded-md p-3 overflow-x-scroll"
-                  ref={magic.innerRef}
-                  {...magic.droppableProps}
-                >
-                  {attachments.map((attachment, index) => (
-                    <Draggable
-                      draggableId={"attachment" + index}
-                      key={"attachment" + index}
-                      index={index}
-                    >
-                      {(magic) => (
-                        <div
-                          className={`${cls(index === 0 ? "ml-0" : "ml-3")}
-                          flex flex-col h-full w-60 bg-white border shadow-sm border-slate-300 rounded-md aspect-square overflow-hidden`}
-                          ref={magic.innerRef}
-                          {...magic.draggableProps}
-                          {...magic.dragHandleProps}
-                        >
-                          <div className="text-xl p-2 flex justify-between items-center">
-                            <ArrowsHorizontal />
-                            <Trash
-                              className="cursor-pointer"
-                              onClick={() => onClearAttachment(index)}
-                            />
-                          </div>
-                          <img
-                            className="w-full h-full object-cover"
-                            src={attachment}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {magic.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+          <AttachmentDND
+            attachments={attachments}
+            setAttachments={setAttachments}
+          />
         )}
 
         <input
-          className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
+          disabled:bg-blue-200 disabled:cursor-default"
           type="submit"
-          value="Create"
+          value={defaultValue ? "Save" : "Create"}
+          disabled={disabled || isUploading}
         />
       </form>
     </>

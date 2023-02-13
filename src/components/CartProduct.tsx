@@ -4,19 +4,20 @@ import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { firebaseDB } from "../firebase/config";
 import useFirebaseDocs from "../firebase/hooks/useFirebaseDocs";
+import { IProductDoc } from "../firebase/types";
 import { getFirebaseDoc } from "../firebase/utils";
-import { meAtom } from "../libs/atoms";
+import { userAtom } from "../libs/atoms";
 import { centToDollor } from "../libs/utils";
-import { IProduct } from "../routes/Home";
+
 import TBodyRow from "./table/TBodyRow";
 
 interface ICartProductProps {
-  cartProduct: IProduct;
+  cartProduct: IProductDoc;
 }
 
 export default function CartProduct({ cartProduct }: ICartProductProps) {
-  const [me, setMe] = useRecoilState(meAtom);
-  const productDoc = useFirebaseDocs<IProduct>(() =>
+  const [me, setUser] = useRecoilState(userAtom);
+  const productDoc = useFirebaseDocs<IProductDoc>(() =>
     getFirebaseDoc("products", cartProduct.id)
   );
 
@@ -31,13 +32,13 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
     });
 
     //3️⃣ Update document
-    const docRef = doc(firebaseDB, "users", me!.uid);
+    const docRef = doc(firebaseDB, "users", me!.id);
     await updateDoc(docRef, {
       cart: stringifiedCart,
     });
 
     //2️⃣ update recoil state
-    setMe((oldMe) => {
+    setUser((oldMe) => {
       if (!oldMe) return oldMe;
       const newMe = { ...oldMe, cart: filteredCart };
       return newMe;
@@ -46,7 +47,7 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
 
   const increasQuantity = async (id: string, increament: number) => {
     if (!productDoc) return;
-    setMe((oldMe) => {
+    setUser((oldMe) => {
       if (!oldMe) return oldMe;
       const newMe = { ...oldMe };
       const newCart = newMe.cart.map((product) => {

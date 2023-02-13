@@ -13,12 +13,12 @@ import {
 import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { firebaseDB } from "../../firebase/config";
-import { meAtom } from "../../libs/atoms";
+import { userAtom } from "../../libs/atoms";
 
 export default function CheckoutForm() {
-  const [me, setMe] = useRecoilState(meAtom);
+  const [me, setUser] = useRecoilState(userAtom);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [message, setMessage] = useState<string>();
+  const [message, setUserssage] = useState<string>();
 
   const stripe = useStripe();
   const elements = useElements();
@@ -31,7 +31,7 @@ export default function CheckoutForm() {
     console.log("STRIPE:::", stripe);
     console.log("ELEMENTS:::", elements);
 
-    setMessage("Processing...");
+    setUserssage("Processing...");
     // isProcessing.....
 
     const { error } = await stripe.confirmPayment({
@@ -42,7 +42,7 @@ export default function CheckoutForm() {
       },
     });
     if (error) {
-      return setMessage(`Status: ${error.message}`);
+      return setUserssage(`Status: ${error.message}`);
     }
 
     // if (paymentIntent.status === "succeeded") {
@@ -76,12 +76,12 @@ export default function CheckoutForm() {
     //     orders,
     //   });
 
-    //   setMe({ ...me!, cart: [], orders });
+    //   setUser({ ...me!, cart: [], orders });
 
-    //   setMessage(`Status: ${paymentIntent?.status}`);
+    //   setUserssage(`Status: ${paymentIntent?.status}`);
     // }
 
-    // setMessage(`Status: ${paymentIntent?.status}`);
+    // setUserssage(`Status: ${paymentIntent?.status}`);
 
     setIsProcessing(false);
   };

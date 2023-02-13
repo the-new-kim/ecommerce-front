@@ -8,11 +8,11 @@ import {
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { headerHeightAtom, meAtom } from "../libs/atoms";
+import { headerHeightAtom, userAtom } from "../libs/atoms";
 import useElementSize from "../libs/hooks/useElementSize";
 
 export default function Header() {
-  const me = useRecoilValue(meAtom);
+  const me = useRecoilValue(userAtom);
   const setHeaderHeight = useSetRecoilState(headerHeightAtom);
 
   const ref = useRef<HTMLElement>(null);
@@ -44,7 +44,7 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link to={me ? "/users/me" : "/auth"}>
+            <Link to={me ? "/me" : "/auth"}>
               <User />
             </Link>
           </li>

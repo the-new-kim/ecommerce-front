@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
-export default function useFirebaseDocs<T>(callback: () => Promise<T>) {
+export default function useFirebaseDocs<T>(
+  callback: () => Promise<T | undefined>
+) {
   const [docs, setDocs] = useState<T>();
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import ProductForm from "../../../components/forms/ProductForm";
+import ProductForm from "../../../components/forms/product/ProductForm";
 import H3 from "../../../components/typos/H3";
 
 export default function CreateProduct() {

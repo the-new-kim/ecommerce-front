@@ -22,7 +22,6 @@ export const uploadStripeFile = async (
 interface ICreateStrpieProductProps {
   name: string;
   id: string;
-  images: string[];
   default_price_data: object;
   active: boolean;
 }
@@ -30,7 +29,6 @@ interface ICreateStrpieProductProps {
 export const createStripeProduct = async ({
   name,
   id,
-  images,
   default_price_data,
   active,
 }: ICreateStrpieProductProps) => {
@@ -44,9 +42,38 @@ export const createStripeProduct = async ({
         name,
         id,
         url: `${window.location.origin}/products/${id}`,
-        images,
         default_price_data,
         active,
+      }),
+    })
+  ).json();
+
+  return result;
+};
+
+interface IUpdateStrpieProductProps {
+  name: string;
+  id: string;
+  active: boolean;
+  default_price: string;
+}
+
+export const updateStripeProduct = async ({
+  name,
+  id,
+  default_price,
+  active,
+}: IUpdateStrpieProductProps) => {
+  const result = await (
+    await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/products/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        active,
+        default_price,
       }),
     })
   ).json();
@@ -74,22 +101,46 @@ export const getStripeProductDetail = async (id: string) => {
   return result;
 };
 
-export const createStripePrice = async (price: number, product: string) => {
-  const result = await fetch(
-    `${process.env.REACT_APP_BACKEND_BASE_URL}/prices/create`,
-    {
+interface ICreateStripePriceProps {
+  currency: string;
+  unit_amount: number;
+  product: string;
+}
+
+export const createStripePrice = async ({
+  currency,
+  unit_amount,
+  product,
+}: ICreateStripePriceProps) => {
+  const result = await (
+    await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/prices/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        unit_amount: price,
-        currency: "usd",
-        recurring: { interval: "month" },
+        unit_amount,
+        currency,
         product,
       }),
-    }
-  );
+    })
+  ).json();
+
+  return result;
+};
+
+export const updateStripePrice = async (id: string, active: boolean) => {
+  const result = await (
+    await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/prices/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        active,
+      }),
+    })
+  ).json();
 
   return result;
 };

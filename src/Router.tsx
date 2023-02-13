@@ -4,7 +4,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { IMe, meAtom } from "./libs/atoms";
+import { IUserAtom, userAtom } from "./libs/atoms";
 
 import Layout from "./Layout";
 import NotFound from "./routes/NotFound";
@@ -27,6 +27,8 @@ import CreateProduct from "./routes/admin/products/CreateProduct";
 import UsersHome from "./routes/admin/users/UsersHome";
 import OrdersHome from "./routes/admin/orders/OrdersHome";
 import EditProduct from "./routes/admin/products/EditProduct";
+import EditOrder from "./routes/admin/orders/EditOrder";
+import EditUser from "./routes/admin/users/EditUser";
 
 const adminOnlyRoutes: RouteObject[] = [
   {
@@ -42,8 +44,20 @@ const adminOnlyRoutes: RouteObject[] = [
           { path: ":id", element: <EditProduct /> },
         ],
       },
-      { path: "users", children: [{ element: <UsersHome />, index: true }] },
-      { path: "orders", children: [{ element: <OrdersHome />, index: true }] },
+      {
+        path: "users",
+        children: [
+          { element: <UsersHome />, index: true },
+          { path: ":id", element: <EditUser /> },
+        ],
+      },
+      {
+        path: "orders",
+        children: [
+          { element: <OrdersHome />, index: true },
+          { path: ":id", element: <EditOrder /> },
+        ],
+      },
       { path: "settings", element: <Settings /> },
     ],
   },
@@ -52,7 +66,7 @@ const adminOnlyRoutes: RouteObject[] = [
 
 const publicOnlyRoutes: RouteObject[] = [{ path: "auth", element: <Auth /> }];
 
-const protectedRoutes: RouteObject[] = [{ path: "users/me", element: <Me /> }];
+const protectedRoutes: RouteObject[] = [{ path: "me", element: <Me /> }];
 
 const globalRoutes: RouteObject[] = [
   { element: <Home />, index: true },
@@ -73,7 +87,7 @@ const globalRoutes: RouteObject[] = [
   // { path: "/products/:category/:productId", element: <Product /> },
 ];
 
-const router = (me: IMe | null) => {
+const router = (me: IUserAtom | null) => {
   return createBrowserRouter([
     {
       path: "/",
@@ -89,7 +103,7 @@ const router = (me: IMe | null) => {
 };
 
 export default function Router() {
-  const me = useRecoilValue(meAtom);
+  const me = useRecoilValue(userAtom);
 
   console.log("ME::", me);
 

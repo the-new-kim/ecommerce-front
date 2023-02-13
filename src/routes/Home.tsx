@@ -1,22 +1,10 @@
 import { Link } from "react-router-dom";
 import useFirebaseDocs from "../firebase/hooks/useFirebaseDocs";
+import { IProductDoc } from "../firebase/types";
 import { getFirebaseDocs } from "../firebase/utils";
 
-export interface IProduct {
-  title: string;
-  label: string;
-  description: string;
-  quantity: number;
-  price: number;
-  categoryId: string;
-  imageUrls: string[];
-  id: string;
-  active: boolean;
-  sold: number;
-}
-
 export default function Home() {
-  const products = useFirebaseDocs<IProduct[]>(() =>
+  const products = useFirebaseDocs<IProductDoc[]>(() =>
     getFirebaseDocs("products")
   );
 

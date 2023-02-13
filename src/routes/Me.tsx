@@ -1,12 +1,12 @@
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { meAtom } from "../libs/atoms";
+import { userAtom } from "../libs/atoms";
 import { firebaseAuth } from "../firebase/config";
 import H1 from "../components/typos/H1";
 
 export default function Me() {
-  const [me] = useRecoilState(meAtom);
+  const [me] = useRecoilState(userAtom);
   const navigage = useNavigate();
 
   const onLogoutClick = () => {
@@ -23,14 +23,14 @@ export default function Me() {
       >
         Logout
       </button>
-      {!!me?.orders.length && (
+      {/* {!!me?.orders.length && (
         <>
           <H1>Order</H1>
           {me.orders.map((order, index) => (
             <div key={`order${index}`}>{order}</div>
           ))}
         </>
-      )}
+      )} */}
     </div>
   );
 }

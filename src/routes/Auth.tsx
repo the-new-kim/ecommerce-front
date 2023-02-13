@@ -2,7 +2,7 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { meAtom } from "../libs/atoms";
+import { userAtom } from "../libs/atoms";
 import RegisterForm from "../components/forms/RegisterForm";
 import SiginInForm from "../components/forms/SignInForm";
 
@@ -10,7 +10,7 @@ import { firebaseAuth } from "../firebase/config";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const me = useRecoilValue(meAtom);
+  const me = useRecoilValue(userAtom);
   const [newAccount, setNewAccount] = useState(false);
 
   const onSocialClick = async (event: React.MouseEvent<HTMLButtonElement>) => {

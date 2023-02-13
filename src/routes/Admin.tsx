@@ -1,5 +1,5 @@
 import AdminNav from "../components/AdminNav";
-import ProductForm from "../components/forms/ProductForm";
+import ProductForm from "../components/forms/product/ProductForm";
 
 export default function Admin() {
   return (

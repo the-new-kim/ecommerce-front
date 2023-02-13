@@ -1,11 +1,10 @@
-import ProductForm from "../../components/forms/ProductForm";
+import ProductForm from "../../components/forms/product/ProductForm";
 
 import useFirebaseDocs from "../../firebase/hooks/useFirebaseDocs";
 import { getFirebaseDocs } from "../../firebase/utils";
-import { IOrder } from "../../libs/atoms";
 
 export default function AdminHome() {
-  const orders = useFirebaseDocs<IOrder[]>(() => getFirebaseDocs("orders"));
+  const orders = useFirebaseDocs<any[]>(() => getFirebaseDocs("orders"));
 
   console.log(
     "ORDERS:::",

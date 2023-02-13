@@ -7,11 +7,14 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { IProduct } from "../routes/Home";
-import { firebaseDB } from "./config";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
+
+import { firebaseDB, firebaseStorage } from "./config";
+import { IProductDoc } from "./types";
 
 export const getProducts = async () => {
-  let results: IProduct[] = [];
+  let results: IProductDoc[] = [];
   const q = query(collection(firebaseDB, "products"));
 
   const querySnapshot = await getDocs(q);
@@ -20,7 +23,7 @@ export const getProducts = async () => {
     return {
       ...doc.data(),
       id: doc.id,
-    } as IProduct;
+    } as IProductDoc;
   });
 
   results = allProducts;
@@ -37,6 +40,8 @@ export const getProducts = async () => {
 export const getFirebaseDoc = async <T>(name: string, id: string) => {
   const docRef = doc(firebaseDB, name, id);
   const docSnap = await getDoc(docRef);
+
+  if (!docSnap.exists()) return;
 
   return { ...docSnap.data(), id: docSnap.id } as T;
 };
@@ -60,8 +65,44 @@ export const getFirebaseDocs = async <T>(name: string) => {
 ///////////
 ///////////
 
+// export const uploadImages = async (attachments: string[], path: string) => {
+//   try {
+//     for (let i = 0; i < attachments.length; i++) {
+//       const fileRef = ref(firebaseStorage, `${path}/${uuidv4()}`);
+//       const response = await uploadString(fileRef, attachments[i], "data_url");
+//     }
+//   } catch (error) {
+//     console.log("ERROR:::", error);
+//   }
+// };
+
+// export const getFirestoreUrls = async (attachments: string[], path: string) => {
+//   const downloadUrls = [];
+
+//   if (!!attachments.length) {
+//     try {
+//       for (let i = 0; i < attachments.length; i++) {
+//         const fileRef = ref(firebaseStorage, `${path}/${uuidv4()}`);
+//         const response = await uploadString(
+//           fileRef,
+//           attachments[i],
+//           "data_url"
+//         );
+//         const downloadUrl = await getDownloadURL(response.ref);
+//         downloadUrls.push(downloadUrl);
+//       }
+//     } catch (error) {
+//       console.log("ERROR:::", error);
+//     }
+//   }
+
+//   return downloadUrls;
+// };
+
+///////////
+
 export const getProductsById = async (id: string) => {
-  let results: IProduct[] = [];
+  let results: IProductDoc[] = [];
   const q = query(collection(firebaseDB, "products"), where("id", "==", id));
 
   try {
@@ -71,7 +112,7 @@ export const getProductsById = async (id: string) => {
       return {
         ...doc.data(),
         id: doc.id,
-      } as IProduct;
+      } as IProductDoc;
     });
 
     results = allProducts;
@@ -83,7 +124,7 @@ export const getProductsById = async (id: string) => {
 };
 
 export const getProductsByMultipleIds = async (ids: string[]) => {
-  const results: IProduct[] = [];
+  const results: IProductDoc[] = [];
 
   for (let i = 0; i < ids.length; i++) {
     try {
@@ -91,7 +132,7 @@ export const getProductsByMultipleIds = async (ids: string[]) => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        results.push(docSnap.data() as IProduct);
+        results.push(docSnap.data() as IProductDoc);
       } else {
         return;
       }

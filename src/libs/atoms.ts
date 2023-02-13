@@ -1,31 +1,15 @@
 import { User } from "firebase/auth";
 import { atom } from "recoil";
+import { IUserDoc } from "../firebase/types";
 
-export interface ICartProduct {
-  productId: string;
-  quantity: number;
-}
-
-export interface IOrder {
-  products: ICartProduct[];
-  orderer: string;
-  shipping: boolean;
-  total: number;
-}
-
-export interface IMe {
-  uid: User["uid"];
+export interface IUserAtom extends IUserDoc {
   displayName: User["displayName"];
   photoURL: User["photoURL"];
   email: User["email"];
   phoneNumber: User["phoneNumber"];
-  isAdmin: boolean;
-  wishlist: string[];
-  cart: ICartProduct[];
-  orders: string[];
 }
 
-export const meAtom = atom<IMe | null>({
+export const userAtom = atom<IUserAtom | null>({
   key: "userState",
   default: null,
 });
