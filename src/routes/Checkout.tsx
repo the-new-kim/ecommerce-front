@@ -1,4 +1,3 @@
-import { async } from "@firebase/util";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";

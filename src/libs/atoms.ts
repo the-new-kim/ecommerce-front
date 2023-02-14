@@ -1,8 +1,9 @@
 import { User } from "firebase/auth";
 import { atom } from "recoil";
-import { IUserDoc } from "../firebase/types";
+import { IUser } from "../firebase/types";
 
-export interface IUserAtom extends IUserDoc {
+export interface IUserAtom extends IUser {
+  id: string;
   displayName: User["displayName"];
   photoURL: User["photoURL"];
   email: User["email"];

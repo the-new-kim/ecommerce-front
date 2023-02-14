@@ -3,13 +3,15 @@
 - [x] Beautiful dnd for images
 - [ ] Multiple files upload
 - [ ] Admin Menu
-- [ ] Category
 - [ ] Wishlist
 - [ ] Cart
-- [x] CRUD product with stripe api
 - [x] Payment(stripe)
-- [ ] Delete stripe files
-- [ ] Oder process
+
+### Cart
+
+1. Information ===> address and cart products...
+2. Payment
+3. Confirmation
 
 ### Payment steps...
 

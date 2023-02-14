@@ -1,42 +1,46 @@
 import { onAuthStateChanged, User } from "firebase/auth";
 
 import { useEffect, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { IUserAtom, userAtom } from "./libs/atoms";
-import { firebaseAuth, firebaseDB } from "./firebase/config";
+import { firebaseAuth, userCollection } from "./firebase/config";
 import Router from "./Router";
-import { doc, getDoc } from "firebase/firestore";
+
+import { getFirebaseDoc, updateFirebaseDoc } from "./firebase/utils";
 
 function App() {
   const [firebaseInit, setFirebaseInit] = useState(false);
-
-  const setUser = useSetRecoilState(userAtom);
+  const [me, setUser] = useRecoilState(userAtom);
 
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, async (user) => {
       if (user) {
         const userCopy = JSON.parse(JSON.stringify(user)) as User; //https://github.com/firebase/firebase-js-sdk/issues/5722 📝 Firebase Recoil Issue...
 
-        const userDocRef = doc(firebaseDB, "users", userCopy.uid);
-        const userDocSnap = await getDoc(userDocRef);
+        const userDoc = await getFirebaseDoc(userCollection, userCopy.uid);
 
-        if (!userDocSnap.exists()) return;
+        if (userDoc) {
+          const { isAdmin, wishlist, cart, orders, address, shipping } =
+            userDoc;
 
-        const { isAdmin, wishlist, cart, orders } = userDocSnap.data();
+          const me: IUserAtom = {
+            id: userCopy.uid,
+            displayName: userCopy.displayName,
+            photoURL: userCopy.photoURL,
+            email: userCopy.email,
+            phoneNumber: userCopy.phoneNumber,
+            isAdmin,
+            wishlist,
+            cart,
+            orders,
+            address,
+            shipping,
+          };
 
-        const me: IUserAtom = {
-          id: userCopy.uid,
-          displayName: userCopy.displayName,
-          photoURL: userCopy.photoURL,
-          email: userCopy.email,
-          phoneNumber: userCopy.phoneNumber,
-          isAdmin,
-          wishlist,
-          cart,
-          orders,
-        };
-
-        setUser(me);
+          setUser(me);
+        } else {
+          firebaseAuth.signOut();
+        }
       } else {
         setUser(null);
       }
@@ -44,6 +48,27 @@ function App() {
       setFirebaseInit(true);
     });
   }, []);
+
+  useEffect(() => {
+    if (!me) return;
+    onAuthStateChanged(firebaseAuth, async (user) => {
+      if (!user) return;
+      console.log("💥💥💥💥State changed💥💥💥💥");
+
+      const userCopy = JSON.parse(JSON.stringify(user)) as User;
+
+      const { isAdmin, wishlist, cart, orders, address, shipping } = me;
+
+      await updateFirebaseDoc(userCollection, userCopy.uid, {
+        isAdmin,
+        wishlist,
+        cart,
+        orders,
+        address,
+        shipping,
+      });
+    });
+  }, [me]);
 
   return <>{firebaseInit ? <Router /> : <div>Init...</div>}</>;
 }

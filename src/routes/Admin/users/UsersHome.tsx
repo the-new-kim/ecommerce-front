@@ -3,12 +3,12 @@ import AdminHeader from "../../../components/AdminHeader";
 import Table from "../../../components/table/Table";
 import THead from "../../../components/table/THead";
 import THeadRow from "../../../components/table/THeadRow";
-import H3 from "../../../components/typos/H3";
+import { userCollection } from "../../../firebase/config";
 import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
 import { getFirebaseDocs } from "../../../firebase/utils";
 
 export default function UsersHome() {
-  const users = useFirebaseDocs<any[]>(() => getFirebaseDocs("users"));
+  const users = useFirebaseDocs(() => getFirebaseDocs(userCollection));
   const navigate = useNavigate();
   const onClick = (id: string) => {
     navigate(`/admin/users/${id}`);
@@ -21,7 +21,7 @@ export default function UsersHome() {
       <Table>
         <THead>
           <THeadRow>
-            <th className="text-start">Display Name</th>
+            <th className="text-start">ID</th>
             <th className="text-start">Admin</th>
           </THeadRow>
         </THead>
@@ -32,7 +32,7 @@ export default function UsersHome() {
               className="[&>*]:p-3 border-b-[1px] border-black cursor-pointer group"
               onClick={() => onClick(user.id)}
             >
-              <td className="group-hover:underline">{user.displayName}</td>
+              <td className="group-hover:underline">{user.id}</td>
               <td>{user.isAdmin ? "Admin User" : "User"}</td>
             </tr>
           ))}

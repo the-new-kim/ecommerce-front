@@ -4,15 +4,14 @@ import CreateButton from "../../../components/CreateButton";
 import Table from "../../../components/table/Table";
 import THead from "../../../components/table/THead";
 import THeadRow from "../../../components/table/THeadRow";
+import { productCollection } from "../../../firebase/config";
 import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
-import { IProductDoc } from "../../../firebase/types";
+
 import { getFirebaseDocs } from "../../../firebase/utils";
 import { centToDollor } from "../../../libs/utils";
 
 export default function ProductsHome() {
-  const products = useFirebaseDocs<IProductDoc[]>(() =>
-    getFirebaseDocs("products")
-  );
+  const products = useFirebaseDocs(() => getFirebaseDocs(productCollection));
 
   const navigate = useNavigate();
 

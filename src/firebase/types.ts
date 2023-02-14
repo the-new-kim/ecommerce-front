@@ -1,37 +1,37 @@
-import { User } from "firebase/auth";
-
-export interface IFirebasDoc {
-  id: string;
-}
-
-export interface IUserDoc extends IFirebasDoc {
+export interface IUser {
   isAdmin: boolean;
   wishlist: string[];
-  cart: ICartProduct[];
+  cart: ICart;
   orders: string[];
+  address: IAddress | null;
+  shipping: IShipping | null;
+}
+
+export interface ICart {
+  paymentIntent: string | null;
+  products: ICartProduct[];
 }
 
 export interface ICartProduct {
-  productId: string;
+  id: string;
   quantity: number;
 }
 
-export interface IProductDoc extends IFirebasDoc {
+export interface IProduct {
   title: string;
-  label: string;
   description: string;
   quantity: number;
   price: number;
-  categoryId: string;
   imageUrls: string[];
   active: boolean;
   sold: number;
 }
-export interface IOrderDoc extends IFirebasDoc {
+
+export interface IOrder {
   products: ICartProduct[];
   orderer: string;
   shipping: IShipping;
-  total: number;
+  paymentIntent: string;
 }
 
 export interface IAddress {

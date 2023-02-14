@@ -3,12 +3,16 @@ import AdminHeader from "../../../components/AdminHeader";
 import Table from "../../../components/table/Table";
 import THead from "../../../components/table/THead";
 import THeadRow from "../../../components/table/THeadRow";
-import H3 from "../../../components/typos/H3";
+import { orderCollection } from "../../../firebase/config";
 import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
+
+import { IOrder } from "../../../firebase/types";
 import { getFirebaseDocs } from "../../../firebase/utils";
 
 export default function OrdersHome() {
-  const orders = useFirebaseDocs<any[]>(() => getFirebaseDocs("orders"));
+  const orders = useFirebaseDocs<(IOrder & { id: string })[]>(() =>
+    getFirebaseDocs(orderCollection)
+  );
   const navigate = useNavigate();
 
   const onClick = (id: string) => {

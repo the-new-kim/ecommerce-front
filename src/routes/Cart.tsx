@@ -1,63 +1,71 @@
-import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import CartProduct from "../components/CartProduct";
-import Table from "../components/table/Table";
 
-import THead from "../components/table/THead";
-import THeadRow from "../components/table/THeadRow";
+import { useRecoilState } from "recoil";
 
-import H1 from "../components/typos/H1";
-import { firebaseDB } from "../firebase/config";
-import { IProductDoc } from "../firebase/types";
-import { createStripePaymentIntent } from "../libs/api";
+import { productCollection } from "../firebase/config";
 
-import { checkoutOptionAtom, userAtom } from "../libs/atoms";
-import { centToDollor } from "../libs/utils";
+import { userAtom } from "../libs/atoms";
+
+import { getFirebaseDoc } from "../firebase/utils";
+import { IProduct } from "../firebase/types";
+import { StripeElementsOptions } from "@stripe/stripe-js";
+import Checkout from "../components/Checkout";
+import ShippingForm from "../components/forms/ShippingForm";
+import CartProducts from "../components/CartProducts";
+import {
+  cancelPaymentIntent,
+  createStripePaymentIntent,
+  getStripePaymentIntentDetail,
+} from "../api/paymentIntents";
+
+export interface IProductWithId extends IProduct {
+  id: string;
+}
+
+export type TPaymentProcess = "information" | "payment" | "confirmation";
+export enum EPaymentProcess {
+  INFORMATION = "information",
+  PAYMENT = "payment",
+  CONFIRMATION = "confirmation",
+}
 
 export default function Cart() {
-  const navgate = useNavigate();
+  const [me, setMe] = useRecoilState(userAtom);
+  const [paymentProcess, setPaymentProcess] = useState<EPaymentProcess>(
+    EPaymentProcess.INFORMATION
+  );
 
-  const me = useRecoilValue(userAtom);
-  const [cartProducts, setCartProducts] = useState<IProductDoc[]>([]);
+  const [cartProducts, setCartProducts] = useState<IProductWithId[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
-  const setCheckoutOptions = useSetRecoilState(checkoutOptionAtom);
+
+  const [checkoutOptions, setCheckoutOptions] =
+    useState<StripeElementsOptions>();
 
   useEffect(() => {
-    console.log(cartProducts);
-  }, [cartProducts]);
-
-  useEffect(() => {
-    if (!me || !me.cart.length) return;
+    if (!me || !me.cart.products.length) return setCartProducts([]);
 
     (async () => {
-      let myCart: IProductDoc[] = [];
+      let myCart: IProductWithId[] = [];
 
-      if (!me.cart.length) return;
-
-      for (let i = 0; i < me.cart.length; i++) {
+      for (let i = 0; i < me.cart.products.length; i++) {
         try {
-          const docRef = doc(firebaseDB, "products", me.cart[i].productId);
-          const docSnap = await getDoc(docRef);
+          const foundProduct = await getFirebaseDoc(
+            productCollection,
+            me.cart.products[i].id
+          );
 
-          if (docSnap.exists()) {
-            const foundItem = {
-              ...docSnap.data(),
-              quantity: me.cart[i].quantity,
-              id: docSnap.id,
-            } as IProductDoc;
-
-            myCart.push(foundItem);
-          } else {
-            return;
+          if (foundProduct) {
+            const cartProduct = {
+              ...foundProduct,
+              quantity: me.cart.products[i].quantity,
+            };
+            myCart.push(cartProduct);
           }
         } catch (error) {
           console.log("ERROR:::", error);
         }
       }
 
-      if (!myCart.length) return;
       setTotalAmount(
         myCart
           .map((product) => product.price * product.quantity)
@@ -67,58 +75,83 @@ export default function Cart() {
     })();
   }, [me]);
 
-  const onCheckoutClick = async () => {
-    // 1️⃣ Create payment intent
-
+  const createPaymentIntent = async () => {
+    if (!me) return;
     const stripePaymentIntentResult = await createStripePaymentIntent({
-      amount: totalAmount, //TO CORRECT ⚠️⚠️⚠️ USE STRIPE PRICE ...
+      amount: totalAmount,
       currency: "usd",
       automatic_payment_methods: { enabled: true },
     });
 
-    console.log("PAYMENT INTENT RESULT::: ", stripePaymentIntentResult);
-    // 2️⃣ Set checkout options using recoil
+    if (!stripePaymentIntentResult.data) return;
+
+    const newCart = {
+      ...me.cart,
+      paymentIntent: stripePaymentIntentResult.data.id,
+    };
+
+    setMe((oldMe) => {
+      if (!oldMe) return oldMe;
+
+      const newMe = { ...oldMe, cart: newCart };
+      return newMe;
+    });
 
     setCheckoutOptions({
       clientSecret: stripePaymentIntentResult.data.client_secret,
     });
+  };
 
-    // 3️⃣ Finally redirect to checkout page
-    navgate("/checkout");
+  const onCheckoutClick = async () => {
+    if (!me) return;
+    if (me.cart.paymentIntent) {
+      const stripePaymentIntentResult = await getStripePaymentIntentDetail(
+        me.cart.paymentIntent
+      );
+
+      if (!stripePaymentIntentResult.data) {
+        createPaymentIntent();
+        return;
+      }
+
+      if (stripePaymentIntentResult.data.amount !== totalAmount) {
+        const cancelPaymentIntentResult = await cancelPaymentIntent(
+          stripePaymentIntentResult.data.id
+        );
+        console.log("CANCEL:::", cancelPaymentIntentResult);
+        createPaymentIntent();
+        return;
+      }
+
+      setCheckoutOptions({
+        clientSecret: stripePaymentIntentResult.data.client_secret,
+      });
+    } else {
+      // create new
+      createPaymentIntent();
+    }
+
+    setPaymentProcess(EPaymentProcess.PAYMENT);
   };
 
   return (
     <div className="p-5 ">
-      <H1>Cart</H1>
-      {!!cartProducts.length && (
+      <div>{paymentProcess}</div>
+      {!!cartProducts.length ? (
         <>
-          <Table>
-            <THead>
-              <THeadRow>
-                <th className="w-[60%] text-start">Item</th>
-                <th className="text-center">Quantity</th>
-                <th className="text-right">Subtotal</th>
-              </THeadRow>
-            </THead>
-            <tbody>
-              {cartProducts.map((cartProduct, index) => (
-                <CartProduct
-                  key={`cart-product${index}`}
-                  cartProduct={cartProduct}
-                />
-              ))}
-              <tr className="[&>*]:p-3">
-                <td>Subtotal includes:</td>
-                <td></td>
-                <td className="text-right">{centToDollor(totalAmount)}</td>
-              </tr>
-            </tbody>
-          </Table>
+          <CartProducts cartProducts={cartProducts} totalAmount={totalAmount} />
+          <hr className="my-5" />
 
-          <button className="p-3 bg-blue-200" onClick={onCheckoutClick}>
-            Checkout
-          </button>
+          {paymentProcess === EPaymentProcess.INFORMATION ? (
+            <ShippingForm onCheckoutClick={onCheckoutClick} />
+          ) : (
+            <div>Shipping address & Billing address</div>
+          )}
+
+          {checkoutOptions && <Checkout checkoutOptions={checkoutOptions} />}
         </>
+      ) : (
+        <div>Your cart is empty</div>
       )}
     </div>
   );

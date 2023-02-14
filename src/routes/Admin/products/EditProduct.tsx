@@ -3,18 +3,20 @@ import { useParams } from "react-router-dom";
 import AdminHeader from "../../../components/AdminHeader";
 
 import ProductForm from "../../../components/forms/product/ProductForm";
-import { IProductDoc } from "../../../firebase/types";
+import { productCollection } from "../../../firebase/config";
+
 import { getFirebaseDoc } from "../../../firebase/utils";
+import { IProductWithId } from "../../Cart";
 
 export default function EditProduct() {
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
-  const [product, setProduct] = useState<IProductDoc>();
+  const [product, setProduct] = useState<IProductWithId>();
 
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const productDoc = await getFirebaseDoc<IProductDoc>("products", id);
+      const productDoc = await getFirebaseDoc(productCollection, id);
       if (!productDoc) return;
       setProduct(productDoc);
     })();

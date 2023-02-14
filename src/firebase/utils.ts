@@ -1,53 +1,38 @@
-import { User } from "firebase/auth";
 import {
-  collection,
+  CollectionReference,
   doc,
   getDoc,
   getDocs,
   query,
-  where,
+  UpdateData,
+  updateDoc,
 } from "firebase/firestore";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
-import { v4 as uuidv4 } from "uuid";
 
-import { firebaseDB, firebaseStorage } from "./config";
-import { IProductDoc } from "./types";
-
-export const getProducts = async () => {
-  let results: IProductDoc[] = [];
-  const q = query(collection(firebaseDB, "products"));
-
-  const querySnapshot = await getDocs(q);
-
-  const allProducts = querySnapshot.docs.map((doc) => {
-    return {
-      ...doc.data(),
-      id: doc.id,
-    } as IProductDoc;
-  });
-
-  results = allProducts;
-
-  return results;
+export const updateFirebaseDoc = async <T>(
+  collection: CollectionReference<T>,
+  id: string,
+  data: UpdateData<T>
+) => {
+  const docRef = doc(collection, id);
+  await updateDoc(docRef, data);
 };
 
-//////////
-//////////
-//////////
-//////////
-//////////
-
-export const getFirebaseDoc = async <T>(name: string, id: string) => {
-  const docRef = doc(firebaseDB, name, id);
+export const getFirebaseDoc = async <T>(
+  collection: CollectionReference<T>,
+  id: string
+) => {
+  const docRef = doc(collection, id);
   const docSnap = await getDoc(docRef);
 
   if (!docSnap.exists()) return;
 
-  return { ...docSnap.data(), id: docSnap.id } as T;
+  return { ...docSnap.data(), id: docSnap.id };
 };
 
-export const getFirebaseDocs = async <T>(name: string) => {
-  const q = query(collection(firebaseDB, name));
+export const getFirebaseDocs = async <T>(
+  collection: CollectionReference<T>
+) => {
+  const q = query(collection);
 
   const querySnapshot = await getDocs(q);
 
@@ -55,7 +40,7 @@ export const getFirebaseDocs = async <T>(name: string) => {
     return {
       ...doc.data(),
       id: doc.id,
-    } as T;
+    };
   });
 };
 
@@ -101,69 +86,69 @@ export const getFirebaseDocs = async <T>(name: string) => {
 
 ///////////
 
-export const getProductsById = async (id: string) => {
-  let results: IProductDoc[] = [];
-  const q = query(collection(firebaseDB, "products"), where("id", "==", id));
+// export const getProductsById = async (id: string) => {
+//   let results: IProductResult[] = [];
+//   const q = query(collection(firebaseDB, "products"), where("id", "==", id));
 
-  try {
-    const querySnapshot = await getDocs(q);
+//   try {
+//     const querySnapshot = await getDocs(q);
 
-    const allProducts = querySnapshot.docs.map((doc) => {
-      return {
-        ...doc.data(),
-        id: doc.id,
-      } as IProductDoc;
-    });
+//     const allProducts = querySnapshot.docs.map((doc) => {
+//       return {
+//         ...doc.data(),
+//         id: doc.id,
+//       } as IProductResult;
+//     });
 
-    results = allProducts;
-  } catch (error) {
-    console.log(error);
-  }
+//     results = allProducts;
+//   } catch (error) {
+//     console.log(error);
+//   }
 
-  return results;
-};
+//   return results;
+// };
 
-export const getProductsByMultipleIds = async (ids: string[]) => {
-  const results: IProductDoc[] = [];
+// export const getProductsByMultipleIds = async (ids: string[]) => {
+//   const results: IProductResult[] = [];
 
-  for (let i = 0; i < ids.length; i++) {
-    try {
-      const docRef = doc(firebaseDB, "products", ids[i]);
-      const docSnap = await getDoc(docRef);
+//   for (let i = 0; i < ids.length; i++) {
+//     try {
+//       const docRef = doc(firebaseDB, "products", ids[i]);
+//       const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        results.push(docSnap.data() as IProductDoc);
-      } else {
-        return;
-      }
-    } catch (error) {
-      console.log("ERROR:::", error);
-    }
-  }
+//       if (docSnap.exists()) {
+//         results.push(docSnap.data() as IProductResult);
+//       } else {
+//         return;
+//       }
+//     } catch (error) {
+//       console.log("ERROR:::", error);
+//     }
+//   }
 
-  return results;
-};
+//   return results;
+// };
 
 //GET USERS ⚠️ Auth & Users collection
 
-interface IUserData {
-  uid: User["uid"];
-  displayName: User["displayName"];
-  photoURL: User["photoURL"];
-  email: User["email"];
-  phoneNumber: User["phoneNumber"];
-  isAdmin: boolean;
-  wishlist: string[];
-  cart: string[];
-  orders: string[];
-}
+// interface IUserData {
+//   uid: User["uid"];
+//   displayName: User["displayName"];
+//   photoURL: User["photoURL"];
+//   email: User["email"];
+//   phoneNumber: User["phoneNumber"];
+//   isAdmin: boolean;
+//   wishlist: string[];
+//   cart: string[];
+//   orders: string[];
+// }
 
-export const getUserData = async (uid: string) => {
-  const q = query(collection(firebaseDB, "users"), where("uid", "==", uid));
+// export const getUserData = async (uid: string) => {
+//   const q = query(collection(firebaseDB, "users"), where("uid", "==", uid));
 
-  const querySnapshot = await getDocs(q);
+//   const querySnapshot = await getDocs(q);
 
-  return {
-    ...querySnapshot.docs[0].data(),
-  } as IUserData;
-};
+//   return {
+//     ...querySnapshot.docs[0].data(),
+//   } as IUserData;
+// };

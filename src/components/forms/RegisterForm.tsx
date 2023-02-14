@@ -1,11 +1,13 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-import { userAtom } from "../../libs/atoms";
-import { firebaseAuth, firebaseDB } from "../../firebase/config";
+import { firebaseAuth, userCollection } from "../../firebase/config";
+import { useEffect, useState } from "react";
+import Message from "../Message";
 
 interface IRegisterForm {
   email: string;
@@ -15,69 +17,67 @@ interface IRegisterForm {
 }
 
 export default function RegisterForm() {
-  const navigate = useNavigate();
-  const setUser = useSetRecoilState(userAtom);
+  const [creating, setCreating] = useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
+    setError,
     formState: { errors },
   } = useForm<IRegisterForm>();
 
   const onSubmit = async ({ email, name, password }: IRegisterForm) => {
+    setCreating(true);
+
     try {
-      const response = await createUserWithEmailAndPassword(
+      // 1️⃣ Create firebase user
+      const userCredential = await createUserWithEmailAndPassword(
         firebaseAuth,
         email,
         password
       );
+      console.log("userCredential:::", userCredential.user);
 
-      console.log("RESPONSE USER:::", response.user);
-      console.log("AUTH CURRENT USER:::", firebaseAuth.currentUser);
-
-      await updateProfile(response.user, {
+      await updateProfile(userCredential.user, {
         displayName: name,
       });
 
-      const settedDoc = await setDoc(
-        doc(firebaseDB, "users", response.user.uid),
-        {
-          // email: response.user.email,
-          // displayName: response.user.displayName,
-          // phoneNumber: response.user.phoneNumber,
-          // photoURL: response.user.photoURL,
-          isAdmin: false,
-          createdAt: Date.now(),
-          wishlist: [],
-          cart: [],
-          orders: [],
-        }
-      );
+      // 2️⃣ Create new user doc
 
-      console.log("ADDED USER ID:::", settedDoc);
-    } catch (error) {
-      console.log("ERROR:::", error);
-    }
-    if (firebaseAuth.currentUser)
-      setUser({
-        id: firebaseAuth.currentUser.uid,
-        displayName: firebaseAuth.currentUser.displayName || "Anonym",
-        email,
-        phoneNumber: firebaseAuth.currentUser.phoneNumber,
-        photoURL: firebaseAuth.currentUser.photoURL,
+      await setDoc(doc(userCollection, userCredential.user.uid), {
         isAdmin: false,
         wishlist: [],
-        cart: [],
+        cart: {
+          paymentIntent: null,
+          products: [],
+        },
         orders: [],
+        address: null,
+        shipping: null,
       });
-    console.log("AUTH CURRENT USER:::", firebaseAuth.currentUser);
 
-    navigate("/");
+      // 3️⃣ Login
+      await signInWithEmailAndPassword(firebaseAuth, email, password);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.includes("email")) {
+          setError("email", { message: "Email already in use." });
+        }
+      }
+      console.log("ERROR:::", error);
+    }
+
+    setCreating(false);
   };
+
+  useEffect(() => {
+    console.log("FB CURRENT", firebaseAuth.currentUser);
+  }, [firebaseAuth]);
 
   return (
     <>
+      {creating && <Message>Creating account...</Message>}
       <form
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
         onSubmit={handleSubmit(onSubmit)}
@@ -151,6 +151,7 @@ export default function RegisterForm() {
         </label>
         <input
           className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          disabled={creating}
           type="submit"
           value="Create"
         />

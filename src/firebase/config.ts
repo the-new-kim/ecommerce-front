@@ -1,8 +1,14 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import {
+  collection,
+  CollectionReference,
+  DocumentData,
+  getFirestore,
+} from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { IOrder, IProduct, IUser } from "./types";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -23,3 +29,11 @@ export const firebaseApp = initializeApp(firebaseConfig);
 export const firebaseAuth = getAuth(firebaseApp);
 export const firebaseDB = getFirestore(firebaseApp);
 export const firebaseStorage = getStorage(firebaseApp);
+
+const createCollection = <T = DocumentData>(collectionName: string) => {
+  return collection(firebaseDB, collectionName) as CollectionReference<T>;
+};
+
+export const userCollection = createCollection<IUser>("users");
+export const productCollection = createCollection<IProduct>("products");
+export const orderCollection = createCollection<IOrder>("orders");

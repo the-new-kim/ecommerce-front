@@ -5,6 +5,8 @@ import { userAtom } from "../libs/atoms";
 import { firebaseAuth } from "../firebase/config";
 import H1 from "../components/typos/H1";
 
+import H3 from "../components/typos/H3";
+
 export default function Me() {
   const [me] = useRecoilState(userAtom);
   const navigage = useNavigate();
@@ -16,7 +18,8 @@ export default function Me() {
 
   return (
     <div className="p-5">
-      <div>{me?.displayName}'s Profile</div>
+      <H3>{me?.displayName}'s Profile</H3>
+
       <button
         className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         onClick={onLogoutClick}

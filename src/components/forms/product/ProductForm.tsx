@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { addDoc } from "firebase/firestore";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { firebaseDB, firebaseStorage } from "../../../firebase/config";
+import { firebaseStorage, productCollection } from "../../../firebase/config";
 import {
   deleteObject,
   getDownloadURL,
@@ -12,18 +12,16 @@ import {
 } from "firebase/storage";
 
 import { fixPrice } from "../../../libs/utils";
-import {
-  createStripePrice,
-  createStripeProduct,
-  updateStripePrice,
-  updateStripeProduct,
-} from "../../../libs/api";
+
 import Message from "../../Message";
-import { IProductDoc } from "../../../firebase/types";
+
 import AttachmentDND from "./AttachmentDND";
 
+import { IProductWithId } from "../../../routes/Cart";
+import { updateFirebaseDoc } from "../../../firebase/utils";
+
 interface IProductFormProps {
-  defaultValue?: IProductDoc;
+  defaultValue?: IProductWithId;
 }
 
 export default function ProductForm({ defaultValue }: IProductFormProps) {
@@ -40,28 +38,16 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
     register,
     handleSubmit,
     watch,
-
     formState: { errors, isDirty, dirtyFields },
-  } = useForm<IProductDoc>();
-
-  useEffect(() => {
-    if (!disabled) return;
-    watch();
-  }, [disabled]);
-
-  useEffect(() => {
-    console.log("DIRTY:::", dirtyFields);
-    console.log("PRICE DIRTY:::", !!dirtyFields.price);
-  }, [dirtyFields]);
+  } = useForm<IProductWithId>();
 
   const onCreate = async ({
     title,
-    label,
     description,
     price,
     quantity,
     active,
-  }: IProductDoc) => {
+  }: IProductWithId) => {
     setIsUploading(true);
 
     const fixedPrice = fixPrice(price);
@@ -86,10 +72,8 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
     }
 
     try {
-      const newProduct = await addDoc(collection(firebaseDB, "products"), {
-        createdAt: Date.now(),
+      const newProduct = await addDoc(productCollection, {
         title,
-        label,
         description,
         imageUrls,
         price: parseFloat(fixedPrice) * 100,
@@ -97,20 +81,6 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
         active,
         sold: 0,
       });
-
-      const default_price_data = {
-        unit_amount: parseFloat(fixedPrice) * 100,
-        currency: "usd",
-      };
-
-      const stripeProductResult = await createStripeProduct({
-        name: title,
-        id: newProduct.id,
-        default_price_data,
-        active,
-      });
-
-      console.log("STRIPE PRODUCT::", stripeProductResult);
 
       navigate(`/products/${newProduct.id}`);
     } catch (error) {
@@ -122,12 +92,11 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
 
   const onUpdate = async ({
     title,
-    label,
     description,
     price,
     quantity,
     active,
-  }: IProductDoc) => {
+  }: IProductWithId) => {
     if (!defaultValue) return;
     setIsUploading(true);
 
@@ -180,26 +149,9 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
 
     // Compare old and new prices...
 
-    let default_price = "";
-
-    if (fixedPrice !== defaultValue.price) {
-      // create new stripe price
-
-      const newPrice = {
-        unit_amount: fixedPrice,
-        currency: "usd",
-        product: defaultValue.id,
-      };
-
-      const newStripePriceResult = await createStripePrice({ ...newPrice });
-
-      console.log("STRIPE NEW PRICE RESULT::", newStripePriceResult);
-    }
-
     try {
-      await updateDoc(doc(firebaseDB, "products", defaultValue.id), {
+      await updateFirebaseDoc(productCollection, defaultValue.id, {
         title,
-        label,
         description,
         imageUrls,
         price: fixedPrice,
@@ -209,40 +161,6 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
     } catch (error) {
       console.log("ERROR:::", error);
     }
-
-    // 2️⃣ Stripe
-
-    const stripeUpdateProductResult = await updateStripeProduct({
-      name: title,
-      id: defaultValue.id,
-      active,
-      default_price,
-    });
-
-    console.log("Stripe Update Result::::", stripeUpdateProductResult);
-
-    // if !!dirtyFields.price Deactivate old price & Create new price
-    // if (!!dirtyFields.price) {
-    //   if (stripeUpdateProductResult.ok && stripeUpdateProductResult.data) {
-    //     const newPrice = {
-    //       unit_amount: fixedPrice,
-    //       currency: "usd",
-    //       product: defaultValue.id,
-    //     };
-
-    //     const newStripePriceResult = await createStripePrice({ ...newPrice });
-
-    //     console.log("STRIPE NEW PRICE RESULT::", newStripePriceResult);
-
-    //     const oldPriceId: string = stripeUpdateProductResult.data.default_price;
-
-    //     const stripeUpdatePriceResult = await updateStripePrice(
-    //       oldPriceId,
-    //       false
-    //     );
-    //     console.log("STRIPE Old Price Reulst:::", stripeUpdatePriceResult);
-    //   }
-    // }
 
     setIsUploading(false);
   };
@@ -291,22 +209,6 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
           {errors.title && (
             <small className="text-red-300 font-medium">
               * {errors.title.message}
-            </small>
-          )}
-        </label>
-
-        {/* LABEL */}
-        <label className="text-gray-700 text-sm font-bold mb-2">
-          Label
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
-            type="text"
-            defaultValue={defaultValue?.label || undefined}
-            {...register("label", { required: "This field is required" })}
-          />
-          {errors.label && (
-            <small className="text-red-300 font-medium">
-              * {errors.label.message}
             </small>
           )}
         </label>

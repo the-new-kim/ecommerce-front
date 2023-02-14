@@ -13,6 +13,11 @@ export default function Auth() {
   const me = useRecoilValue(userAtom);
   const [newAccount, setNewAccount] = useState(false);
 
+  useEffect(() => {
+    if (!me) return;
+    navigate("/");
+  }, [me]);
+
   const onSocialClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     const { name } = event.target as HTMLButtonElement;
     let provider;

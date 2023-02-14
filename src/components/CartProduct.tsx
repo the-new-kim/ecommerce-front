@@ -1,77 +1,76 @@
-import { doc, updateDoc } from "firebase/firestore";
 import { Trash } from "phosphor-react";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { firebaseDB } from "../firebase/config";
+import { productCollection } from "../firebase/config";
 import useFirebaseDocs from "../firebase/hooks/useFirebaseDocs";
-import { IProductDoc } from "../firebase/types";
 import { getFirebaseDoc } from "../firebase/utils";
+
 import { userAtom } from "../libs/atoms";
 import { centToDollor } from "../libs/utils";
 
 import TBodyRow from "./table/TBodyRow";
+import { IProductWithId } from "../routes/Cart";
 
 interface ICartProductProps {
-  cartProduct: IProductDoc;
+  cartProduct: IProductWithId;
 }
 
 export default function CartProduct({ cartProduct }: ICartProductProps) {
-  const [me, setUser] = useRecoilState(userAtom);
-  const productDoc = useFirebaseDocs<IProductDoc>(() =>
-    getFirebaseDoc("products", cartProduct.id)
+  const [me, setMe] = useRecoilState(userAtom);
+  const productDoc = useFirebaseDocs(() =>
+    getFirebaseDoc(productCollection, cartProduct.id)
   );
 
   const deleteFromCart = async (id: string) => {
     //1️⃣ Filter cart items
-
-    const filteredCart = me!.cart.filter((product) => product.productId !== id);
-
-    //2️⃣ Stringify before update firestore document
-    const stringifiedCart = filteredCart.map((product) => {
-      return JSON.stringify(product);
-    });
-
-    //3️⃣ Update document
-    const docRef = doc(firebaseDB, "users", me!.id);
-    await updateDoc(docRef, {
-      cart: stringifiedCart,
-    });
+    const filteredCartProducts = me!.cart.products.filter(
+      (product) => product.id !== id
+    );
 
     //2️⃣ update recoil state
-    setUser((oldMe) => {
+    setMe((oldMe) => {
       if (!oldMe) return oldMe;
-      const newMe = { ...oldMe, cart: filteredCart };
+      const newMe = {
+        ...oldMe,
+        cart: { ...oldMe.cart },
+      };
+
+      newMe.cart.products = filteredCartProducts;
       return newMe;
     });
   };
 
-  const increasQuantity = async (id: string, increament: number) => {
-    if (!productDoc) return;
-    setUser((oldMe) => {
-      if (!oldMe) return oldMe;
-      const newMe = { ...oldMe };
-      const newCart = newMe.cart.map((product) => {
-        return { ...product };
-      });
-      newMe.cart = newCart.map((product) => {
-        if (product.productId === id) {
-          const newQuantity = product.quantity + increament;
+  const increaseQuantity = async (id: string, increament: number) => {
+    if (!productDoc || !me) return;
 
-          if (newQuantity < 1 || newQuantity > productDoc.quantity) {
-            console.log(
-              "NEW QUANTITY CAN NOT BE BIGGER THAN PRODUCT QUANTITY OR LESS THAN 1 ❌❌❌"
-            );
+    const currentCartProducts = me.cart.products.map((product) => {
+      return { ...product };
+    });
 
-            return product;
-          } else {
-            product.quantity = newQuantity;
-            return product;
-          }
+    const updatedCartProducts = currentCartProducts.map((product) => {
+      if (product.id === id) {
+        const newQuantity = product.quantity + increament;
+
+        if (newQuantity < 1 || newQuantity > productDoc.quantity) {
+          console.log(
+            "NEW QUANTITY CAN NOT BE BIGGER THAN PRODUCT QUANTITY OR LESS THAN 1 ❌❌❌"
+          );
+
+          return product;
         } else {
+          product.quantity = newQuantity;
           return product;
         }
-      });
+      } else {
+        return product;
+      }
+    });
 
+    setMe((oldMe) => {
+      if (!oldMe) return oldMe;
+      const newMe = { ...oldMe, cart: { ...oldMe.cart } };
+
+      newMe.cart.products = updatedCartProducts;
       return newMe;
     });
   };
@@ -97,9 +96,9 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
         </span>
       </td>
       <td className="text-center">
-        <button onClick={() => increasQuantity(cartProduct.id, 1)}>+</button>
+        <button onClick={() => increaseQuantity(cartProduct.id, 1)}>+</button>
         {cartProduct.quantity}
-        <button onClick={() => increasQuantity(cartProduct.id, -1)}>-</button>
+        <button onClick={() => increaseQuantity(cartProduct.id, -1)}>-</button>
       </td>
       <td className="text-right">
         {centToDollor(cartProduct.quantity * cartProduct.price)}

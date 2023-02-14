@@ -64,9 +64,9 @@ const adminOnlyRoutes: RouteObject[] = [
   { path: "users/:id", element: <User /> },
 ];
 
-const publicOnlyRoutes: RouteObject[] = [{ path: "auth", element: <Auth /> }];
+// const publicOnlyRoutes: RouteObject[] = [{ path: "auth", element: <Auth /> }];
 
-const protectedRoutes: RouteObject[] = [{ path: "me", element: <Me /> }];
+// const protectedRoutes: RouteObject[] = [{ path: "me", element: <Me /> }];
 
 const globalRoutes: RouteObject[] = [
   { element: <Home />, index: true },
@@ -80,8 +80,11 @@ const globalRoutes: RouteObject[] = [
     path: "products",
     children: [{ path: ":productId", element: <Product /> }],
   },
-  { path: "checkout", element: <Checkout /> },
+  // { path: "checkout", element: <Checkout /> },
   { path: "completion", element: <Completion /> },
+
+  { path: "auth", element: <Auth /> },
+  { path: "me", element: <Me /> },
 
   // { path: "/products/:category", element: <Category /> },
   // { path: "/products/:category/:productId", element: <Product /> },
@@ -95,7 +98,7 @@ const router = (me: IUserAtom | null) => {
       errorElement: <NotFound />,
       children: [
         ...globalRoutes,
-        ...(me ? protectedRoutes : publicOnlyRoutes),
+        // ...(me ? protectedRoutes : publicOnlyRoutes),
         ...(me?.isAdmin ? adminOnlyRoutes : []),
       ],
     },
