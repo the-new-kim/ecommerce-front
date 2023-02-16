@@ -6,6 +6,8 @@ import { firebaseAuth } from "../firebase/config";
 import H1 from "../components/typos/H1";
 
 import H3 from "../components/typos/H3";
+import ShippingForm from "../components/forms/ShippingForm";
+import H4 from "../components/typos/H4";
 
 export default function Me() {
   const [me] = useRecoilState(userAtom);
@@ -19,6 +21,9 @@ export default function Me() {
   return (
     <div className="p-5">
       <H3>{me?.displayName}'s Profile</H3>
+      <hr className="my-5" />
+      <H4>Shipping Information</H4>
+      <ShippingForm />
 
       <button
         className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

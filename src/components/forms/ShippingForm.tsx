@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import { IShipping } from "../../firebase/types";
 import { userAtom } from "../../libs/atoms";
 
 interface IShippingFormProps {
-  onCheckoutClick: () => Promise<void>;
+  onCheckoutClick?: () => Promise<void>;
 }
 
 export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
@@ -16,15 +16,30 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
     handleSubmit,
     watch,
     setError,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<IShipping>();
 
   useEffect(() => {}, []);
 
   const onSubmit = async ({ name, phone, address }: IShipping) => {
-    // 1️⃣ check if user has already
+    if (isDirty) {
+      setMe((oldMe) => {
+        if (!oldMe) return oldMe;
 
-    onCheckoutClick();
+        const newMe = { ...oldMe };
+        newMe.shipping = {
+          name,
+          address,
+          phone,
+        };
+
+        return newMe;
+      });
+    }
+
+    if (onCheckoutClick) {
+      onCheckoutClick();
+    }
   };
 
   return (
@@ -39,6 +54,7 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Name"
+            defaultValue={me?.shipping?.name || undefined}
             {...register("name", { required: true })}
           />
           {errors.name && (
@@ -54,6 +70,7 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Telephone number"
+            defaultValue={me?.shipping?.phone || undefined}
             {...register("phone", {
               required: true,
             })}
@@ -71,6 +88,7 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Address"
+            defaultValue={me?.shipping?.address.line1 || undefined}
             {...register("address.line1", {
               required: true,
             })}
@@ -87,6 +105,7 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Additional address field"
+            defaultValue={me?.shipping?.address.line2 || undefined}
             {...register("address.line2", {
               required: true,
             })}
@@ -103,6 +122,7 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Postal code"
+            defaultValue={me?.shipping?.address.postal_code || undefined}
             {...register("address.postal_code", {
               required: true,
             })}
@@ -119,6 +139,7 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="City"
+            defaultValue={me?.shipping?.address.city || undefined}
             {...register("address.city", {
               required: true,
             })}
@@ -130,11 +151,29 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
           )}
         </label>
         <label className="block text-gray-700 text-sm font-bold mb-2">
+          State
+          <input
+            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+            type="text"
+            placeholder="State"
+            defaultValue={me?.shipping?.address.state || undefined}
+            {...register("address.state", {
+              required: true,
+            })}
+          />
+          {errors.address?.state && (
+            <small className="text-red-300 font-medium">
+              * {errors.address?.state.message}
+            </small>
+          )}
+        </label>
+        <label className="block text-gray-700 text-sm font-bold mb-2">
           Country
           <input
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Country"
+            defaultValue={me?.shipping?.address.country || undefined}
             {...register("address.country", {
               required: true,
             })}
@@ -149,7 +188,7 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
         <input
           className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
-          value="Continue to payment"
+          value={onCheckoutClick ? "Continue to payment" : "Save"}
         />
       </form>
     </>

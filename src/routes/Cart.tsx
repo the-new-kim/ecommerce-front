@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
-
 import { useRecoilState } from "recoil";
-
-import { productCollection } from "../firebase/config";
-
 import { userAtom } from "../libs/atoms";
 
+import { productCollection } from "../firebase/config";
 import { getFirebaseDoc } from "../firebase/utils";
 import { IProduct } from "../firebase/types";
+
 import { StripeElementsOptions } from "@stripe/stripe-js";
-import Checkout from "../components/Checkout";
-import ShippingForm from "../components/forms/ShippingForm";
-import CartProducts from "../components/CartProducts";
 import {
   cancelPaymentIntent,
   createStripePaymentIntent,
   getStripePaymentIntentDetail,
 } from "../api/paymentIntents";
+
+import Checkout from "../components/Checkout";
+import ShippingForm from "../components/forms/ShippingForm";
+import CartProducts from "../components/CartProducts";
+import ShippingInformation from "../components/ShippingInformation";
+import { Link } from "react-router-dom";
 
 export interface IProductWithId extends IProduct {
   id: string;
@@ -140,15 +141,21 @@ export default function Cart() {
       {!!cartProducts.length ? (
         <>
           <CartProducts cartProducts={cartProducts} totalAmount={totalAmount} />
-          <hr className="my-5" />
+          {/* <hr className="my-5" />
 
           {paymentProcess === EPaymentProcess.INFORMATION ? (
             <ShippingForm onCheckoutClick={onCheckoutClick} />
           ) : (
-            <div>Shipping address & Billing address</div>
+            <ShippingInformation />
           )}
 
-          {checkoutOptions && <Checkout checkoutOptions={checkoutOptions} />}
+          {checkoutOptions && <Checkout checkoutOptions={checkoutOptions} />} */}
+          <Link
+            className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            to="/checkout"
+          >
+            Checkout
+          </Link>
         </>
       ) : (
         <div>Your cart is empty</div>

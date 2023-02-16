@@ -11,7 +11,7 @@ import Message from "../Message";
 
 interface IRegisterForm {
   email: string;
-  name: string;
+  // name: string;
   password: string;
   passwordRepeat: string;
 }
@@ -27,7 +27,7 @@ export default function RegisterForm() {
     formState: { errors },
   } = useForm<IRegisterForm>();
 
-  const onSubmit = async ({ email, name, password }: IRegisterForm) => {
+  const onSubmit = async ({ email, password }: IRegisterForm) => {
     setCreating(true);
 
     try {
@@ -39,9 +39,9 @@ export default function RegisterForm() {
       );
       console.log("userCredential:::", userCredential.user);
 
-      await updateProfile(userCredential.user, {
-        displayName: name,
-      });
+      // await updateProfile(userCredential.user, {
+      //   displayName: name,
+      // });
 
       // 2️⃣ Create new user doc
 
@@ -96,7 +96,7 @@ export default function RegisterForm() {
           )}
         </label>
 
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        {/* <label className="block text-gray-700 text-sm font-bold mb-2">
           Name
           <input
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
@@ -108,7 +108,7 @@ export default function RegisterForm() {
               * {errors.name.message}
             </small>
           )}
-        </label>
+        </label> */}
 
         <label className="block text-gray-700 text-sm font-bold mb-2">
           Password

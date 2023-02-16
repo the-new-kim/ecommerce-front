@@ -80,7 +80,7 @@ const globalRoutes: RouteObject[] = [
     path: "products",
     children: [{ path: ":productId", element: <Product /> }],
   },
-  // { path: "checkout", element: <Checkout /> },
+  { path: "checkout", element: <Checkout /> },
   { path: "completion", element: <Completion /> },
 
   { path: "auth", element: <Auth /> },
