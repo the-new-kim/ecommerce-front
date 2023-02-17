@@ -1,10 +1,10 @@
 import ProductForm from "../../../components/forms/product/ProductForm";
-import H3 from "../../../components/typos/H3";
+import Heading from "../../../components/typos/Heading";
 
 export default function CreateProduct() {
   return (
     <>
-      <H3>Add New Product</H3>
+      <Heading>Add New Product</Heading>
       <ProductForm />
     </>
   );

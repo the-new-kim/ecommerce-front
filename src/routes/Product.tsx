@@ -4,10 +4,10 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { headerHeightAtom, userAtom } from "../libs/atoms";
 import { productCollection, userCollection } from "../firebase/config";
 
-import H1 from "../components/typos/H1";
 import { centToDollor } from "../libs/utils";
 import { ICartProduct, IProduct } from "../firebase/types";
 import { getFirebaseDoc } from "../firebase/utils";
+import Heading from "../components/typos/Heading";
 
 export default function Product() {
   const [me, setUser] = useRecoilState(userAtom);
@@ -82,7 +82,7 @@ export default function Product() {
           }}
           className="sticky flex flex-col justify-center items-center p-5"
         >
-          <H1>{product.title}</H1>
+          <Heading>{product.title}</Heading>
 
           <div>
             <span>Price: {centToDollor(product.price)}</span>

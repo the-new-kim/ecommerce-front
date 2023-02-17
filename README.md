@@ -1,11 +1,48 @@
+### URL
+
+## global
+
+- / .........................(👷‍♀️)
+- /cart .....................(👷‍♀️)
+- /wishlist .................(❌)
+- /search ...................(❌)
+- /products/:id .............(👷‍♀️)
+- /auth .....................(👷‍♀️)
+
+## checkout
+
+- /checkout/information .....(👷‍♀️)
+- /checkout/shipping ........(❌)
+- /checkout/payment .........(👷‍♀️)
+
+## admin
+
+- /admin ....................(❌)
+- /admin/products ...........(👷‍♀️)
+- /admin/products/add .......(👷‍♀️)
+- /admin/products/:id .......(👷‍♀️)
+- /admin/users/ .............(❌)
+- /admin/users/add ..........(❌)
+- /admin/users/:id ..........(❌)
+- /admin/orders/ ............(❌)
+- /admin/orders/:id .........(❌)
+
+## me
+
+- /me .......................(❌)
+- /me/edit ..................(❌)
+- /me/orders ................(❌)
+- /me/orders/:id ............(❌)
+
 ### Todos...
 
 - [x] Beautiful dnd for images
 - [ ] Multiple files upload
 - [ ] Admin Menu
 - [ ] Wishlist
-- [ ] Cart
+- [x] Cart
 - [x] Payment(stripe)
+- [ ] Form component
 
 ### Cart
 
@@ -20,45 +57,3 @@
 3. Create stripe's Element component.
 4. Handle payment submit event.
 5. Redirect & Empty cart & Add cart products to order
-
-### Routes
-
-## global
-
-- /
-- /cart
-- /wishlist
-- /search
-- /products/:category
-- /products/:category/:id
-
-## loggedIn?
-
-- /users/:id
-
-## !loggedIn?
-
-- /auth
-
-## isAdmin?
-
-- /admin
-- /admin/products
-- /admin/products/add
-- /admin/products/:productId
-- /admin/users/
-- /admin/users/add
-- /admin/users/:userId
-
-### Odering...
-
-order model
-{
-orderer: users id
-placedAt || createdAt ???
-productID:string
-shipping:boolean
-total:number
-}
-
-### useFirebaseDocs.....Hook

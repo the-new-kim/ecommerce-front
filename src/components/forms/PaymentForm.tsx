@@ -5,13 +5,15 @@ import {
 } from "@stripe/react-stripe-js";
 import { addDoc, increment } from "firebase/firestore";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { orderCollection, productCollection } from "../../firebase/config";
 import { updateFirebaseDoc } from "../../firebase/utils";
 import { userAtom } from "../../libs/atoms";
 
-export default function CheckoutForm() {
-  const [me, setUser] = useRecoilState(userAtom);
+export default function PaymentForm() {
+  const navigate = useNavigate();
+  const [me, setMe] = useRecoilState(userAtom);
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState<string>();
 
@@ -35,7 +37,9 @@ export default function CheckoutForm() {
       redirect: "if_required",
     });
     if (error) {
-      return setMessage(`Error: ${error.message}`);
+      setMessage(`Error: ${error.message}`);
+      setIsProcessing(false);
+      return;
     }
 
     if (paymentIntent.status === "succeeded") {
@@ -46,8 +50,6 @@ export default function CheckoutForm() {
         products: me.cart.products,
         shipping: me.shipping,
         paymentIntent: me.cart.paymentIntent,
-        // shipping: {address:{}},
-        // amount: paymentIntent.amount,
       });
 
       //2️⃣Upadate product doc
@@ -62,14 +64,9 @@ export default function CheckoutForm() {
 
       //3️⃣ Empty cart & set order from user
       const orders = [orderDocRef.id, ...me!.orders];
-
-      setUser({ ...me!, cart: { paymentIntent: null, products: [] }, orders });
-
-      setMessage(`Status: ${paymentIntent.status}`);
+      setMe({ ...me!, cart: { paymentIntent: null, products: [] }, orders });
     }
-
     setMessage(`Status: ${paymentIntent.status}`);
-
     setIsProcessing(false);
   };
 
@@ -77,7 +74,7 @@ export default function CheckoutForm() {
     <>
       <form onSubmit={handleSubmit}>
         <PaymentElement />
-        <button disabled={isProcessing} className="p-3 bg-blue-200">
+        <button disabled={isProcessing} className="p-3 bg-blue-200 mt-5">
           {isProcessing ? "Processing..." : "Pay now"}
         </button>
       </form>

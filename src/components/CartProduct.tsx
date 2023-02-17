@@ -77,28 +77,37 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
 
   return (
     <TBodyRow>
-      <td className="flex justify-start items-center group">
-        <span className="relative w-20 max-w-[40%] aspect-square mr-3 overflow-hidden">
-          <img
-            className="object-cover w-full h-full"
-            src={cartProduct.imageUrls[0]}
-          />
-          <button
-            onClick={() => deleteFromCart(cartProduct.id)}
-            className="absolute top-1 left-1 w-7 h-7 rounded-full bg-white flex justify-center items-center drop-shadow-lg
+      <td className="group">
+        <div className="flex justify-start items-center">
+          <span className="relative w-24 max-w-[40%] mr-5 overflow-hidden">
+            <img
+              className="object-contain w-full h-full"
+              src={cartProduct.imageUrls[0]}
+            />
+            <button
+              onClick={() => deleteFromCart(cartProduct.id)}
+              className="absolute top-1 left-1 w-7 h-7 rounded-full bg-white flex justify-center items-center drop-shadow-lg
             opacity-0 group-hover:opacity-100 scale-0 group-hover:scale-100 duration-300"
-          >
+            >
+              <Trash />
+            </button>
+          </span>
+          <span className="hover:underline ">
+            <Link to={`/products/${cartProduct.id}`}>{cartProduct.title}</Link>
+          </span>
+        </div>
+      </td>
+      <td>
+        <div className="[&>*]:mx-2 flex justify-center items-center">
+          <button onClick={() => increaseQuantity(cartProduct.id, -1)}>
+            -
+          </button>
+          <span>{cartProduct.quantity}</span>
+          <button onClick={() => increaseQuantity(cartProduct.id, 1)}>+</button>
+          <button onClick={() => deleteFromCart(cartProduct.id)}>
             <Trash />
           </button>
-        </span>
-        <span className="hover:underline">
-          <Link to={`/products/${cartProduct.id}`}>{cartProduct.title}</Link>
-        </span>
-      </td>
-      <td className="text-center">
-        <button onClick={() => increaseQuantity(cartProduct.id, 1)}>+</button>
-        {cartProduct.quantity}
-        <button onClick={() => increaseQuantity(cartProduct.id, -1)}>-</button>
+        </div>
       </td>
       <td className="text-right">
         {centToDollor(cartProduct.quantity * cartProduct.price)}

@@ -3,26 +3,35 @@ import { loadStripe, Stripe, StripeElementsOptions } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 
-import CheckoutForm from "../components/forms/CheckoutForm";
-import H1 from "../components/typos/H1";
-import { userAtom } from "../libs/atoms";
+import PaymentForm from "../../components/forms/PaymentForm";
+
+import { userAtom } from "../../libs/atoms";
 import {
   cancelPaymentIntent,
   createStripePaymentIntent,
   getStripePaymentIntentDetail,
-} from "../api/paymentIntents";
-import useCartProducts from "../firebase/hooks/useCartProducts";
+} from "../../api/paymentIntents";
+import useCartProducts from "../../firebase/hooks/useCartProducts";
+import ShippingInformation from "../../components/checkout/ShippingInformation";
+import ContainerWithRoundedBorder from "../../components/ContainerWithRoundedBorder";
 
-export default function Checkout() {
+import Heading from "../../components/typos/Heading";
+
+export default function CheckoutPayment() {
   const [me, setMe] = useRecoilState(userAtom);
-  const { cartProducts, totalAmount } = useCartProducts(me);
+  const { totalAmount } = useCartProducts(me);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null>>();
   const [options, setOptions] = useState<StripeElementsOptions>();
+  const [times, setTiems] = useState(1);
 
-  console.log("USE CART PRODUCTS:::", cartProducts, totalAmount);
+  useEffect(() => {
+    console.log("TIMES", times);
+  }, [times]);
 
   const createPaymentIntent = async () => {
-    if (!me || !totalAmount) return;
+    if (!me || !totalAmount || !me.cart.products.length) return;
+    console.log("start to create new payment intent");
+    console.log("TOTAL AMOUNT:::", totalAmount);
     const stripePaymentIntentResult = await createStripePaymentIntent({
       amount: totalAmount,
       currency: "usd",
@@ -49,7 +58,9 @@ export default function Checkout() {
   };
 
   useEffect(() => {
-    if (!me || !totalAmount) return;
+    if (!me || !totalAmount || !me.cart.products.length) return;
+    setTiems((prev) => (prev += 1));
+
     (async () => {
       if (me.cart.paymentIntent) {
         const stripePaymentIntentResult = await getStripePaymentIntentDetail(
@@ -89,13 +100,16 @@ export default function Checkout() {
   }, []);
 
   return (
-    <div className="p-5">
-      <H1>Checkout</H1>
+    <div className="[&>*]:mb-5">
+      <ShippingInformation />
 
       {stripePromise && options && (
-        <Elements stripe={stripePromise} options={options}>
-          <CheckoutForm />
-        </Elements>
+        <ContainerWithRoundedBorder>
+          <Heading tagName="h1">Payment</Heading>
+          <Elements stripe={stripePromise} options={options}>
+            <PaymentForm />
+          </Elements>
+        </ContainerWithRoundedBorder>
       )}
     </div>
   );

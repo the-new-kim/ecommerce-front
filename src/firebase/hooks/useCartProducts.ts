@@ -9,21 +9,20 @@ export default function useCartProducts(me: IUserAtom | null) {
   const [totalAmount, setTotalAmount] = useState<number>();
 
   useEffect(() => {
-    if (!me) return;
+    if (!me || !me.cart.products.length) return;
     (async () => {
       let myCart: IProductWithId[] = [];
 
       for (let i = 0; i < me.cart.products.length; i++) {
         try {
-          const foundProduct = await getFirebaseDoc(
-            productCollection,
-            me.cart.products[i].id
-          );
+          const { id, quantity } = me.cart.products[i];
+
+          const foundProduct = await getFirebaseDoc(productCollection, id);
 
           if (foundProduct) {
             const cartProduct = {
               ...foundProduct,
-              quantity: me.cart.products[i].quantity,
+              quantity,
             };
             myCart.push(cartProduct);
           }
@@ -39,7 +38,7 @@ export default function useCartProducts(me: IUserAtom | null) {
       );
       setCartProducts(myCart);
     })();
-  }, []);
+  }, [me]);
 
   return { cartProducts, totalAmount };
 }

@@ -19,9 +19,9 @@ export default function CartProducts({
       <Table>
         <THead>
           <THeadRow>
-            <th className="w-[60%] text-start">Item</th>
-            <th className="text-center">Quantity</th>
-            <th className="text-right">Subtotal</th>
+            <td className="w-[60%] text-start">Product</td>
+            <td className="text-center">Quantity</td>
+            <td className="text-right">Total</td>
           </THeadRow>
         </THead>
         <tbody>
@@ -32,9 +32,12 @@ export default function CartProducts({
             />
           ))}
           <tr className="[&>*]:p-3">
-            <td>Subtotal includes:</td>
             <td></td>
-            <td className="text-right">{centToDollor(totalAmount)}</td>
+            <td></td>
+            <td className="text-right min-w-max">
+              <span className="mr-10">Subtotal</span>{" "}
+              {centToDollor(totalAmount)}
+            </td>
           </tr>
         </tbody>
       </Table>

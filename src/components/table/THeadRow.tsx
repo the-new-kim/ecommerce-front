@@ -5,5 +5,5 @@ interface ITHeadRowProps {
 }
 
 export default function THeadRow({ children }: ITHeadRowProps) {
-  return <tr className="[&>*]:p-3 border-b-2 border-black">{children}</tr>;
+  return <tr className="[&>*]:p-3 border-b-[1px] border-black ">{children}</tr>;
 }

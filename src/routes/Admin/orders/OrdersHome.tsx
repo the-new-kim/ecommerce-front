@@ -27,7 +27,7 @@ export default function OrdersHome() {
       <Table>
         <THead>
           <THeadRow>
-            <th className="text-start">ID</th>
+            <td className="text-start">ID</td>
           </THeadRow>
         </THead>
         <tbody>

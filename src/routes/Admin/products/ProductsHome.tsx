@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../../components/AdminHeader";
 import CreateButton from "../../../components/CreateButton";
 import Table from "../../../components/table/Table";
+import TBodyRow from "../../../components/table/TBodyRow";
 import THead from "../../../components/table/THead";
 import THeadRow from "../../../components/table/THeadRow";
 import { productCollection } from "../../../firebase/config";
@@ -28,19 +29,20 @@ export default function ProductsHome() {
       <Table>
         <THead>
           <THeadRow>
-            <th className="text-start">Image</th>
-            <th className="text-start">Title</th>
-            <th className="text-start">Price</th>
-            <th className="text-start">Quantity</th>
-            <th className="text-start">Sold</th>
-            <th className="text-start">Active</th>
+            <td className="text-start">Image</td>
+            <td className="text-start">Title</td>
+            <td className="text-start">Price</td>
+            <td className="text-start">Quantity</td>
+            <td className="text-start">Sold</td>
+            <td className="text-start">Active</td>
           </THeadRow>
         </THead>
+
         <tbody>
           {products?.map((product) => (
-            <tr
+            <TBodyRow
               key={product.id}
-              className="[&>*]:p-3 border-b-[1px] border-black cursor-pointer group"
+              className="cursor-pointer group"
               onClick={() => onClick(product.id)}
             >
               <td className="flex justify-start items-center">
@@ -56,7 +58,7 @@ export default function ProductsHome() {
               <td>{product.quantity}</td>
               <td>{product.sold}</td>
               <td>{product.active ? "true" : "no"}</td>
-            </tr>
+            </TBodyRow>
           ))}
         </tbody>
       </Table>

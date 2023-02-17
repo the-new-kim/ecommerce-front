@@ -1,8 +1,8 @@
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, Stripe, StripeElementsOptions } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
-import CheckoutForm from "./forms/CheckoutForm";
-import H1 from "./typos/H1";
+import PaymentForm from "./forms/PaymentForm";
+import Heading from "./typos/Heading";
 
 interface ICheckoutProps {
   checkoutOptions: StripeElementsOptions;
@@ -23,9 +23,9 @@ export default function Checkout({ checkoutOptions }: ICheckoutProps) {
     <>
       {stripePromise && (
         <>
-          <H1>Checkout</H1>
+          <Heading>Checkout</Heading>
           <Elements stripe={stripePromise} options={checkoutOptions}>
-            <CheckoutForm />
+            <PaymentForm />
           </Elements>
         </>
       )}

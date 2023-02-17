@@ -1,15 +1,25 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { IShipping } from "../../firebase/types";
 import { userAtom } from "../../libs/atoms";
+import Form from "../form/Form";
+import Input from "../form/Input";
 
-interface IShippingFormProps {
-  onCheckoutClick?: () => Promise<void>;
+interface ICheckoutInfromationFormProps {
+  // onCheckoutClick?: () => Promise<void>;
+  actionUrl?: string;
+  submitValue?: string;
 }
 
-export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
+export default function ShippingInformationForm({
+  // onCheckoutClick,
+  actionUrl,
+  submitValue = "Save",
+}: ICheckoutInfromationFormProps) {
   const [me, setMe] = useRecoilState(userAtom);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -37,21 +47,22 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
       });
     }
 
-    if (onCheckoutClick) {
-      onCheckoutClick();
+    if (actionUrl) {
+      navigate(actionUrl);
     }
   };
 
   return (
     <>
-      <form
+      {/* <form
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
         onSubmit={handleSubmit(onSubmit)}
-      >
+      > */}
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <label className="block text-gray-700 text-sm font-bold mb-2">
           Name
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+          <Input
+            // className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Name"
             defaultValue={me?.shipping?.name || undefined}
@@ -188,9 +199,10 @@ export default function ShippingForm({ onCheckoutClick }: IShippingFormProps) {
         <input
           className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
-          value={onCheckoutClick ? "Continue to payment" : "Save"}
+          value={submitValue}
         />
-      </form>
+      </Form>
+      {/* </form> */}
     </>
   );
 }

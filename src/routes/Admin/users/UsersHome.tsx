@@ -21,8 +21,8 @@ export default function UsersHome() {
       <Table>
         <THead>
           <THeadRow>
-            <th className="text-start">ID</th>
-            <th className="text-start">Admin</th>
+            <td className="text-start">ID</td>
+            <td className="text-start">Admin</td>
           </THeadRow>
         </THead>
         <tbody>
