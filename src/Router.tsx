@@ -1,10 +1,6 @@
-import {
-  createBrowserRouter,
-  RouteObject,
-  RouterProvider,
-} from "react-router-dom";
-import { useRecoilValue } from "recoil";
-import { IUserAtom, userAtom } from "./libs/atoms";
+import { createBrowserRouter, RouteObject } from "react-router-dom";
+
+import { IUserAtom } from "./libs/atoms";
 
 import Layout from "./Layout";
 import NotFound from "./routes/NotFound";
@@ -34,6 +30,7 @@ import MeHome from "./routes/me/MeHome";
 import MeLayout from "./routes/me/MeLayout";
 import MeEdit from "./routes/me/MeEdit";
 import MeOrders from "./routes/me/MeOrders";
+import MeOrderDetail from "./routes/me/MeOrderDetail";
 
 const adminOnlyRoutes: RouteObject[] = [
   {
@@ -69,10 +66,6 @@ const adminOnlyRoutes: RouteObject[] = [
   { path: "users/:id", element: <User /> },
 ];
 
-// const publicOnlyRoutes: RouteObject[] = [{ path: "auth", element: <Auth /> }];
-
-// const protectedRoutes: RouteObject[] = [{ path: "me", element: <Me /> }];
-
 const meRoutes: RouteObject[] = [
   {
     path: "me",
@@ -81,28 +74,31 @@ const meRoutes: RouteObject[] = [
       { path: "", element: <MeHome />, index: true },
 
       { path: "edit", element: <MeEdit /> },
-      { path: "orders", element: <MeOrders /> },
+      {
+        path: "orders",
+        element: <MeOrders />,
+        // children: [{ path: ":orderId", element: <MeOrderDetail /> }],
+      },
+      { path: "orders/:orderId", element: <MeOrderDetail /> },
     ],
   },
 ];
 
-const checkoutRoutes: RouteObject[] = [
-  {
-    path: "checkout",
-    element: <CheckoutLayout />,
-    children: [
-      { path: "information", element: <CheckoutInformation />, index: true },
-      {
-        path: "shipping",
-        element: <CheckoutShipping />,
-      },
-      {
-        path: "payment",
-        element: <CheckoutPayment />,
-      },
-    ],
-  },
-];
+const checkoutRout: RouteObject = {
+  path: "checkout",
+  element: <CheckoutLayout />,
+  children: [
+    { path: "information", element: <CheckoutInformation />, index: true },
+    {
+      path: "shipping",
+      element: <CheckoutShipping />,
+    },
+    {
+      path: "payment",
+      element: <CheckoutPayment />,
+    },
+  ],
+};
 
 const globalRoutes: RouteObject[] = [
   { element: <Home />, index: true },
@@ -121,7 +117,7 @@ const globalRoutes: RouteObject[] = [
 
   { path: "auth", element: <Auth /> },
   ...meRoutes,
-  ...checkoutRoutes,
+  // ...checkoutRoutes,
 ];
 
 const router = (me: IUserAtom | null) => {
@@ -136,17 +132,8 @@ const router = (me: IUserAtom | null) => {
         ...(me?.isAdmin ? adminOnlyRoutes : []),
       ],
     },
+    checkoutRout,
   ]);
 };
 
-export default function Router() {
-  const me = useRecoilValue(userAtom);
-
-  console.log("ME::", me);
-
-  return (
-    <>
-      <RouterProvider router={router(me)} />
-    </>
-  );
-}
+export default router;

@@ -1,20 +1,20 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { IShipping } from "../../firebase/types";
 import { userAtom } from "../../libs/atoms";
-import Form from "../form/Form";
-import Input from "../form/Input";
+import ErrorMessage from "../elements/form/ErrorMessage";
+import Form from "../elements/form/Form";
+import Input from "../elements/form/Input";
+import Label from "../elements/form/Label";
 
 interface ICheckoutInfromationFormProps {
-  // onCheckoutClick?: () => Promise<void>;
   actionUrl?: string;
   submitValue?: string;
 }
 
 export default function ShippingInformationForm({
-  // onCheckoutClick,
   actionUrl,
   submitValue = "Save",
 }: ICheckoutInfromationFormProps) {
@@ -59,145 +59,132 @@ export default function ShippingInformationForm({
         onSubmit={handleSubmit(onSubmit)}
       > */}
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        <Label>
           Name
           <Input
-            // className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Name"
             defaultValue={me?.shipping?.name || undefined}
-            {...register("name", { required: true })}
+            hasError={errors.name ? true : false}
+            {...register("name", { required: "This field is required" })}
           />
-          {errors.name && (
-            <small className="text-red-300 font-medium">
-              * {errors.name.message}
-            </small>
-          )}
-        </label>
+          {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+        </Label>
 
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        <Label>
           Telephone number
-          <input
+          <Input
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Telephone number"
             defaultValue={me?.shipping?.phone || undefined}
+            hasError={errors.phone ? true : false}
             {...register("phone", {
-              required: true,
+              required: "This field is required",
             })}
           />
-          {errors.phone && (
-            <small className="text-red-300 font-medium">
-              * {errors.phone.message}
-            </small>
-          )}
-        </label>
+          {errors.phone && <ErrorMessage>{errors.phone.message}</ErrorMessage>}
+        </Label>
         {/* ADDRESS */}
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        <Label>
           Address
-          <input
+          <Input
+            hasError={errors.address?.line1 ? true : false}
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Address"
             defaultValue={me?.shipping?.address.line1 || undefined}
             {...register("address.line1", {
-              required: true,
+              required: "This field is required",
             })}
           />
           {errors.address?.line1 && (
-            <small className="text-red-300 font-medium">
-              * {errors.address?.line1.message}
-            </small>
+            <ErrorMessage>{errors.address.line1.message}</ErrorMessage>
           )}
-        </label>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        </Label>
+        <Label>
           Additional address field
-          <input
+          <Input
+            hasError={errors.address?.line2 ? true : false}
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Additional address field"
             defaultValue={me?.shipping?.address.line2 || undefined}
             {...register("address.line2", {
-              required: true,
+              required: "This field is required",
             })}
           />
           {errors.address?.line2 && (
-            <small className="text-red-300 font-medium">
-              * {errors.address?.line2.message}
-            </small>
+            <ErrorMessage>{errors.address.line2.message}</ErrorMessage>
           )}
-        </label>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        </Label>
+        <Label>
           Postal code
-          <input
+          <Input
+            hasError={errors.address?.postal_code ? true : false}
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Postal code"
             defaultValue={me?.shipping?.address.postal_code || undefined}
             {...register("address.postal_code", {
-              required: true,
+              required: "This field is required",
             })}
           />
           {errors.address?.postal_code && (
-            <small className="text-red-300 font-medium">
-              * {errors.address?.postal_code.message}
-            </small>
+            <ErrorMessage>{errors.address.postal_code.message}</ErrorMessage>
           )}
-        </label>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        </Label>
+        <Label>
           City
-          <input
+          <Input
+            hasError={errors.address?.city ? true : false}
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="City"
             defaultValue={me?.shipping?.address.city || undefined}
             {...register("address.city", {
-              required: true,
+              required: "This field is required",
             })}
           />
           {errors.address?.city && (
-            <small className="text-red-300 font-medium">
-              * {errors.address?.city.message}
-            </small>
+            <ErrorMessage>{errors.address.city.message}</ErrorMessage>
           )}
-        </label>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        </Label>
+        <Label>
           State
-          <input
+          <Input
+            hasError={errors.address?.state ? true : false}
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="State"
             defaultValue={me?.shipping?.address.state || undefined}
             {...register("address.state", {
-              required: true,
+              required: "This field is required",
             })}
           />
           {errors.address?.state && (
-            <small className="text-red-300 font-medium">
-              * {errors.address?.state.message}
-            </small>
+            <ErrorMessage>{errors.address.state.message}</ErrorMessage>
           )}
-        </label>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        </Label>
+        <Label>
           Country
-          <input
+          <Input
+            hasError={errors.address?.country ? true : false}
             className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
             type="text"
             placeholder="Country"
             defaultValue={me?.shipping?.address.country || undefined}
             {...register("address.country", {
-              required: true,
+              required: "This field is required",
             })}
           />
           {errors.address?.country && (
-            <small className="text-red-300 font-medium">
-              * {errors.address?.country.message}
-            </small>
+            <ErrorMessage>{errors.address.country.message}</ErrorMessage>
           )}
-        </label>
+        </Label>
 
         <input
-          className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="bg-black hover:bg-white text-white hover:text-black border-black border-[1px] py-2 px-4 duration-300 cursor-pointer mt-5"
           type="submit"
           value={submitValue}
         />

@@ -13,7 +13,7 @@ export const fixPrice = (price: number | string) => {
 };
 
 export const centToDollor = (cent: number) => {
-  return `$ ${cent * 0.01}`;
+  return `$ ${(cent * 0.01).toFixed(2)}`;
 };
 
 export const addressToText = (address: IAddress) => {

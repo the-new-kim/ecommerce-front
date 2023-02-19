@@ -44,7 +44,7 @@ export default function AttachmentDND({
       <Droppable droppableId="images" direction="horizontal">
         {(magic) => (
           <div
-            className="flex justify-start items-center bg-white border shadow-sm border-slate-300 rounded-md p-3"
+            className="flex justify-start items-center bg-white border shadow-sm border-slate-300 rounded-md p-3 mb-3"
             ref={magic.innerRef}
             {...magic.droppableProps}
           >

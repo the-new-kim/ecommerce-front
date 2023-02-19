@@ -3,7 +3,9 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
+  QueryConstraint,
   UpdateData,
   updateDoc,
 } from "firebase/firestore";
@@ -30,9 +32,10 @@ export const getFirebaseDoc = async <T>(
 };
 
 export const getFirebaseDocs = async <T>(
-  collection: CollectionReference<T>
+  collection: CollectionReference<T>,
+  ...queryConstraints: QueryConstraint[]
 ) => {
-  const q = query(collection);
+  const q = query(collection, ...queryConstraints);
 
   const querySnapshot = await getDocs(q);
 

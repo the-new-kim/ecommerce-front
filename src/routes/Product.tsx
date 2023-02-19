@@ -2,12 +2,24 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { headerHeightAtom, userAtom } from "../libs/atoms";
-import { productCollection, userCollection } from "../firebase/config";
+import { productCollection } from "../firebase/config";
 
 import { centToDollor } from "../libs/utils";
 import { ICartProduct, IProduct } from "../firebase/types";
 import { getFirebaseDoc } from "../firebase/utils";
-import Heading from "../components/typos/Heading";
+import Heading from "../components/elements/typos/Heading";
+import Button from "../components/elements/Button";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+function AddedMessage() {
+  return (
+    <div className="flex flex-col justify-center items-center [&>*]:mb-5">
+      <div>Item Added!</div>
+      <Button link="/cart"> Go to cart</Button>
+    </div>
+  );
+}
 
 export default function Product() {
   const [me, setUser] = useRecoilState(userAtom);
@@ -63,12 +75,15 @@ export default function Product() {
     });
 
     // ON SUCCESS MESSAGE
+    // toast("Item added to your cart");
+    toast.info(<AddedMessage />);
   };
 
   if (!product) return <div>No Product..</div>;
 
   return (
     <>
+      <ToastContainer />
       <div className="relative grid grid-cols-2">
         <div>
           {product.imageUrls.map((imageUrl, index) => (
@@ -80,24 +95,22 @@ export default function Product() {
             top: headerHeight,
             height: `calc(100vh - ${headerHeight}px)`,
           }}
-          className="sticky flex flex-col justify-center items-center p-5"
+          className="sticky flex flex-col justify-center items-center"
         >
-          <Heading>{product.title}</Heading>
+          <div className="[&>*]:mb-5 max-w-xs">
+            <Heading tagName="h3">{product.title}</Heading>
 
-          <div>
-            <span>Price: {centToDollor(product.price)}</span>
-            <hr />
-            <span>Quantity: {product.quantity}</span>
+            <div>
+              <div>{centToDollor(product.price)}</div>
+              <div>
+                Availability: {product.quantity ? "In Stock" : "Sold out"}{" "}
+              </div>
+            </div>
+
+            <Button onClick={onAddToCartClick}>Add to Cart</Button>
+
+            <p>{product.description}</p>
           </div>
-
-          <p>Description: {product.description}</p>
-
-          <button
-            onClick={onAddToCartClick}
-            className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Add to Cart
-          </button>
         </div>
       </div>
     </>

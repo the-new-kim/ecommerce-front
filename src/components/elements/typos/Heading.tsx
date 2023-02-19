@@ -27,25 +27,25 @@ const H2 = ({ className, children }: IHeadingComponentProps) => {
 
 const H3 = ({ className, children }: IHeadingComponentProps) => {
   return (
-    <h2 className={"text-lg sm:text-xl md:text-2xl lg:text-3xl " + className}>
+    <h3 className={"text-lg sm:text-xl md:text-2xl lg:text-3xl " + className}>
       {children}
-    </h2>
+    </h3>
   );
 };
 
 const H4 = ({ className, children }: IHeadingComponentProps) => {
   return (
-    <h2 className={"text-base sm:text-lg md:text-xl lg:text-2xl " + className}>
+    <h4 className={"text-base sm:text-lg md:text-xl lg:text-2xl " + className}>
       {children}
-    </h2>
+    </h4>
   );
 };
 
 const H5 = ({ className, children }: IHeadingComponentProps) => {
   return (
-    <h2 className={"text-sm sm:text-base md:text-lg lg:text-xl " + className}>
+    <h5 className={"text-sm sm:text-base md:text-lg lg:text-xl " + className}>
       {children}
-    </h2>
+    </h5>
   );
 };
 

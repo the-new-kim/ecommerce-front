@@ -1,3 +1,5 @@
+import { TPaymentStatusTypes } from "../api/paymentIntents";
+
 export interface IUser {
   isAdmin: boolean;
   wishlist: string[];
@@ -18,6 +20,7 @@ export interface ICartProduct {
 }
 
 export interface IProduct {
+  createdAt: number;
   title: string;
   description: string;
   quantity: number;
@@ -28,10 +31,15 @@ export interface IProduct {
 }
 
 export interface IOrder {
+  createdAt: number;
   products: ICartProduct[];
   orderer: string;
   shipping: IShipping;
-  paymentIntent: string;
+  paymentIntent: {
+    id: string;
+    status: TPaymentStatusTypes;
+    amount: number;
+  };
 }
 
 export interface IAddress {

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import Heading from "./typos/Heading";
+import Heading from "./elements/typos/Heading";
 
 interface IAdminHeaderProps {
   title: string;

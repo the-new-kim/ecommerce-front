@@ -10,6 +10,7 @@ import { useRecoilState } from "recoil";
 import { orderCollection, productCollection } from "../../firebase/config";
 import { updateFirebaseDoc } from "../../firebase/utils";
 import { userAtom } from "../../libs/atoms";
+import Button from "../elements/Button";
 
 export default function PaymentForm() {
   const navigate = useNavigate();
@@ -46,10 +47,15 @@ export default function PaymentForm() {
       //1️⃣ Create new doc "order" on firestore
 
       const orderDocRef = await addDoc(orderCollection, {
+        createdAt: Date.now(),
         orderer: me.id,
         products: me.cart.products,
         shipping: me.shipping,
-        paymentIntent: me.cart.paymentIntent,
+        paymentIntent: {
+          id: me.cart.paymentIntent,
+          status: paymentIntent.status,
+          amount: paymentIntent.amount,
+        },
       });
 
       //2️⃣Upadate product doc
@@ -65,6 +71,9 @@ export default function PaymentForm() {
       //3️⃣ Empty cart & set order from user
       const orders = [orderDocRef.id, ...me!.orders];
       setMe({ ...me!, cart: { paymentIntent: null, products: [] }, orders });
+      navigate(`/me/orders/${orderDocRef.id}`, {
+        state: { id: orderDocRef.id },
+      });
     }
     setMessage(`Status: ${paymentIntent.status}`);
     setIsProcessing(false);
@@ -74,9 +83,12 @@ export default function PaymentForm() {
     <>
       <form onSubmit={handleSubmit}>
         <PaymentElement />
-        <button disabled={isProcessing} className="p-3 bg-blue-200 mt-5">
+        {/* <button disabled={isProcessing} className="p-3 bg-blue-200 mt-5">
           {isProcessing ? "Processing..." : "Pay now"}
-        </button>
+        </button> */}
+        <Button disabled={isProcessing} className="my-5">
+          {isProcessing ? "Processing..." : "Pay now"}
+        </Button>
       </form>
       {message && <div>{message}</div>}
     </>

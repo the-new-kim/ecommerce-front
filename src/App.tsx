@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { IUserAtom, userAtom } from "./libs/atoms";
 import { firebaseAuth, userCollection } from "./firebase/config";
-import Router from "./Router";
+// import Router from "./router";
 
 import { getFirebaseDoc, updateFirebaseDoc } from "./firebase/utils";
+import { RouterProvider } from "react-router-dom";
+import router from "./router";
 
 function App() {
   const [firebaseInit, setFirebaseInit] = useState(false);
@@ -70,7 +72,15 @@ function App() {
     });
   }, [me]);
 
-  return <>{firebaseInit ? <Router /> : <div>Init...</div>}</>;
+  return (
+    <>
+      {firebaseInit ? (
+        <RouterProvider router={router(me)} />
+      ) : (
+        <div>Init...</div>
+      )}
+    </>
+  );
 }
 
 export default App;

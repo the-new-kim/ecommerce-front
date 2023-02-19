@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
-import { IUserAtom } from "../../libs/atoms";
 import { IProductWithId } from "../../routes/Cart";
 import { productCollection } from "../config";
+import { ICartProduct } from "../types";
 import { getFirebaseDoc } from "../utils";
 
-export default function useCartProducts(me: IUserAtom | null) {
-  const [cartProducts, setCartProducts] = useState<IProductWithId[]>([]);
+export default function useCartProducts(
+  cartProducts: ICartProduct[] | undefined
+) {
+  const [products, setProducts] = useState<IProductWithId[]>([]);
   const [totalAmount, setTotalAmount] = useState<number>();
 
   useEffect(() => {
-    if (!me || !me.cart.products.length) return;
+    if (!cartProducts) return;
     (async () => {
       let myCart: IProductWithId[] = [];
 
-      for (let i = 0; i < me.cart.products.length; i++) {
+      for (let i = 0; i < cartProducts.length; i++) {
         try {
-          const { id, quantity } = me.cart.products[i];
+          const { id, quantity } = cartProducts[i];
 
           const foundProduct = await getFirebaseDoc(productCollection, id);
 
@@ -32,13 +34,15 @@ export default function useCartProducts(me: IUserAtom | null) {
       }
 
       setTotalAmount(
-        myCart
-          .map((product) => product.price * product.quantity)
-          .reduce((accumulator, currentValue) => accumulator + currentValue)
+        cartProducts.length
+          ? myCart
+              .map((product) => product.price * product.quantity)
+              .reduce((accumulator, currentValue) => accumulator + currentValue)
+          : 0
       );
-      setCartProducts(myCart);
+      setProducts(myCart);
     })();
-  }, [me]);
+  }, [cartProducts]);
 
-  return { cartProducts, totalAmount };
+  return { products, totalAmount };
 }

@@ -3,11 +3,11 @@ import AdminNav from "../../components/AdminNav";
 
 export default function AdminLayout() {
   return (
-    <div className="grid grid-cols-12 h-full gap-2">
-      <div className="col-span-2">
+    <div className="grid grid-cols-12 h-full [&>*]:p-5">
+      <div className="col-span-2 bg-slate-200">
         <AdminNav />
       </div>
-      <div className="col-span-10 col-start-3 flex flex-col p-5 justify-start items-start">
+      <div className="col-span-10 col-start-3 flex flex-col justify-start items-start">
         <Outlet />
       </div>
     </div>

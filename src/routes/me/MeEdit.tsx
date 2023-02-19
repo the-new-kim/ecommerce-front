@@ -5,7 +5,7 @@ import { userAtom } from "../../libs/atoms";
 import { firebaseAuth } from "../../firebase/config";
 import ShippingInformationForm from "../../components/forms/ShippingInformationForm";
 
-import Heading from "../../components/typos/Heading";
+import Heading from "../../components/elements/typos/Heading";
 
 export default function MeEdit() {
   const [me] = useRecoilState(userAtom);

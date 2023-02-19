@@ -2,7 +2,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, Stripe, StripeElementsOptions } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import PaymentForm from "./forms/PaymentForm";
-import Heading from "./typos/Heading";
+import Heading from "./elements/typos/Heading";
 
 interface ICheckoutProps {
   checkoutOptions: StripeElementsOptions;

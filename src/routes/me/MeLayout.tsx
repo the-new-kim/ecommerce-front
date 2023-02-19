@@ -1,8 +1,8 @@
 import { signOut } from "firebase/auth";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import Button from "../../components/Button";
-import Heading from "../../components/typos/Heading";
+import Button from "../../components/elements/Button";
+import Heading from "../../components/elements/typos/Heading";
 import { firebaseAuth } from "../../firebase/config";
 import { userAtom } from "../../libs/atoms";
 

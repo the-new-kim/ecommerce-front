@@ -2,8 +2,8 @@
 
 ## global
 
-- / .........................(👷‍♀️)
-- /cart .....................(👷‍♀️)
+- / .........................(✅)
+- /cart .....................(✅)
 - /wishlist .................(❌)
 - /search ...................(❌)
 - /products/:id .............(👷‍♀️)
@@ -11,16 +11,16 @@
 
 ## checkout
 
-- /checkout/information .....(👷‍♀️)
-- /checkout/shipping ........(❌)
-- /checkout/payment .........(👷‍♀️)
+- /checkout/information .....(✅)
+- /checkout/shipping ........(✅)
+- /checkout/payment .........(✅)
 
 ## admin
 
 - /admin ....................(❌)
-- /admin/products ...........(👷‍♀️)
-- /admin/products/add .......(👷‍♀️)
-- /admin/products/:id .......(👷‍♀️)
+- /admin/products ...........(✅)
+- /admin/products/add .......(✅)
+- /admin/products/:id .......(✅)
 - /admin/users/ .............(❌)
 - /admin/users/add ..........(❌)
 - /admin/users/:id ..........(❌)
@@ -31,7 +31,7 @@
 
 - /me .......................(❌)
 - /me/edit ..................(❌)
-- /me/orders ................(❌)
+- /me/orders ................(👷‍♀️)
 - /me/orders/:id ............(❌)
 
 ### Todos...

@@ -28,7 +28,7 @@ export default function Header() {
       ref={ref}
       className="fixed top-0 left-0 z-50 bg-white flex justify-between items-center p-5 shadow-sm"
     >
-      <Link to="/">Home</Link>
+      <Link to="/">Toy shop</Link>
 
       <nav>
         <ul className="flex [&>*]:ml-3 justify-end items-center text-2xl">
@@ -49,8 +49,13 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link to="/cart">
+            <Link to="/cart" className="relative">
               <ShoppingCart />
+              {me && !!me.cart.products.length && (
+                <small className="absolute text-xs -top-1 -right-1 bg-black text-white shadow-md p-2 w-3 h-3 flex justify-center items-center rounded-full">
+                  {me.cart.products.length}
+                </small>
+              )}
             </Link>
           </li>
           {me?.isAdmin && (

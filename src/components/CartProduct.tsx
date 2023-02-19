@@ -27,6 +27,8 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
       (product) => product.id !== id
     );
 
+    console.log("FILTERD:::", filteredCartProducts);
+
     //2️⃣ update recoil state
     setMe((oldMe) => {
       if (!oldMe) return oldMe;

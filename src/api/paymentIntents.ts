@@ -4,6 +4,15 @@ interface IStripeResponse {
   error?: any;
 }
 
+export type TPaymentStatusTypes =
+  | "requires_payment_method"
+  | "requires_confirmation"
+  | "requires_action"
+  | "processing"
+  | "requires_capture"
+  | "canceled"
+  | "succeeded";
+
 interface IStripePaymentIntentData {
   id: string;
   // object: "payment_intent";
@@ -58,14 +67,7 @@ interface IStripePaymentIntentData {
   // shipping: null;
   // statement_descriptor: null;
   // statement_descriptor_suffix: null;
-  status:
-    | "requires_payment_method"
-    | "requires_confirmation"
-    | "requires_action"
-    | "processing"
-    | "requires_capture"
-    | "canceled"
-    | "succeeded";
+  status: TPaymentStatusTypes;
   // transfer_data: null;
   // transfer_group: null;
 }

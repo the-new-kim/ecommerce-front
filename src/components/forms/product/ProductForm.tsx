@@ -19,6 +19,11 @@ import AttachmentDND from "./AttachmentDND";
 
 import { IProductWithId } from "../../../routes/Cart";
 import { updateFirebaseDoc } from "../../../firebase/utils";
+import Form from "../../elements/form/Form";
+import Label from "../../elements/form/Label";
+import Input from "../../elements/form/Input";
+import ErrorMessage from "../../elements/form/ErrorMessage";
+import TextArea from "../../elements/form/TextArea";
 
 interface IProductFormProps {
   defaultValue?: IProductWithId;
@@ -73,6 +78,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
 
     try {
       const newProduct = await addDoc(productCollection, {
+        createdAt: Date.now(),
         title,
         description,
         imageUrls,
@@ -190,34 +196,29 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
   return (
     <>
       {isUploading && <Message>Uploading...</Message>}
-      <form
+      <Form
         ref={formRef}
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col"
         onSubmit={
           defaultValue ? handleSubmit(onUpdate) : handleSubmit(onCreate)
         }
       >
         {/* TITLE */}
-        <label className="text-gray-700 text-sm font-bold mb-2">
+        <Label>
           Title
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
+          <Input
+            hasError={errors.title ? true : false}
             type="text"
             defaultValue={defaultValue?.title || undefined}
             {...register("title", { required: "This field is required" })}
           />
-          {errors.title && (
-            <small className="text-red-300 font-medium">
-              * {errors.title.message}
-            </small>
-          )}
-        </label>
+          {errors.title && <ErrorMessage>{errors.title.message}</ErrorMessage>}
+        </Label>
 
         {/* DESCRIPTION */}
-        <label className="text-gray-700 text-sm font-bold mb-2">
+        <Label>
           Description
-          <textarea
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
+          <TextArea
+            hasError={errors.description ? true : false}
             placeholder="Description"
             defaultValue={defaultValue?.description || undefined}
             {...register("description", {
@@ -229,33 +230,15 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
             })}
           />
           {errors.description && (
-            <small className="text-red-300 font-medium">
-              * {errors.description.message}
-            </small>
+            <ErrorMessage>{errors.description.message}</ErrorMessage>
           )}
-        </label>
-
-        {/* CATEGORY */}
-        {/* <label className="text-gray-700 text-sm font-bold mb-2">
-          Category
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
-            type="text"
-            {...register("categoryId", { required: "This field is required" })}
-          />
-          {errors.categoryId && (
-            <small className="text-red-300 font-medium">
-              * {errors.categoryId.message}
-            </small>
-          )}
-        </label> */}
+        </Label>
 
         {/* PRICE & QUANTITY & ACTIVE */}
-        <div className="flex">
-          <label className="text-gray-700 text-sm font-bold mb-2 mr-2">
+        <div className="flex [&>*]:mr-3">
+          <Label>
             Price
-            <input
-              className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
+            <Input
               type="number"
               step="0.01"
               defaultValue={
@@ -276,12 +259,11 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
                 * {errors.price.message}
               </small>
             )}
-          </label>
+          </Label>
 
-          <label className="text-gray-700 text-sm font-bold mb-2">
+          <Label>
             Quantity
-            <input
-              className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
+            <Input
               type="number"
               min={1}
               defaultValue={defaultValue?.quantity || 100}
@@ -296,26 +278,25 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
                 * {errors.quantity.message}
               </small>
             )}
-          </label>
+          </Label>
 
-          <label className="text-gray-700 text-sm font-bold mb-2 flex flex-col">
+          <Label>
             Active
             <div className="w-full h-full flex justify-center items-center">
-              <input
-                className="mt-1 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 rounded-md sm:text-sm focus:ring-1"
+              <Input
                 type="checkbox"
                 defaultChecked={defaultValue?.active === false ? false : true}
                 {...register("active")}
               />
             </div>
-          </label>
+          </Label>
         </div>
 
         {/* IMAGES */}
-        <label className="text-gray-700 text-sm font-bold mb-2">
+        <Label>
           Images
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 w-full rounded-md sm:text-sm focus:ring-1"
+          <Input
+            className="!border-none"
             type="file"
             accept="image/*"
             {...register("imageUrls", {
@@ -328,7 +309,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
               * {errors.imageUrls.message}
             </small>
           )}
-        </label>
+        </Label>
 
         {!!attachments.length && (
           <AttachmentDND
@@ -337,14 +318,12 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
           />
         )}
 
-        <input
-          className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
-          disabled:bg-blue-200 disabled:cursor-default"
+        <Input
           type="submit"
           value={defaultValue ? "Save" : "Create"}
           disabled={disabled || isUploading}
         />
-      </form>
+      </Form>
     </>
   );
 }

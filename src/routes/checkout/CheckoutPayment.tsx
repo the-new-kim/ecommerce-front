@@ -15,11 +15,11 @@ import useCartProducts from "../../firebase/hooks/useCartProducts";
 import ShippingInformation from "../../components/checkout/ShippingInformation";
 import ContainerWithRoundedBorder from "../../components/ContainerWithRoundedBorder";
 
-import Heading from "../../components/typos/Heading";
+import Heading from "../../components/elements/typos/Heading";
 
 export default function CheckoutPayment() {
   const [me, setMe] = useRecoilState(userAtom);
-  const { totalAmount } = useCartProducts(me);
+  const { totalAmount } = useCartProducts(me?.cart.products);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null>>();
   const [options, setOptions] = useState<StripeElementsOptions>();
   const [times, setTiems] = useState(1);
@@ -105,7 +105,9 @@ export default function CheckoutPayment() {
 
       {stripePromise && options && (
         <ContainerWithRoundedBorder>
-          <Heading tagName="h1">Payment</Heading>
+          <Heading tagName="h4" className="mb-5">
+            Payment
+          </Heading>
           <Elements stripe={stripePromise} options={options}>
             <PaymentForm />
           </Elements>
