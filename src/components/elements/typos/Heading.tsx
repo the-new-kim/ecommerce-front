@@ -11,7 +11,12 @@ interface IHeadingProps extends IHeadingComponentProps {
 
 const H1 = ({ className, children }: IHeadingComponentProps) => {
   return (
-    <h1 className={"text-2xl sm:text-3xl md:text-4xl lg:text-5xl " + className}>
+    <h1
+      className={
+        "font-semibold text-2xl sm:text-3xl md:text-4xl lg:text-5xl " +
+        className
+      }
+    >
       {children}
     </h1>
   );
@@ -19,7 +24,11 @@ const H1 = ({ className, children }: IHeadingComponentProps) => {
 
 const H2 = ({ className, children }: IHeadingComponentProps) => {
   return (
-    <h2 className={"text-xl sm:text-2xl md:text-3xl lg:text-4xl " + className}>
+    <h2
+      className={
+        "font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl " + className
+      }
+    >
       {children}
     </h2>
   );
@@ -27,7 +36,11 @@ const H2 = ({ className, children }: IHeadingComponentProps) => {
 
 const H3 = ({ className, children }: IHeadingComponentProps) => {
   return (
-    <h3 className={"text-lg sm:text-xl md:text-2xl lg:text-3xl " + className}>
+    <h3
+      className={
+        "font-semibold text-lg sm:text-xl md:text-2xl lg:text-3xl " + className
+      }
+    >
       {children}
     </h3>
   );
@@ -35,7 +48,11 @@ const H3 = ({ className, children }: IHeadingComponentProps) => {
 
 const H4 = ({ className, children }: IHeadingComponentProps) => {
   return (
-    <h4 className={"text-base sm:text-lg md:text-xl lg:text-2xl " + className}>
+    <h4
+      className={
+        "font-semibold text-base sm:text-lg md:text-xl lg:text-2xl " + className
+      }
+    >
       {children}
     </h4>
   );
@@ -43,7 +60,11 @@ const H4 = ({ className, children }: IHeadingComponentProps) => {
 
 const H5 = ({ className, children }: IHeadingComponentProps) => {
   return (
-    <h5 className={"text-sm sm:text-base md:text-lg lg:text-xl " + className}>
+    <h5
+      className={
+        "font-semibold text-sm sm:text-base md:text-lg lg:text-xl " + className
+      }
+    >
       {children}
     </h5>
   );

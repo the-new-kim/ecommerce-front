@@ -15,7 +15,6 @@ import AdminHome from "./routes/admin/AdminHome";
 import ProductsHome from "./routes/admin/products/ProductsHome";
 import AdminLayout from "./routes/admin/AdminLayout";
 import Settings from "./routes/admin/Settings";
-import Completion from "./routes/Completion";
 import CreateProduct from "./routes/admin/products/CreateProduct";
 import UsersHome from "./routes/admin/users/UsersHome";
 import OrdersHome from "./routes/admin/orders/OrdersHome";
@@ -112,8 +111,6 @@ const globalRoutes: RouteObject[] = [
     path: "products",
     children: [{ path: ":productId", element: <Product /> }],
   },
-
-  { path: "completion", element: <Completion /> },
 
   { path: "auth", element: <Auth /> },
   ...meRoutes,

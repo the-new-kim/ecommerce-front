@@ -5,26 +5,20 @@ import { headerHeightAtom, userAtom } from "../libs/atoms";
 import { productCollection } from "../firebase/config";
 
 import { centToDollor } from "../libs/utils";
-import { ICartProduct, IProduct } from "../firebase/types";
+import { ICartProduct } from "../firebase/types";
 import { getFirebaseDoc } from "../firebase/utils";
 import Heading from "../components/elements/typos/Heading";
 import Button from "../components/elements/Button";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-function AddedMessage() {
-  return (
-    <div className="flex flex-col justify-center items-center [&>*]:mb-5">
-      <div>Item Added!</div>
-      <Button link="/cart"> Go to cart</Button>
-    </div>
-  );
-}
+import { toast } from "react-toastify";
+import AddedToCartMessage from "../components/messages/AddedToCartMessage";
+import { IProductWithId } from "./Cart";
+import ReviewSection from "../components/review/ReviewSection";
+import ReviewStars from "../components/review/ReviewStars";
 
 export default function Product() {
-  const [me, setUser] = useRecoilState(userAtom);
+  const [me, setMe] = useRecoilState(userAtom);
   const { productId } = useParams();
-  const [product, setProduct] = useState<IProduct & { id: string }>();
+  const [product, setProduct] = useState<IProductWithId>();
 
   useEffect(() => {
     if (!productId) return;
@@ -66,7 +60,7 @@ export default function Product() {
       newCartProducts.push(cartProduct);
     }
 
-    setUser((prev) => {
+    setMe((prev) => {
       if (!prev) return prev;
       const newMe = { ...prev, cart: { ...prev.cart } };
 
@@ -74,20 +68,17 @@ export default function Product() {
       return newMe;
     });
 
-    // ON SUCCESS MESSAGE
-    // toast("Item added to your cart");
-    toast.info(<AddedMessage />);
+    toast.info(<AddedToCartMessage product={product} />);
   };
 
   if (!product) return <div>No Product..</div>;
 
   return (
     <>
-      <ToastContainer />
       <div className="relative grid grid-cols-2">
         <div>
           {product.imageUrls.map((imageUrl, index) => (
-            <img key={"img" + index} src={imageUrl}></img>
+            <img key={"img" + index} src={imageUrl} />
           ))}
         </div>
         <div
@@ -98,7 +89,13 @@ export default function Product() {
           className="sticky flex flex-col justify-center items-center"
         >
           <div className="[&>*]:mb-5 max-w-xs">
-            <Heading tagName="h3">{product.title}</Heading>
+            <div>
+              <Heading tagName="h3">{product.title}</Heading>
+              <div className="flex justify-start items-center [&>*]:mr-3">
+                <ReviewStars rating={Math.floor(Math.random() * 5)} />
+                <span>63 Reviews</span>
+              </div>
+            </div>
 
             <div>
               <div>{centToDollor(product.price)}</div>
@@ -107,12 +104,15 @@ export default function Product() {
               </div>
             </div>
 
-            <Button onClick={onAddToCartClick}>Add to Cart</Button>
+            <div className="flex justify-start items-center [&>*]:mr-3">
+              <Button onClick={onAddToCartClick}>Add to Cart</Button>
+            </div>
 
             <p>{product.description}</p>
           </div>
         </div>
       </div>
+      <ReviewSection />
     </>
   );
 }

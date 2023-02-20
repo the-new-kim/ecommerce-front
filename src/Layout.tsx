@@ -1,4 +1,7 @@
 import { Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { useRecoilValue } from "recoil";
 
 import Footer from "./components/Footer";
@@ -9,6 +12,7 @@ export default function Layout() {
   const headerHeight = useRecoilValue(headerHeightAtom);
   return (
     <div className="relative flex flex-col min-h-screen w-full justify-start items-start [&>*]:w-full font-light">
+      <ToastContainer />
       <Header />
 
       <main
