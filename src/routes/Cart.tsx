@@ -8,6 +8,7 @@ import CartProducts from "../components/CartProducts";
 import useCartProducts from "../firebase/hooks/useCartProducts";
 import Button from "../components/elements/Button";
 import Heading from "../components/elements/typos/Heading";
+import Empty from "../components/Empty";
 
 export interface IProductWithId extends IProduct {
   id: string;
@@ -41,11 +42,7 @@ export default function Cart() {
           </div>
         </>
       ) : (
-        <div className="w-full h-full flex-grow flex justify-center items-center">
-          <Heading tagName="h5" className="mb-10">
-            Your cart is empty
-          </Heading>
-        </div>
+        <Empty>Your Cart is empty</Empty>
       )}
     </div>
   );

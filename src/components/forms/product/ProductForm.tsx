@@ -218,6 +218,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
         <Label>
           Description
           <TextArea
+            rows="10"
             hasError={errors.description ? true : false}
             placeholder="Description"
             defaultValue={defaultValue?.description || undefined}

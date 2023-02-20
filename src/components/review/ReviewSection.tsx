@@ -19,48 +19,51 @@ const avatars = [
   "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fGF2YXRhcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
   "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDh8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=800&q=60",
 ];
-const getRandomRating = () => Math.floor(Math.random() * 4) + 1;
+
+const getRandomInt = (min: number, max: number) => {
+  return Math.round(Math.random() * (max - min)) + min;
+};
 
 const fakeUserReviews = [
   {
-    name: names[getRandomRating() - 1],
-    avatar: avatars[getRandomRating() - 1],
-    rating: getRandomRating(),
+    name: names[getRandomInt(0, names.length - 1)],
+    avatar: avatars[getRandomInt(0, avatars.length - 1)],
+    rating: getRandomInt(1, 5),
     title: "Lorem ipsum",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
   },
   {
-    name: names[getRandomRating() - 1],
-    avatar: avatars[getRandomRating() - 1],
-    rating: getRandomRating(),
+    name: names[getRandomInt(0, names.length - 1)],
+    avatar: avatars[getRandomInt(0, avatars.length - 1)],
+    rating: getRandomInt(1, 5),
     title: "Lorem ipsum",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
   },
   {
-    name: names[getRandomRating() - 1],
-    avatar: avatars[getRandomRating() - 1],
-    rating: getRandomRating(),
+    name: names[getRandomInt(0, names.length - 1)],
+    avatar: avatars[getRandomInt(0, avatars.length - 1)],
+    rating: getRandomInt(1, 5),
     title: "Lorem ipsum",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
   },
   {
-    name: names[getRandomRating() - 1],
-    avatar: avatars[getRandomRating() - 1],
-    rating: getRandomRating(),
+    name: names[getRandomInt(0, names.length - 1)],
+    avatar: avatars[getRandomInt(0, avatars.length - 1)],
+    rating: getRandomInt(1, 5),
     title: "Lorem ipsum",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
   },
   {
-    name: names[getRandomRating() - 1],
-    avatar: avatars[getRandomRating() - 1],
-    rating: getRandomRating(),
+    name: names[getRandomInt(0, names.length - 1)],
+    avatar: avatars[getRandomInt(0, avatars.length - 1)],
+    rating: getRandomInt(1, 5),
     title: "Lorem ipsum",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
   },
   {
-    name: names[getRandomRating() - 1],
-    avatar: avatars[getRandomRating() - 1],
-    rating: getRandomRating(),
+    name: names[getRandomInt(0, names.length - 1)],
+    avatar: avatars[getRandomInt(0, avatars.length - 1)],
+    rating: getRandomInt(1, 5),
     title: "Lorem ipsum",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
   },
@@ -74,10 +77,14 @@ export default function ReviewSection({ rating = 4 }: IReviewSectionProps) {
   return (
     <section className="p-5 [&>*]:mb-5">
       <Heading tagName="h3">Reviews</Heading>
-      <div className="border-[1px] border-black p-5 flex justify-between items-start relative">
+      <div className="relative flex flex-col md:flex-row justify-between items-start p-5 border-[1px] border-black">
         {/* HEADER */}
 
-        <div className="flex flex-col [&>*]:mb-3">
+        <div
+          className="flex flex-col w-full md:w-auto [&>*]:mb-3 items-center
+        border-b-[1px] border-black
+        "
+        >
           <div className="flex justify-start items-center">
             <div className="bg-orange-400 py-1 px-3 text-white mr-3">
               {rating}
@@ -104,7 +111,7 @@ export default function ReviewSection({ rating = 4 }: IReviewSectionProps) {
                         <div
                           className="absolute top-0 left-0 h-full bg-orange-400"
                           style={{
-                            width: `${Math.floor(Math.random() * 100)}%`,
+                            width: `${Math.round(Math.random() * 100)}%`,
                           }}
                         />
                       </div>
@@ -122,7 +129,11 @@ export default function ReviewSection({ rating = 4 }: IReviewSectionProps) {
 
         {/* MAIN */}
 
-        <div className="flex-grow flex flex-col justify-start items-start border-l-[1px] border-black min-h-full ml-5 pl-5">
+        <div
+          className="flex-grow flex flex-col justify-start items-start min-h-full  mt-10
+        md:ml-5 md:border-l-[1px] md:border-black md:mt-0 md:pl-5
+        "
+        >
           {fakeUserReviews.map((userReview, index) => (
             <UserReview key={"user_review" + index} {...userReview} />
           ))}

@@ -1,8 +1,8 @@
 import {
   Gear,
+  Heart,
   MagnifyingGlass,
   ShoppingCart,
-  Star,
   User,
 } from "phosphor-react";
 import { useEffect, useRef, useState } from "react";
@@ -50,7 +50,7 @@ export default function Header() {
       ref={ref}
       className="fixed top-0 left-0 z-50 bg-white flex justify-between items-center p-5 shadow-sm"
     >
-      <Link to="/" className="font-semibold">
+      <Link to="/" className="font-gloock">
         Toy shop
       </Link>
 
@@ -65,8 +65,9 @@ export default function Header() {
                 >
                   <input
                     {...register("keyword")}
+                    placeholder="Search"
                     type="text"
-                    className="text-right text-sm px-3 border-b-[1px] border-black py-1 focus:outline-none"
+                    className="text-center text-sm px-3 border-b-[1px] border-black py-1 focus:outline-none"
                   />
                 </form>
               )}
@@ -81,7 +82,7 @@ export default function Header() {
 
           <li>
             <Link to="/wishlist">
-              <Star />
+              <Heart />
             </Link>
           </li>
           <li>

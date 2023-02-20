@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
+import Heading from "../../components/elements/typos/Heading";
+import Empty from "../../components/Empty";
 import OrderCard, { IOrderWithId } from "../../components/OrderCard";
 import { orderCollection } from "../../firebase/config";
 
@@ -35,12 +37,14 @@ export default function MeOrders() {
   console.log("MY ORDERS", myOrders);
 
   return (
-    <div>
-      <div>Orders</div>
+    <div className="w-full h-full flex flex-col">
+      <Heading tagName="h3" className="mb-5">
+        Order history
+      </Heading>
       {!!myOrders.length ? (
         myOrders.map((order) => <OrderCard key={order.id} order={order} />)
       ) : (
-        <div>No orders</div>
+        <Empty>You haven't placed any orders yet</Empty>
       )}
     </div>
   );

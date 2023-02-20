@@ -10,7 +10,9 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <RecoilRoot>
-    <App />
+    <div className="font-roboto">
+      <App />
+    </div>
   </RecoilRoot>
   // </React.StrictMode>
 );

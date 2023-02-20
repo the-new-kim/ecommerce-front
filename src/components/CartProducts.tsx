@@ -1,3 +1,4 @@
+import useViewportSize from "../libs/hooks/useViewportSize";
 import { centToDollor } from "../libs/utils";
 import { IProductWithId } from "../routes/Cart";
 import CartProduct from "./CartProduct";
@@ -14,16 +15,21 @@ export default function CartProducts({
   cartProducts,
   totalAmount,
 }: ICartProductsProps) {
+  const {
+    mediaQuery: { md },
+  } = useViewportSize();
   return (
     <>
       <Table>
-        <THead>
-          <THeadRow>
-            <td className="w-[60%] text-start">Product</td>
-            <td className="text-center">Quantity</td>
-            <td className="text-right">Total</td>
-          </THeadRow>
-        </THead>
+        {md && (
+          <THead>
+            <THeadRow>
+              <td className="w-[60%] text-start">Product</td>
+              <td className="text-center">Quantity</td>
+              <td className="text-right">Total</td>
+            </THeadRow>
+          </THead>
+        )}
         <tbody>
           {cartProducts.map((cartProduct, index) => (
             <CartProduct
@@ -31,16 +37,24 @@ export default function CartProducts({
               cartProduct={cartProduct}
             />
           ))}
-          <tr className="[&>*]:p-3">
-            <td></td>
-            <td></td>
-            <td className="text-right min-w-max">
-              <span className="mr-10">Subtotal</span>{" "}
-              {centToDollor(totalAmount)}
-            </td>
-          </tr>
+          {md && (
+            <tr className="[&>*]:p-3">
+              <td></td>
+              <td></td>
+              <td className="text-right min-w-max">
+                <span className="mr-10">Subtotal</span>{" "}
+                {centToDollor(totalAmount)}
+              </td>
+            </tr>
+          )}
         </tbody>
       </Table>
+      {!md && (
+        <div className="flex justify-center items-center my-5">
+          <div>Subtotal</div>
+          <div className="ml-3">{centToDollor(totalAmount)}</div>
+        </div>
+      )}
     </>
   );
 }

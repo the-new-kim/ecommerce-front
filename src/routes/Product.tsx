@@ -14,11 +14,16 @@ import AddedToCartMessage from "../components/messages/AddedToCartMessage";
 import { IProductWithId } from "./Cart";
 import ReviewSection from "../components/review/ReviewSection";
 import ReviewStars from "../components/review/ReviewStars";
+import useViewportSize from "../libs/hooks/useViewportSize";
 
 export default function Product() {
   const [me, setMe] = useRecoilState(userAtom);
   const { productId } = useParams();
   const [product, setProduct] = useState<IProductWithId>();
+  const {
+    size: { width },
+    mediaQuery: { md },
+  } = useViewportSize();
 
   useEffect(() => {
     if (!productId) return;
@@ -75,24 +80,27 @@ export default function Product() {
 
   return (
     <>
-      <div className="relative grid grid-cols-2">
+      <section className="relative flex flex-col md:grid md:grid-cols-2">
+        {/* IMAGE */}
         <div>
           {product.imageUrls.map((imageUrl, index) => (
             <img key={"img" + index} src={imageUrl} />
           ))}
         </div>
+
+        {/* PRODUCT INFO */}
         <div
           style={{
-            top: headerHeight,
-            height: `calc(100vh - ${headerHeight}px)`,
+            top: md ? headerHeight : 0,
+            height: md ? `calc(100vh - ${headerHeight}px)` : "100%",
           }}
-          className="sticky flex flex-col justify-center items-center"
+          className="md:sticky flex flex-col justify-center items-center p-5"
         >
-          <div className="[&>*]:mb-5 max-w-xs">
+          <div className="[&>*]:mb-5 md:max-w-sm">
             <div>
               <Heading tagName="h3">{product.title}</Heading>
               <div className="flex justify-start items-center [&>*]:mr-3">
-                <ReviewStars rating={Math.floor(Math.random() * 5)} />
+                <ReviewStars rating={Math.round(Math.random() * 5)} />
                 <span>63 Reviews</span>
               </div>
             </div>
@@ -111,7 +119,7 @@ export default function Product() {
             <p>{product.description}</p>
           </div>
         </div>
-      </div>
+      </section>
       <ReviewSection />
     </>
   );

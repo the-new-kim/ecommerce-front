@@ -8,6 +8,10 @@ import { useForm } from "react-hook-form";
 import { firebaseAuth, userCollection } from "../../firebase/config";
 import { useEffect, useState } from "react";
 import Message from "../Message";
+import Form from "../elements/form/Form";
+import Label from "../elements/form/Label";
+import Input from "../elements/form/Input";
+import ErrorMessage from "../elements/form/ErrorMessage";
 
 interface IRegisterForm {
   email: string;
@@ -62,7 +66,7 @@ export default function RegisterForm() {
     } catch (error) {
       if (error instanceof Error) {
         if (error.message.includes("email")) {
-          setError("email", { message: "Email already in use." });
+          setError("email", { message: "Email already in use" });
         }
       }
       console.log("ERROR:::", error);
@@ -78,84 +82,54 @@ export default function RegisterForm() {
   return (
     <>
       {creating && <Message>Creating account...</Message>}
-      <form
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Label>
           Email
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+          <Input
+            hasError={!!errors.email}
             type="email"
-            {...register("email", { required: true })}
+            {...register("email", { required: "This field is required" })}
           />
-          {errors.email && (
-            <small className="text-red-300 font-medium">
-              * {errors.email.message}
-            </small>
-          )}
-        </label>
+          {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
+        </Label>
 
-        {/* <label className="block text-gray-700 text-sm font-bold mb-2">
-          Name
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
-            type="text"
-            {...register("name", { required: true })}
-          />
-          {errors.name && (
-            <small className="text-red-300 font-medium">
-              * {errors.name.message}
-            </small>
-          )}
-        </label> */}
-
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        <Label>
           Password
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+          <Input
+            hasError={!!errors.password}
             type="password"
             placeholder="Password"
             {...register("password", {
-              required: true,
+              required: "This field is required",
               minLength: {
                 value: 8,
-                message: "Password must be 8 or more characters in length.",
+                message: "Password must be 8 or more characters in length",
               },
             })}
           />
           {errors.password && (
-            <small className="text-red-300 font-medium">
-              * {errors.password.message}
-            </small>
+            <ErrorMessage>{errors.password.message}</ErrorMessage>
           )}
-        </label>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        </Label>
+        <Label>
           Confirm Password
-          <input
-            className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
+          <Input
+            hasError={!!errors.passwordRepeat}
             type="password"
             placeholder="Confirm Password"
             {...register("passwordRepeat", {
-              required: true,
+              required: "This field is required",
               validate: (value) =>
                 value === watch("password") ||
-                "Password confirmation does not match.",
+                "Password confirmation does not match",
             })}
           />
           {errors.passwordRepeat && (
-            <small className="text-red-300 font-medium">
-              * {errors.passwordRepeat.message}
-            </small>
+            <ErrorMessage>{errors.passwordRepeat.message}</ErrorMessage>
           )}
-        </label>
-        <input
-          className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          disabled={creating}
-          type="submit"
-          value="Create"
-        />
-      </form>
+        </Label>
+        <Input disabled={creating} type="submit" value="Create" />
+      </Form>
     </>
   );
 }

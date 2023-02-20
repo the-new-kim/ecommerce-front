@@ -13,8 +13,7 @@ const H1 = ({ className, children }: IHeadingComponentProps) => {
   return (
     <h1
       className={
-        "font-semibold text-2xl sm:text-3xl md:text-4xl lg:text-5xl " +
-        className
+        "font-gloock text-2xl sm:text-3xl md:text-4xl lg:text-5xl " + className
       }
     >
       {children}
@@ -26,7 +25,7 @@ const H2 = ({ className, children }: IHeadingComponentProps) => {
   return (
     <h2
       className={
-        "font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl " + className
+        "font-gloock text-xl sm:text-2xl md:text-3xl lg:text-4xl " + className
       }
     >
       {children}
@@ -38,7 +37,7 @@ const H3 = ({ className, children }: IHeadingComponentProps) => {
   return (
     <h3
       className={
-        "font-semibold text-lg sm:text-xl md:text-2xl lg:text-3xl " + className
+        "font-gloock text-lg sm:text-xl md:text-2xl lg:text-3xl " + className
       }
     >
       {children}
@@ -50,7 +49,7 @@ const H4 = ({ className, children }: IHeadingComponentProps) => {
   return (
     <h4
       className={
-        "font-semibold text-base sm:text-lg md:text-xl lg:text-2xl " + className
+        "font-gloock text-base sm:text-lg md:text-xl lg:text-2xl " + className
       }
     >
       {children}
@@ -62,7 +61,7 @@ const H5 = ({ className, children }: IHeadingComponentProps) => {
   return (
     <h5
       className={
-        "font-semibold text-sm sm:text-base md:text-lg lg:text-xl " + className
+        "font-gloock text-sm sm:text-base md:text-lg lg:text-xl " + className
       }
     >
       {children}

@@ -7,6 +7,8 @@ import RegisterForm from "../components/forms/RegisterForm";
 import SiginInForm from "../components/forms/SignInForm";
 
 import { firebaseAuth } from "../firebase/config";
+import Button from "../components/elements/Button";
+import { GithubLogo, GoogleLogo } from "phosphor-react";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -37,29 +39,28 @@ export default function Auth() {
   const toggleAccount = () => setNewAccount((prev) => !prev);
 
   return (
-    <div className="flex flex-col justify-center items-center p-5">
-      {newAccount ? <RegisterForm /> : <SiginInForm />}
+    <div className="w-full flex justify-center items-center">
+      <div className="flex flex-col justify-center items-center max-w-lg w-full">
+        <div className="mb-5 border-[1px] border-black p-5 w-full">
+          <div className="mb-5">
+            {newAccount ? <RegisterForm /> : <SiginInForm />}
+          </div>
+          <button className="underline mb-3" onClick={toggleAccount}>
+            {newAccount ? "sign in" : "create account"}
+          </button>
+        </div>
 
-      <button className="underline" onClick={toggleAccount}>
-        {newAccount ? "sign in" : "create account"}
-      </button>
-
-      <span className="flex flex-col [&>*]:mb-3">
-        <button
-          className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          onClick={onSocialClick}
-          name="google"
-        >
-          Google Login
-        </button>
-        <button
-          className="mt-5 cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          onClick={onSocialClick}
-          name="github"
-        >
-          Github Login
-        </button>
-      </span>
+        <div className="flex flex-col [&>*]:mb-3 [&>*]:flex [&>*]:justify-center [&>*]:items-center w-full">
+          <Button onClick={onSocialClick} name="google">
+            <GoogleLogo className="mr-3" />
+            {!newAccount ? "sign in" : "sign up"} with google account
+          </Button>
+          <Button onClick={onSocialClick} name="github">
+            <GithubLogo className="mr-3" />
+            {!newAccount ? "sign in" : "sign up"} with github account
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

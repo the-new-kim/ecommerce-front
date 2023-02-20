@@ -40,6 +40,7 @@ export interface IOrder {
     status: TPaymentStatusTypes;
     amount: number;
   };
+  // trackingCode:string | null
 }
 
 export interface IAddress {

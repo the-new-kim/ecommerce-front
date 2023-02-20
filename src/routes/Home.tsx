@@ -11,7 +11,7 @@ export default function Home() {
   );
 
   return (
-    <div className="p-5 w-full flex justify-center items-center flex-col">
+    <div className="p-5 w-full flex flex-col justify-center items-center">
       {products && !!products.length && <GridProducts products={products} />}
     </div>
   );

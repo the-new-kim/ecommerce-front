@@ -9,16 +9,17 @@ interface IGridProductsProps {
 
 export default function GridProducts({ products }: IGridProductsProps) {
   return (
-    <div className="grid grid-cols-3 gap-5 max-w-5xl">
+    <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl gap-5 w-full">
       {products.map((product) => (
         <div
           key={product.id}
-          className="flex flex-col justify-center items-center [&>*]:mb-3"
+          className="flex flex-col justify-center items-center [&>*]:mb-3 w-full"
         >
-          <Link to={`/products/${product.id}`}>
-            <div className="aspect-[2/3] w-full h-full overflow-hidden">
+          <Link to={`/products/${product.id}`} className="w-full">
+            <div className="aspect-[2/3] w-full h-full overflow-hidden bg-slate-200">
               <img
                 src={product.imageUrls[0]}
+                alt={product.title}
                 className="w-full h-full object-cover hover:scale-105 duration-300 transition-transform"
               />
             </div>
@@ -32,6 +33,6 @@ export default function GridProducts({ products }: IGridProductsProps) {
           </div>
         </div>
       ))}
-    </div>
+    </section>
   );
 }

@@ -25,11 +25,11 @@ import CheckoutLayout from "./routes/checkout/CheckoutLayout";
 import CheckoutInformation from "./routes/checkout/CheckoutInformation";
 import CheckoutShipping from "./routes/checkout/CheckoutShipping";
 import CheckoutPayment from "./routes/checkout/CheckoutPayment";
-import MeHome from "./routes/me/MeHome";
+
 import MeLayout from "./routes/me/MeLayout";
-import MeEdit from "./routes/me/MeEdit";
 import MeOrders from "./routes/me/MeOrders";
 import MeOrderDetail from "./routes/me/MeOrderDetail";
+import MeAddresses from "./routes/me/MeAddresses";
 
 const adminOnlyRoutes: RouteObject[] = [
   {
@@ -70,15 +70,12 @@ const meRoutes: RouteObject[] = [
     path: "me",
     element: <MeLayout />,
     children: [
-      { path: "", element: <MeHome />, index: true },
-
-      { path: "edit", element: <MeEdit /> },
       {
-        path: "orders",
+        path: "",
         element: <MeOrders />,
-        // children: [{ path: ":orderId", element: <MeOrderDetail /> }],
       },
       { path: "orders/:orderId", element: <MeOrderDetail /> },
+      { path: "addresses", element: <MeAddresses /> },
     ],
   },
 ];

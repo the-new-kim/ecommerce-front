@@ -10,6 +10,7 @@ import Input from "../elements/form/Input";
 import Label from "../elements/form/Label";
 
 interface ICheckoutInfromationFormProps {
+  onValidAction?: () => any;
   actionUrl?: string;
   submitValue?: string;
 }
@@ -17,6 +18,7 @@ interface ICheckoutInfromationFormProps {
 export default function ShippingInformationForm({
   actionUrl,
   submitValue = "Save",
+  onValidAction,
 }: ICheckoutInfromationFormProps) {
   const [me, setMe] = useRecoilState(userAtom);
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ export default function ShippingInformationForm({
 
   useEffect(() => {}, []);
 
-  const onSubmit = async ({ name, phone, address }: IShipping) => {
+  const onValid = async ({ name, phone, address }: IShipping) => {
     if (isDirty) {
       setMe((oldMe) => {
         if (!oldMe) return oldMe;
@@ -47,6 +49,10 @@ export default function ShippingInformationForm({
       });
     }
 
+    if (onValidAction) {
+      onValidAction();
+    }
+
     if (actionUrl) {
       navigate(actionUrl);
     }
@@ -58,7 +64,7 @@ export default function ShippingInformationForm({
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
         onSubmit={handleSubmit(onSubmit)}
       > */}
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onValid)}>
         <Label>
           Name
           <Input
@@ -183,11 +189,7 @@ export default function ShippingInformationForm({
           )}
         </Label>
 
-        <input
-          className="bg-black hover:bg-white text-white hover:text-black border-black border-[1px] py-2 px-4 duration-300 cursor-pointer mt-5"
-          type="submit"
-          value={submitValue}
-        />
+        <Input type="submit" value={submitValue} />
       </Form>
       {/* </form> */}
     </>
