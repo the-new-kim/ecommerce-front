@@ -9,9 +9,10 @@ import { IOrderWithId } from "../OrderCard";
 
 interface IOrderFormProps {
   defaultValue: IOrderWithId;
+  fetcher: () => Promise<void>;
 }
 
-export default function OrderForm({ defaultValue }: IOrderFormProps) {
+export default function OrderForm({ defaultValue, fetcher }: IOrderFormProps) {
   const {
     register,
     handleSubmit,
@@ -25,6 +26,7 @@ export default function OrderForm({ defaultValue }: IOrderFormProps) {
 
     switch (status) {
       case EDeliveryStatus.ORDERED:
+        trackingCode = null;
         break;
       case EDeliveryStatus.SHIPPED:
         trackingCodeRequired = true;
@@ -48,6 +50,8 @@ export default function OrderForm({ defaultValue }: IOrderFormProps) {
           trackingCode,
         },
       });
+
+      fetcher();
     }
   };
 

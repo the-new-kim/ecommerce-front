@@ -12,7 +12,7 @@ import { getFirebaseDocs } from "../../../firebase/utils";
 import { centToDollor } from "../../../libs/utils";
 
 export default function OrdersHome() {
-  const orders = useFirebaseDocs<IOrderWithId[]>(() =>
+  const [orders] = useFirebaseDocs<IOrderWithId[]>(() =>
     getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
   const navigate = useNavigate();

@@ -18,7 +18,6 @@ import Settings from "./routes/admin/Settings";
 import CreateProduct from "./routes/admin/products/CreateProduct";
 import UsersHome from "./routes/admin/users/UsersHome";
 import OrdersHome from "./routes/admin/orders/OrdersHome";
-import EditProduct from "./routes/admin/products/EditProduct";
 import OrderDetail from "./routes/admin/orders/OrderDetail";
 import EditUser from "./routes/admin/users/EditUser";
 import CheckoutLayout from "./routes/checkout/CheckoutLayout";
@@ -30,6 +29,7 @@ import MeLayout from "./routes/me/MeLayout";
 import MeOrders from "./routes/me/MeOrders";
 import MeOrderDetail from "./routes/me/MeOrderDetail";
 import MeAddresses from "./routes/me/MeAddresses";
+import ProductDetail from "./routes/admin/products/ProductDetail";
 
 const adminOnlyRoutes: RouteObject[] = [
   {
@@ -42,7 +42,7 @@ const adminOnlyRoutes: RouteObject[] = [
         children: [
           { element: <ProductsHome />, index: true },
           { path: "create", element: <CreateProduct /> },
-          { path: ":id", element: <EditProduct /> },
+          { path: ":id", element: <ProductDetail /> },
         ],
       },
       {

@@ -14,7 +14,7 @@ const getLastMonthes = () => {
   const lastMonths = [];
 
   for (let i = 0; i < 12; i++) {
-    const monthIndex = i + currentDate.getMonth();
+    const monthIndex = i + currentDate.getMonth() + 1;
 
     lastMonths.push(
       new Date(previousYear, monthIndex).toLocaleDateString(undefined, {
@@ -28,7 +28,7 @@ const getLastMonthes = () => {
 };
 
 export default function RevenueChart() {
-  const orders = useFirebaseDocs<IOrderWithId[]>(() =>
+  const [orders] = useFirebaseDocs<IOrderWithId[]>(() =>
     getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
 

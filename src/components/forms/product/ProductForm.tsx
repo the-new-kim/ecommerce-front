@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { addDoc } from "firebase/firestore";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { firebaseStorage, productCollection } from "../../../firebase/config";
@@ -11,7 +11,7 @@ import {
   uploadString,
 } from "firebase/storage";
 
-import { fixPrice } from "../../../libs/utils";
+import { cls, fixPrice } from "../../../libs/utils";
 
 import Message from "../../Message";
 
@@ -24,6 +24,10 @@ import Label from "../../elements/form/Label";
 import Input from "../../elements/form/Input";
 import FieldErrorMessage from "../../elements/form/FieldErrorMessage";
 import TextArea from "../../elements/form/TextArea";
+import { Leaf, UploadSimple } from "phosphor-react";
+import Heading from "../../elements/typos/Heading";
+import ReactPlayer from "react-player";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface IProductFormProps {
   defaultValue?: IProductWithId;
@@ -38,6 +42,8 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [disabled, setDisabled] = useState(false);
+
+  const [isDragEnter, setIsDragEnter] = useState(false);
 
   const {
     register,
@@ -191,6 +197,61 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
     reader.readAsDataURL(file);
   };
 
+  const onDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    // console.log("DRAG OVER");
+    event.preventDefault(); // Prevent default behavior (Prevent file from being opened)
+  };
+
+  const onDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault(); // Prevent default behavior (Prevent file from being opened)
+    event.stopPropagation();
+
+    if (event.dataTransfer.files) {
+      for (let i = 0; i < event.dataTransfer.items.length; i++) {
+        const item = event.dataTransfer.items[i];
+        // If dropped items aren't files, reject them
+        if (item.kind !== "file" || !item.type.includes("image")) return;
+
+        let file = item.getAsFile();
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onloadend = (finishedEvent) => {
+          if (!finishedEvent.target || !finishedEvent.target.result) return;
+
+          setAttachments((prev) => {
+            const newArray = [...prev, finishedEvent.target!.result as string];
+
+            return newArray;
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    setIsDragEnter(false);
+  };
+
+  const onDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log("DRAG ENTER");
+    if (isDragEnter) return;
+    setIsDragEnter(true);
+  };
+  const onDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    // event.preventDefault();
+    // event.stopPropagation();
+    // console.log("DRAG LEAVE");
+    // if (!isDragEnter) return;
+    // setIsDragEnter(false);
+  };
+
+  useEffect(() => {
+    console.log("DRAG ENTER", isDragEnter);
+  }, [isDragEnter]);
+
   return (
     <>
       {isUploading && <Message>Uploading...</Message>}
@@ -294,30 +355,84 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
         </div>
 
         {/* IMAGES */}
-        <Label>
+        <div className="mb-2 flex flex-col">
           Images
-          <Input
-            className="!border-none"
-            type="file"
-            accept="image/*"
-            {...register("imageUrls", {
-              onChange: onFileChange,
-              validate: () => attachments.length > 0 || "No Images",
-            })}
-          />
+          <div
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            onDragEnter={onDragEnter}
+            // onDragLeave={onDragLeave}
+            className="relative border-[1px] border-black"
+          >
+            {/* <div className="absolute top-0 left-0 w-full h-full -z-10 flex justify-center items-center overflow-hidden">
+              Drop file here
+              <div className="absolute top-0 left-0 w-[400%] h-full -z-10 bg-gradient-to-tr from-slate-200 to-orange-300" />
+            </div> */}
+
+            <label>
+              <div className="px-3 py-2 flex justify-center items-center">
+                <div
+                  className="flex justify-center items-center px-3 py-2 border-[1px] border-black cursor-pointer
+                bg-black text-white hover:bg-white hover:text-black duration-300 transition-colors
+                "
+                >
+                  <UploadSimple className="mr-2" />
+                  <span>Upload image</span>
+                </div>
+              </div>
+              <input
+                className="hidden"
+                type="file"
+                accept="image/*"
+                {...register("imageUrls", {
+                  onChange: onFileChange,
+                  validate: () => attachments.length > 0 || "No Images",
+                })}
+              />
+            </label>
+            <div className="p-3 mb-3 min-h-[15rem]">
+              {!!attachments.length && (
+                <AttachmentDND
+                  attachments={attachments}
+                  setAttachments={setAttachments}
+                />
+              )}
+
+              <div className="absolute top-0 left-0 w-full h-full -z-10 flex justify-center items-center overflow-hidden">
+                {!attachments.length && (
+                  <Heading tagName="h2">🔥 Drop it like it's hot 🔥</Heading>
+                )}
+
+                <div
+                  style={{
+                    opacity: isDragEnter ? 100 : 0,
+                    transition: "opacity ease-out 300ms",
+                  }}
+                  className="absolute -top-[50%] -left-[50%] w-full min-w-[200%] h-full min-h-[200%] flex justify-center items-center -z-10"
+                >
+                  <ReactPlayer
+                    url="https://www.youtube.com/watch?v=GtUVQei3nX4&ab_channel=SnoopDoggVEVO"
+                    controls={false}
+                    playing
+                    muted
+                    loop
+                    style={{
+                      minWidth: "100%",
+                      minHeight: "100%",
+                      zIndex: -100,
+                      pointerEvents: "none",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
           {errors.imageUrls && (
             <small className="text-red-300 font-medium">
               * {errors.imageUrls.message}
             </small>
           )}
-        </Label>
-
-        {!!attachments.length && (
-          <AttachmentDND
-            attachments={attachments}
-            setAttachments={setAttachments}
-          />
-        )}
+        </div>
 
         <Input
           type="submit"

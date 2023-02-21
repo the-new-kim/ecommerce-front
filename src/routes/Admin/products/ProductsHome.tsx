@@ -16,7 +16,7 @@ import { centToDollor } from "../../../libs/utils";
 
 export default function ProductsHome() {
   const headerHeight = useRecoilValue(headerHeightAtom);
-  const products = useFirebaseDocs(() => getFirebaseDocs(productCollection));
+  const [products] = useFirebaseDocs(() => getFirebaseDocs(productCollection));
 
   const navigate = useNavigate();
 

@@ -1,6 +1,7 @@
 import { limit, orderBy } from "firebase/firestore";
 import { Package, ShoppingBag, Users } from "phosphor-react";
 import { ReactNode, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import RevenueChart from "../../components/charts/RevenueChart";
 import Heading from "../../components/elements/typos/Heading";
 import { IOrderWithId } from "../../components/OrderCard";
@@ -33,19 +34,21 @@ function Card({ children, className = "" }: ICardProps) {
 }
 
 export default function AdminHome() {
-  const topProducts = useFirebaseDocs<IProductWithId[]>(() =>
+  const [topProducts] = useFirebaseDocs<IProductWithId[]>(() =>
     getFirebaseDocs(productCollection, orderBy("sold", "desc"), limit(5))
   );
 
-  const orders = useFirebaseDocs<IOrderWithId[]>(() =>
+  const [orders] = useFirebaseDocs<IOrderWithId[]>(() =>
     getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
 
-  const users = useFirebaseDocs<(IUser & { id: string })[]>(() =>
+  const [users] = useFirebaseDocs<(IUser & { id: string })[]>(() =>
     getFirebaseDocs(userCollection)
   );
 
   const [totalSales, setTotalSeles] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!orders || !orders.length) return;
@@ -56,6 +59,10 @@ export default function AdminHome() {
         .reduce((accumulator, currentValue) => accumulator + currentValue)
     );
   }, [orders]);
+
+  const onTopProductClick = (id: string) => {
+    navigate(`/admin/products/${id}`);
+  };
 
   return (
     <>
@@ -116,8 +123,12 @@ export default function AdminHome() {
           </THead>
           <tbody>
             {topProducts?.map((product) => (
-              <TBodyRow key={product.id + "top"}>
-                <td>{product.title}</td>
+              <TBodyRow
+                key={product.id + "top"}
+                onClick={() => onTopProductClick(product.id)}
+                className="cursor-pointer group"
+              >
+                <td className="group-hover:underline">{product.title}</td>
                 <td>{centToDollor(product.price)}</td>
                 <td>{product.sold}</td>
                 <td>{centToDollor(product.price * product.sold)}</td>

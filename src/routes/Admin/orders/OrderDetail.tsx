@@ -9,7 +9,7 @@ import { getFirebaseDoc } from "../../../firebase/utils";
 
 export default function OrderDetail() {
   const { id } = useParams();
-  const order = useFirebaseDocs<IOrderWithId>(() =>
+  const [order, orderFetcher] = useFirebaseDocs<IOrderWithId>(() =>
     getFirebaseDoc(orderCollection, id!)
   );
 
@@ -21,7 +21,7 @@ export default function OrderDetail() {
         <>
           <AdminHeader title="Order detail" />
           <OrderCard order={order} />
-          <OrderForm defaultValue={order} />
+          <OrderForm defaultValue={order} fetcher={orderFetcher} />
         </>
       )}
     </>

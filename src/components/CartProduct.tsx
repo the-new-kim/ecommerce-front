@@ -36,9 +36,6 @@ function CartProductIncreamentButtons({
 }: ICartProductIncreamentButtonsProps) {
   return (
     <div className={className}>
-      {/* <button onClick={() => deleteFromCart(cartProduct.id)}>
-        <Trash />
-      </button> */}
       <button onClick={() => increaseQuantity(cartProduct.id, -1)}>
         <Minus />
       </button>
@@ -55,7 +52,7 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
     mediaQuery: { md },
   } = useViewportSize();
   const [me, setMe] = useRecoilState(userAtom);
-  const productDoc = useFirebaseDocs(() =>
+  const [productDoc] = useFirebaseDocs(() =>
     getFirebaseDoc(productCollection, cartProduct.id)
   );
 
