@@ -1,7 +1,6 @@
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import CheckoutHeader from "../../components/checkout/CheckoutHeader";
 import Summary from "../../components/checkout/Summary";
-import Heading from "../../components/elements/typos/Heading";
 
 export default function CheckoutLayout() {
   return (

@@ -3,7 +3,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { firebaseAuth } from "../../firebase/config";
-import ErrorMessage from "../elements/form/ErrorMessage";
+import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 import Form from "../elements/form/Form";
 import Input from "../elements/form/Input";
 import Label from "../elements/form/Label";
@@ -56,7 +56,9 @@ export default function SignInForm() {
             {...register("email", { required: "This field is required" })}
             hasError={!!errors.email}
           />
-          {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
+          {errors.email && (
+            <FieldErrorMessage>{errors.email.message}</FieldErrorMessage>
+          )}
         </Label>
         <Label>
           Password
@@ -67,7 +69,7 @@ export default function SignInForm() {
             hasError={!!errors.password}
           />
           {errors.password && (
-            <ErrorMessage>{errors.password.message}</ErrorMessage>
+            <FieldErrorMessage>{errors.password.message}</FieldErrorMessage>
           )}
         </Label>
         <Input type="submit" value="Sign In" />

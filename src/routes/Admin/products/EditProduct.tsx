@@ -23,8 +23,6 @@ export default function EditProduct() {
     setLoading(false);
   }, [id]);
 
-  console.log(product);
-
   if (loading) return <div className="bg-red-500 p-10">Loading...</div>;
 
   if (!id || !product) return <>Nothing found...</>;

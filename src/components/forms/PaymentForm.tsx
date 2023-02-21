@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRecoilState } from "recoil";
 import { orderCollection, productCollection } from "../../firebase/config";
+import { EDeliveryStatus } from "../../firebase/types";
 import { updateFirebaseDoc } from "../../firebase/utils";
 import { userAtom } from "../../libs/atoms";
 import Button from "../elements/Button";
@@ -56,6 +57,10 @@ export default function PaymentForm() {
           id: me.cart.paymentIntent,
           status: paymentIntent.status,
           amount: paymentIntent.amount,
+        },
+        delivery: {
+          status: EDeliveryStatus.ORDERED,
+          trackingCode: null,
         },
       });
 

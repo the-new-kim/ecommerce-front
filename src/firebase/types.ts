@@ -30,6 +30,17 @@ export interface IProduct {
   sold: number;
 }
 
+export enum EDeliveryStatus {
+  ORDERED = "ordered",
+  SHIPPED = "shipped",
+  DELIVERED = "delivered",
+}
+
+export interface IDelivery {
+  status: EDeliveryStatus;
+  trackingCode: string | null;
+}
+
 export interface IOrder {
   createdAt: number;
   products: ICartProduct[];
@@ -40,6 +51,7 @@ export interface IOrder {
     status: TPaymentStatusTypes;
     amount: number;
   };
+  delivery: IDelivery;
   // trackingCode:string | null
 }
 

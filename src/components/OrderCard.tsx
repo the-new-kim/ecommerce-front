@@ -2,6 +2,7 @@ import useCartProducts from "../firebase/hooks/useCartProducts";
 import { IOrder } from "../firebase/types";
 import { centToDollor } from "../libs/utils";
 import Heading from "./elements/typos/Heading";
+import SummaryTable from "./SummaryTable";
 
 export interface IOrderWithId extends IOrder {
   id: string;
@@ -41,32 +42,23 @@ export default function OrderCard({ order }: IOrderCardProps) {
           text={new Date(order.createdAt).toDateString()}
         />
         <HeaderItem
-          title="Total"
-          text={centToDollor(order.paymentIntent.amount)}
+          title="Delivery status"
+          text={
+            order.delivery.status.charAt(0).toUpperCase() +
+            order.delivery.status.slice(1)
+          }
         />
         <HeaderItem title="Ship to" text={order.shipping.name} />
         <HeaderItem title="Order ID" text={order.id} />
       </header>
       <div className="flex flex-col justify-start items-start">
-        <Heading tagName="h5" className="font-roboto font-semibold mb-3">
-          Delivery status
-        </Heading>
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="flex justify-start items-center mb-3 [&>*]:mr-3"
-          >
-            <div className="w-16 h-16 flex justify-center items-center overflow-hidden">
-              <img
-                src={product.imageUrls[0]}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>{product.title}</div>
-            <div>{centToDollor(product.price)}</div>
-            <div>{product.quantity}</div>
-          </div>
-        ))}
+        {order.delivery.trackingCode && (
+          <div>{order.delivery.trackingCode}</div>
+        )}
+
+        {!!products.length && totalAmount && (
+          <SummaryTable products={products} totalAmount={totalAmount} />
+        )}
       </div>
     </div>
   );

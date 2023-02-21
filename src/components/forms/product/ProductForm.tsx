@@ -22,7 +22,7 @@ import { updateFirebaseDoc } from "../../../firebase/utils";
 import Form from "../../elements/form/Form";
 import Label from "../../elements/form/Label";
 import Input from "../../elements/form/Input";
-import ErrorMessage from "../../elements/form/ErrorMessage";
+import FieldErrorMessage from "../../elements/form/FieldErrorMessage";
 import TextArea from "../../elements/form/TextArea";
 
 interface IProductFormProps {
@@ -112,8 +112,6 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
     const imageUrlsToDelete = defaultValue?.imageUrls.filter(
       (imageUrl) => !attachments.includes(imageUrl)
     );
-
-    // console.log("To Delete:::", imageUrlsToDelete);
 
     // 2️⃣ Delete Image from FireStorage
     if (imageUrlsToDelete && !!imageUrlsToDelete.length) {
@@ -211,7 +209,9 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
             defaultValue={defaultValue?.title || undefined}
             {...register("title", { required: "This field is required" })}
           />
-          {errors.title && <ErrorMessage>{errors.title.message}</ErrorMessage>}
+          {errors.title && (
+            <FieldErrorMessage>{errors.title.message}</FieldErrorMessage>
+          )}
         </Label>
 
         {/* DESCRIPTION */}
@@ -231,7 +231,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
             })}
           />
           {errors.description && (
-            <ErrorMessage>{errors.description.message}</ErrorMessage>
+            <FieldErrorMessage>{errors.description.message}</FieldErrorMessage>
           )}
         </Label>
 

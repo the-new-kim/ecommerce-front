@@ -5,11 +5,15 @@ export default function useFirebaseDocs<T>(
 ) {
   const [docs, setDocs] = useState<T>();
 
+  const fetcher = async () => {
+    const results = await getFunction();
+    setDocs(results);
+  };
+
   useEffect(() => {
     (async () => {
       try {
-        const results = await getFunction();
-        setDocs(results);
+        fetcher();
       } catch (error) {
         console.log("Error::::", error);
       }

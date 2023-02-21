@@ -1,21 +1,19 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  updateProfile,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useForm } from "react-hook-form";
 import { firebaseAuth, userCollection } from "../../firebase/config";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Message from "../Message";
 import Form from "../elements/form/Form";
 import Label from "../elements/form/Label";
 import Input from "../elements/form/Input";
-import ErrorMessage from "../elements/form/ErrorMessage";
+import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 
 interface IRegisterForm {
   email: string;
-  // name: string;
   password: string;
   passwordRepeat: string;
 }
@@ -41,7 +39,6 @@ export default function RegisterForm() {
         email,
         password
       );
-      console.log("userCredential:::", userCredential.user);
 
       // await updateProfile(userCredential.user, {
       //   displayName: name,
@@ -75,10 +72,6 @@ export default function RegisterForm() {
     setCreating(false);
   };
 
-  useEffect(() => {
-    console.log("FB CURRENT", firebaseAuth.currentUser);
-  }, [firebaseAuth]);
-
   return (
     <>
       {creating && <Message>Creating account...</Message>}
@@ -90,7 +83,9 @@ export default function RegisterForm() {
             type="email"
             {...register("email", { required: "This field is required" })}
           />
-          {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
+          {errors.email && (
+            <FieldErrorMessage>{errors.email.message}</FieldErrorMessage>
+          )}
         </Label>
 
         <Label>
@@ -108,7 +103,7 @@ export default function RegisterForm() {
             })}
           />
           {errors.password && (
-            <ErrorMessage>{errors.password.message}</ErrorMessage>
+            <FieldErrorMessage>{errors.password.message}</FieldErrorMessage>
           )}
         </Label>
         <Label>
@@ -125,7 +120,9 @@ export default function RegisterForm() {
             })}
           />
           {errors.passwordRepeat && (
-            <ErrorMessage>{errors.passwordRepeat.message}</ErrorMessage>
+            <FieldErrorMessage>
+              {errors.passwordRepeat.message}
+            </FieldErrorMessage>
           )}
         </Label>
         <Input disabled={creating} type="submit" value="Create" />

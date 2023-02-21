@@ -19,7 +19,7 @@ import CreateProduct from "./routes/admin/products/CreateProduct";
 import UsersHome from "./routes/admin/users/UsersHome";
 import OrdersHome from "./routes/admin/orders/OrdersHome";
 import EditProduct from "./routes/admin/products/EditProduct";
-import EditOrder from "./routes/admin/orders/EditOrder";
+import OrderDetail from "./routes/admin/orders/OrderDetail";
 import EditUser from "./routes/admin/users/EditUser";
 import CheckoutLayout from "./routes/checkout/CheckoutLayout";
 import CheckoutInformation from "./routes/checkout/CheckoutInformation";
@@ -56,7 +56,7 @@ const adminOnlyRoutes: RouteObject[] = [
         path: "orders",
         children: [
           { element: <OrdersHome />, index: true },
-          { path: ":id", element: <EditOrder /> },
+          { path: ":id", element: <OrderDetail /> },
         ],
       },
       { path: "settings", element: <Settings /> },
@@ -126,7 +126,7 @@ const router = (me: IUserAtom | null) => {
         ...(me?.isAdmin ? adminOnlyRoutes : []),
       ],
     },
-    checkoutRout,
+    !!me?.cart.products.length ? checkoutRout : {},
   ]);
 };
 

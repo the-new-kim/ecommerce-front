@@ -4,7 +4,7 @@ export default function AdminNav() {
   return (
     <ul className="[&>*]:my-2">
       <li>
-        <Link to="/admin">Dashboards</Link>
+        <Link to="/admin">Overview</Link>
       </li>
       <hr />
       <li>

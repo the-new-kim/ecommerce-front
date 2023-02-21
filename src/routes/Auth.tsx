@@ -29,8 +29,7 @@ export default function Auth() {
 
     if (!provider) return;
     try {
-      const popup = await signInWithPopup(firebaseAuth, provider);
-      console.log("POPUP USER:::", popup.user);
+      await signInWithPopup(firebaseAuth, provider);
     } catch (error) {
       console.log("ERROR::::", error);
     }
@@ -53,11 +52,11 @@ export default function Auth() {
         <div className="flex flex-col [&>*]:mb-3 [&>*]:flex [&>*]:justify-center [&>*]:items-center w-full">
           <Button onClick={onSocialClick} name="google">
             <GoogleLogo className="mr-3" />
-            {!newAccount ? "sign in" : "sign up"} with google account
+            continue with google
           </Button>
           <Button onClick={onSocialClick} name="github">
             <GithubLogo className="mr-3" />
-            {!newAccount ? "sign in" : "sign up"} with github account
+            continue with github
           </Button>
         </div>
       </div>

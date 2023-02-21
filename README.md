@@ -17,15 +17,15 @@
 
 ## admin
 
-- /admin ....................(❌)
+- /admin ....................(✅)
 - /admin/products ...........(✅)
 - /admin/products/add .......(✅)
 - /admin/products/:id .......(✅)
-- /admin/users/ .............(❌)
+- /admin/users/ .............(✅)
 - /admin/users/add ..........(❌)
 - /admin/users/:id ..........(❌)
-- /admin/orders/ ............(❌)
-- /admin/orders/:id .........(❌)
+- /admin/orders/ ............(✅)
+- /admin/orders/:id .........(👷‍♀️)
 
 ## me
 
@@ -42,6 +42,12 @@
 - [x] Cart
 - [x] Payment(stripe)
 - [ ] Form component
+
+### Chart
+
+- [ ] Revenue
+- [ ] Product sold
+- [ ] Customer count
 
 ### Cart
 

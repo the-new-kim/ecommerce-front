@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { IShipping } from "../../firebase/types";
 import { userAtom } from "../../libs/atoms";
-import ErrorMessage from "../elements/form/ErrorMessage";
+import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 import Form from "../elements/form/Form";
 import Input from "../elements/form/Input";
 import Label from "../elements/form/Label";
@@ -74,7 +74,9 @@ export default function ShippingInformationForm({
             hasError={errors.name ? true : false}
             {...register("name", { required: "This field is required" })}
           />
-          {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+          {errors.name && (
+            <FieldErrorMessage>{errors.name.message}</FieldErrorMessage>
+          )}
         </Label>
 
         <Label>
@@ -89,7 +91,9 @@ export default function ShippingInformationForm({
               required: "This field is required",
             })}
           />
-          {errors.phone && <ErrorMessage>{errors.phone.message}</ErrorMessage>}
+          {errors.phone && (
+            <FieldErrorMessage>{errors.phone.message}</FieldErrorMessage>
+          )}
         </Label>
         {/* ADDRESS */}
         <Label>
@@ -105,7 +109,9 @@ export default function ShippingInformationForm({
             })}
           />
           {errors.address?.line1 && (
-            <ErrorMessage>{errors.address.line1.message}</ErrorMessage>
+            <FieldErrorMessage>
+              {errors.address.line1.message}
+            </FieldErrorMessage>
           )}
         </Label>
         <Label>
@@ -121,7 +127,9 @@ export default function ShippingInformationForm({
             })}
           />
           {errors.address?.line2 && (
-            <ErrorMessage>{errors.address.line2.message}</ErrorMessage>
+            <FieldErrorMessage>
+              {errors.address.line2.message}
+            </FieldErrorMessage>
           )}
         </Label>
         <Label>
@@ -137,7 +145,9 @@ export default function ShippingInformationForm({
             })}
           />
           {errors.address?.postal_code && (
-            <ErrorMessage>{errors.address.postal_code.message}</ErrorMessage>
+            <FieldErrorMessage>
+              {errors.address.postal_code.message}
+            </FieldErrorMessage>
           )}
         </Label>
         <Label>
@@ -153,7 +163,7 @@ export default function ShippingInformationForm({
             })}
           />
           {errors.address?.city && (
-            <ErrorMessage>{errors.address.city.message}</ErrorMessage>
+            <FieldErrorMessage>{errors.address.city.message}</FieldErrorMessage>
           )}
         </Label>
         <Label>
@@ -169,7 +179,9 @@ export default function ShippingInformationForm({
             })}
           />
           {errors.address?.state && (
-            <ErrorMessage>{errors.address.state.message}</ErrorMessage>
+            <FieldErrorMessage>
+              {errors.address.state.message}
+            </FieldErrorMessage>
           )}
         </Label>
         <Label>
@@ -185,7 +197,9 @@ export default function ShippingInformationForm({
             })}
           />
           {errors.address?.country && (
-            <ErrorMessage>{errors.address.country.message}</ErrorMessage>
+            <FieldErrorMessage>
+              {errors.address.country.message}
+            </FieldErrorMessage>
           )}
         </Label>
 

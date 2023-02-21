@@ -22,16 +22,10 @@ export default function CheckoutPayment() {
   const { totalAmount } = useCartProducts(me?.cart.products);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null>>();
   const [options, setOptions] = useState<StripeElementsOptions>();
-  const [times, setTiems] = useState(1);
-
-  useEffect(() => {
-    console.log("TIMES", times);
-  }, [times]);
 
   const createPaymentIntent = async () => {
     if (!me || !totalAmount || !me.cart.products.length) return;
-    console.log("start to create new payment intent");
-    console.log("TOTAL AMOUNT:::", totalAmount);
+
     const stripePaymentIntentResult = await createStripePaymentIntent({
       amount: totalAmount,
       currency: "usd",
@@ -59,7 +53,6 @@ export default function CheckoutPayment() {
 
   useEffect(() => {
     if (!me || !totalAmount || !me.cart.products.length) return;
-    setTiems((prev) => (prev += 1));
 
     (async () => {
       if (me.cart.paymentIntent) {
