@@ -19,3 +19,12 @@ export const centToDollor = (cent: number) => {
 export const addressToText = (address: IAddress) => {
   return `${address.line1}, ${address.line2}, ${address.postal_code}, ${address.city}, ${address.state}, ${address.country}`;
 };
+
+export const getKeyByValue = (object: { [key: string]: any }, value: any) => {
+  return Object.keys(object).find((key) => object[key] === value);
+};
+
+export const getKeyIndex = (object: { [key: string]: any }, key?: string) => {
+  if (!key) return 0;
+  return Object.keys(object).indexOf(key);
+};

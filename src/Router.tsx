@@ -27,7 +27,6 @@ import CheckoutPayment from "./routes/checkout/CheckoutPayment";
 
 import MeLayout from "./routes/me/MeLayout";
 import MeOrders from "./routes/me/MeOrders";
-import MeOrderDetail from "./routes/me/MeOrderDetail";
 import MeAddresses from "./routes/me/MeAddresses";
 import ProductDetail from "./routes/admin/products/ProductDetail";
 
@@ -74,7 +73,7 @@ const meRoutes: RouteObject[] = [
         path: "",
         element: <MeOrders />,
       },
-      { path: "orders/:orderId", element: <MeOrderDetail /> },
+      // { path: "orders/:orderId", element: <MeOrderDetail /> },
       { path: "addresses", element: <MeAddresses /> },
     ],
   },

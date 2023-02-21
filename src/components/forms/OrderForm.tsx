@@ -22,37 +22,47 @@ export default function OrderForm({ defaultValue, fetcher }: IOrderFormProps) {
   } = useForm<IDelivery>();
 
   const onValid = async ({ status, trackingCode }: IDelivery) => {
-    let trackingCodeRequired = false;
+    // let trackingCodeRequired = false;
 
-    switch (status) {
-      case EDeliveryStatus.ORDERED:
-        trackingCode = null;
-        break;
-      case EDeliveryStatus.SHIPPED:
-        trackingCodeRequired = true;
-        break;
-      case EDeliveryStatus.DELIVERED:
-        break;
-    }
+    // switch (status) {
+    //   case EDeliveryStatus.ORDERED:
+    //     trackingCode = null;
+    //     break;
+    //   case EDeliveryStatus.SHIPPED:
+    //     trackingCodeRequired = true;
+    //     break;
+    //   case EDeliveryStatus.DELIVERED:
+    //     break;
+    // }
 
-    if (trackingCodeRequired && !trackingCode) {
-      console.log("set errors and do something");
-      // set errors
-      // stop
-    } else {
-      // update
-      console.log("alles ok goahead");
+    // if (trackingCodeRequired && !trackingCode) {
+    //   console.log("set errors and do something");
+    //   // set errors
+    //   // stop
+    // } else {
+    //   // update
+    //   console.log("alles ok goahead");
 
-      await updateFirebaseDoc(orderCollection, defaultValue.id, {
-        ...defaultValue,
-        delivery: {
-          status,
-          trackingCode,
-        },
-      });
+    //   await updateFirebaseDoc(orderCollection, defaultValue.id, {
+    //     ...defaultValue,
+    //     delivery: {
+    //       status,
+    //       trackingCode,
+    //     },
+    //   });
 
-      fetcher();
-    }
+    //   fetcher();
+    // }
+
+    await updateFirebaseDoc(orderCollection, defaultValue.id, {
+      ...defaultValue,
+      delivery: {
+        status,
+        trackingCode,
+      },
+    });
+
+    fetcher();
   };
 
   return (
@@ -77,10 +87,11 @@ export default function OrderForm({ defaultValue, fetcher }: IOrderFormProps) {
         <Input
           type="text"
           placeholder="Tracking code"
+          defaultValue={defaultValue.delivery.trackingCode || ""}
           {...register("trackingCode")}
         />
       </Label>
-      <Input type="submit" />
+      <Input type="submit" value="Save" />
     </Form>
   );
 }

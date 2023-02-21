@@ -77,11 +77,11 @@ export default function PaymentForm() {
       //3️⃣ Empty cart & set order from user
       const orders = [orderDocRef.id, ...me!.orders];
 
-      toast("ありがとうね！");
+      toast("Thank you for your order!");
 
       setMe({ ...me!, cart: { paymentIntent: null, products: [] }, orders });
 
-      navigate(`/me/orders/${orderDocRef.id}`);
+      navigate(`/me`);
     }
     setMessage(`Status: ${paymentIntent.status}`);
     setIsProcessing(false);

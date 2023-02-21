@@ -25,13 +25,12 @@
 - /admin/users/add ..........(❌)
 - /admin/users/:id ..........(❌)
 - /admin/orders/ ............(✅)
-- /admin/orders/:id .........(👷‍♀️)
+- /admin/orders/:id .........(✅)
 
 ## me
 
 - /me .......................(✅)
 - /me/addresses .............(✅)
-- /me/orders/:id ............(❌)
 
 ### Todos...
 

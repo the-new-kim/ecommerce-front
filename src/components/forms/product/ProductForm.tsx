@@ -11,7 +11,7 @@ import {
   uploadString,
 } from "firebase/storage";
 
-import { cls, fixPrice } from "../../../libs/utils";
+import { fixPrice } from "../../../libs/utils";
 
 import Message from "../../Message";
 
@@ -24,10 +24,9 @@ import Label from "../../elements/form/Label";
 import Input from "../../elements/form/Input";
 import FieldErrorMessage from "../../elements/form/FieldErrorMessage";
 import TextArea from "../../elements/form/TextArea";
-import { Leaf, UploadSimple } from "phosphor-react";
+import { UploadSimple } from "phosphor-react";
 import Heading from "../../elements/typos/Heading";
 import ReactPlayer from "react-player";
-import { AnimatePresence, motion } from "framer-motion";
 
 interface IProductFormProps {
   defaultValue?: IProductWithId;
@@ -267,6 +266,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
           <Input
             hasError={errors.title ? true : false}
             type="text"
+            placeholder="Title"
             defaultValue={defaultValue?.title || undefined}
             {...register("title", { required: "This field is required" })}
           />
@@ -386,7 +386,8 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
                 accept="image/*"
                 {...register("imageUrls", {
                   onChange: onFileChange,
-                  validate: () => attachments.length > 0 || "No Images",
+                  validate: () =>
+                    attachments.length > 0 || "Add at least 1 Image",
                 })}
               />
             </label>
@@ -428,9 +429,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
             </div>
           </div>
           {errors.imageUrls && (
-            <small className="text-red-300 font-medium">
-              * {errors.imageUrls.message}
-            </small>
+            <FieldErrorMessage>{errors.imageUrls.message}</FieldErrorMessage>
           )}
         </div>
 

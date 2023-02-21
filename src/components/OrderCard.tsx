@@ -1,7 +1,7 @@
 import useCartProducts from "../firebase/hooks/useCartProducts";
-import { IOrder } from "../firebase/types";
-import { centToDollor } from "../libs/utils";
-import Heading from "./elements/typos/Heading";
+import { EDeliveryStatus, IOrder } from "../firebase/types";
+import { getKeyByValue, getKeyIndex } from "../libs/utils";
+
 import SummaryTable from "./SummaryTable";
 
 export interface IOrderWithId extends IOrder {
@@ -53,8 +53,78 @@ export default function OrderCard({ order }: IOrderCardProps) {
       </header>
       <div className="flex flex-col justify-start items-start">
         {order.delivery.trackingCode && (
-          <div>{order.delivery.trackingCode}</div>
+          <div>Tracking code: {order.delivery.trackingCode}</div>
         )}
+        {/* DELIVERY STATUS */}
+        <div className="flex flex-col justify-center items-center w-full py-5 px-10">
+          <div className="flex justify-between items-center w-full relative">
+            {Object.values(EDeliveryStatus).map((value, index) => (
+              <div
+                key={value}
+                className="flex flex-col justify-center items-center"
+              >
+                {/* CIRCLE */}
+                <div
+                  style={{
+                    // width: 30,
+                    width: 60,
+                    height: 60,
+                    aspectRatio: "1/1",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 10,
+                    background:
+                      getKeyIndex(
+                        EDeliveryStatus,
+                        getKeyByValue(EDeliveryStatus, order.delivery.status)
+                      ) >= index
+                        ? "rgb(34 197 94)"
+                        : "rgb(226 232 240)",
+                    zIndex: 10,
+                    borderRadius: "50%",
+                    transform:
+                      index === 0
+                        ? "translateX(-50%)"
+                        : index === Object.values(EDeliveryStatus).length - 1
+                        ? "translateX(50%)"
+                        : "translateX(0%)",
+                    // overflow: "hidden",
+                  }}
+                >
+                  <small>
+                    {value.charAt(0).toUpperCase() + value.slice(1)}
+                  </small>
+                </div>
+
+                {/* BAR */}
+                {index !== 0 && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "calc(50%-10px)",
+                      left: `${
+                        (100 / (Object.values(EDeliveryStatus).length - 1)) *
+                        (index - 1)
+                      }%`,
+                      width: `${
+                        100 / (Object.values(EDeliveryStatus).length - 1)
+                      }%`,
+                      height: 10,
+                      background:
+                        getKeyIndex(
+                          EDeliveryStatus,
+                          getKeyByValue(EDeliveryStatus, order.delivery.status)
+                        ) >= index
+                          ? "rgb(34 197 94)"
+                          : "rgb(226 232 240)",
+                    }}
+                  ></div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
 
         {!!products.length && totalAmount && (
           <SummaryTable products={products} totalAmount={totalAmount} />
