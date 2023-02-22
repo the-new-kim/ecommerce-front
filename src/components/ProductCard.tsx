@@ -19,7 +19,7 @@ export default function ProductCard({ product }: IProductCardProps) {
         <AddToWishlistButton product={product} />
       </div>
       <Link to={`/products/${product.id}`} className="w-full">
-        <div className="aspect-[2/3] w-full h-full overflow-hidden bg-slate-200">
+        <div className="relative aspect-[2/3] w-full h-full overflow-hidden bg-slate-200">
           <img
             src={product.imageUrls[0]}
             alt={product.title}

@@ -44,7 +44,7 @@ export default function AttachmentDND({
       <Droppable droppableId="images" direction="horizontal">
         {(magic) => (
           <div
-            className="flex justify-start items-center overflow-x-auto"
+            className="flex justify-start items-center overflow-x-auto p-3"
             ref={magic.innerRef}
             {...magic.droppableProps}
           >
@@ -56,7 +56,7 @@ export default function AttachmentDND({
               >
                 {(magic) => (
                   <div
-                    className={`${cls(index === 0 ? "ml-0" : "ml-3")}
+                    className={`${cls(index !== 0 ? "ml-3" : "")}
                 flex flex-col bg-white border border-black`}
                     ref={magic.innerRef}
                     {...magic.draggableProps}
@@ -69,9 +69,9 @@ export default function AttachmentDND({
                         onClick={() => onClearAttachment(index)}
                       />
                     </div>
-                    <div className="relative w-60 aspect-square overflow-hidden p-5">
+                    <div className="relative w-60 overflow-hidden p-5">
                       <img
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain aspect-square"
                         src={attachment}
                       />
                     </div>

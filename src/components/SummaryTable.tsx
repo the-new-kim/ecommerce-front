@@ -18,10 +18,7 @@ export default function SummaryTable({ products, totalAmount }: ISummaryTable) {
             <td className="w-20">
               <div className="relative w-full aspect-square">
                 <div className="overflow-hidden rounded-md max-w-full max-h-full shadow-md">
-                  <img
-                    className="object-cover w-full h-full"
-                    src={product.imageUrls[0]}
-                  />
+                  <img className="object-cover" src={product.imageUrls[0]} />
                 </div>
                 <small className="absolute -top-1 -right-1 bg-white shadow-md p-2 w-3 h-3 flex justify-center items-center rounded-full">
                   {product.quantity}

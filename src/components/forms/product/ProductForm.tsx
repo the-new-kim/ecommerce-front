@@ -391,7 +391,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
                 })}
               />
             </label>
-            <div className="p-3 mb-3 min-h-[15rem]">
+            <div className="min-h-[15rem] h-full">
               {!!attachments.length && (
                 <AttachmentDND
                   attachments={attachments}

@@ -110,9 +110,9 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
     <TBodyRow className="group">
       <td>
         <div className="flex justify-start items-center">
-          <span className="relative w-24 max-w-[40%] aspect-square mr-5 overflow-hidden shadow-md rounded-md">
+          <div className="relative w-24 max-w-[40%] max-h-full aspect-square mr-5 overflow-hidden shadow-md rounded-md flex justify-center items-center">
             <img
-              className="object-cover w-full h-full"
+              className="object-contain"
               src={cartProduct.imageUrls[0]}
               alt={cartProduct.title}
             />
@@ -123,7 +123,7 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
             >
               <Trash />
             </button>
-          </span>
+          </div>
           {md && <CartProductTitle cartProduct={cartProduct} />}
         </div>
       </td>
