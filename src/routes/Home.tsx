@@ -6,7 +6,7 @@ import useFirebaseDocs from "../firebase/hooks/useFirebaseDocs";
 import { getFirebaseDocs } from "../firebase/utils";
 
 export default function Home() {
-  const [products] = useFirebaseDocs(() =>
+  const { docs: products } = useFirebaseDocs(() =>
     getFirebaseDocs(productCollection, orderBy("createdAt", "desc"))
   );
 

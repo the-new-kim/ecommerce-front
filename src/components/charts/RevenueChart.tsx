@@ -28,7 +28,7 @@ const getLastMonthes = () => {
 };
 
 export default function RevenueChart() {
-  const [orders] = useFirebaseDocs<IOrderWithId[]>(() =>
+  const { docs: orders } = useFirebaseDocs<IOrderWithId[]>(() =>
     getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
 

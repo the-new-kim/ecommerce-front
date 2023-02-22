@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { orderCollection } from "../../firebase/config";
 import { EDeliveryStatus, IDelivery } from "../../firebase/types";
 import { updateFirebaseDoc } from "../../firebase/utils";
+import { makeFirstLetterBig } from "../../libs/utils";
 import Form from "../elements/form/Form";
 import Input from "../elements/form/Input";
 import Label from "../elements/form/Label";
@@ -77,7 +78,7 @@ export default function OrderForm({ defaultValue, fetcher }: IOrderFormProps) {
         >
           {Object.values(EDeliveryStatus).map((value) => (
             <option key={value} value={value}>
-              {value.charAt(0).toLocaleUpperCase() + value.slice(1)}
+              {makeFirstLetterBig(value)}
             </option>
           ))}
         </select>

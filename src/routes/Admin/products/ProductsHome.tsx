@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import AdminHeader from "../../../components/AdminHeader";
-import CreateButton from "../../../components/CreateButton";
 import Button from "../../../components/elements/Button";
 import Table from "../../../components/table/Table";
 import TBodyRow from "../../../components/table/TBodyRow";
@@ -16,7 +15,9 @@ import { centToDollor } from "../../../libs/utils";
 
 export default function ProductsHome() {
   const headerHeight = useRecoilValue(headerHeightAtom);
-  const [products] = useFirebaseDocs(() => getFirebaseDocs(productCollection));
+  const { docs: products } = useFirebaseDocs(() =>
+    getFirebaseDocs(productCollection)
+  );
 
   const navigate = useNavigate();
 
@@ -27,7 +28,6 @@ export default function ProductsHome() {
   return (
     <>
       <AdminHeader title="Products">
-        {/* <CreateButton href="/admin/products/create" text="Create" /> */}
         <Button link="/admin/products/create">Create</Button>
       </AdminHeader>
 
@@ -59,6 +59,7 @@ export default function ProductsHome() {
                     <img
                       className="object-cover w-full h-full"
                       src={product.imageUrls[0]}
+                      alt={product.title}
                     />
                   </span>
                 </td>

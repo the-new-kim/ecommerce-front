@@ -1,6 +1,7 @@
+import { AddressBook, EnvelopeSimple, Phone } from "phosphor-react";
 import useCartProducts from "../firebase/hooks/useCartProducts";
-import { EDeliveryStatus, IOrder } from "../firebase/types";
-import { getKeyByValue, getKeyIndex } from "../libs/utils";
+import { EDeliveryStatus, IOrder, IShipping } from "../firebase/types";
+import { getKeyByValue, getKeyIndex, makeFirstLetterBig } from "../libs/utils";
 
 import SummaryTable from "./SummaryTable";
 
@@ -27,6 +28,30 @@ function HeaderItem({ title, text }: IHeaderItemProps) {
   );
 }
 
+interface IShippingInformationProps {
+  shipping: IShipping;
+  // email: string;
+}
+
+function ShippingInformation({ shipping }: IShippingInformationProps) {
+  return (
+    <div className="[&>*]:flex [&>*]:justify-start [&>*]:items-center">
+      <div>
+        <AddressBook className="mr-2 hidden md:block" />
+        {shipping.address.line1}, {shipping.address.line2},{" "}
+        {shipping.address.postal_code}, {shipping.address.city},{" "}
+        {shipping.address.state}, {shipping.address.country}
+      </div>
+      <div>
+        <Phone className="mr-2 hidden md:block" /> {shipping.phone}
+      </div>
+      {/* <div>
+        <EnvelopeSimple className="mr-2" /> {email}
+      </div> */}
+    </div>
+  );
+}
+
 export default function OrderCard({ order }: IOrderCardProps) {
   const { products, totalAmount } = useCartProducts(order.products);
 
@@ -43,18 +68,24 @@ export default function OrderCard({ order }: IOrderCardProps) {
         />
         <HeaderItem
           title="Delivery status"
-          text={
-            order.delivery.status.charAt(0).toUpperCase() +
-            order.delivery.status.slice(1)
-          }
+          text={makeFirstLetterBig(order.delivery.status)}
         />
         <HeaderItem title="Ship to" text={order.shipping.name} />
         <HeaderItem title="Order ID" text={order.id} />
       </header>
       <div className="flex flex-col justify-start items-start">
+        {/* TRACKING CODE */}
         {order.delivery.trackingCode && (
-          <div>Tracking code: {order.delivery.trackingCode}</div>
+          <div className="mb-3">
+            Tracking code: {order.delivery.trackingCode}
+          </div>
         )}
+
+        {/* SHIPPING INFORMATION */}
+        {/* <div className="p-5"> */}
+        <ShippingInformation shipping={order.shipping} />
+        {/* </div> */}
+
         {/* DELIVERY STATUS */}
         <div className="flex flex-col justify-center items-center w-full py-5 px-10">
           <div className="flex justify-between items-center w-full relative">
@@ -92,9 +123,7 @@ export default function OrderCard({ order }: IOrderCardProps) {
                     // overflow: "hidden",
                   }}
                 >
-                  <small>
-                    {value.charAt(0).toUpperCase() + value.slice(1)}
-                  </small>
+                  <small>{makeFirstLetterBig(value)}</small>
                 </div>
 
                 {/* BAR */}
@@ -126,6 +155,7 @@ export default function OrderCard({ order }: IOrderCardProps) {
           </div>
         </div>
 
+        {/* PRODUCTS */}
         {!!products.length && totalAmount && (
           <SummaryTable products={products} totalAmount={totalAmount} />
         )}

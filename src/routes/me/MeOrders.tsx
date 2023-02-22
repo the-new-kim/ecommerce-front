@@ -13,7 +13,7 @@ import { userAtom } from "../../libs/atoms";
 export default function MeOrders() {
   const me = useRecoilValue(userAtom);
 
-  const [myOrders] = useFirebaseDocs(() =>
+  const { docs: myOrders } = useFirebaseDocs(() =>
     getFirebaseDocs(
       orderCollection,
       where("orderer", "==", me!.id),

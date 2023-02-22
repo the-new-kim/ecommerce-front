@@ -52,7 +52,7 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
     mediaQuery: { md },
   } = useViewportSize();
   const [me, setMe] = useRecoilState(userAtom);
-  const [productDoc] = useFirebaseDocs(() =>
+  const { docs: productDoc } = useFirebaseDocs(() =>
     getFirebaseDoc(productCollection, cartProduct.id)
   );
 
@@ -118,6 +118,7 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
             <img
               className="object-contain w-full h-full"
               src={cartProduct.imageUrls[0]}
+              alt={cartProduct.title}
             />
             <button
               onClick={() => deleteFromCart(cartProduct.id)}

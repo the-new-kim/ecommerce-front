@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function useFirebaseDocs<T>(
   getFunction: () => Promise<T | undefined>
-): [T | undefined, () => Promise<void>] {
+): { docs: T | undefined; fetcher: () => Promise<void>; loading: boolean } {
   const [docs, setDocs] = useState<T>();
   const [loading, setLoading] = useState(false);
 
@@ -17,5 +17,5 @@ export default function useFirebaseDocs<T>(
     fetcher();
   }, []);
 
-  return [docs, fetcher];
+  return { docs, fetcher, loading };
 }

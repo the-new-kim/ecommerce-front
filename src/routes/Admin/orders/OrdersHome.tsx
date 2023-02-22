@@ -9,10 +9,10 @@ import { orderCollection } from "../../../firebase/config";
 import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
 
 import { getFirebaseDocs } from "../../../firebase/utils";
-import { centToDollor } from "../../../libs/utils";
+import { centToDollor, makeFirstLetterBig } from "../../../libs/utils";
 
 export default function OrdersHome() {
-  const [orders] = useFirebaseDocs<IOrderWithId[]>(() =>
+  const { docs: orders } = useFirebaseDocs<IOrderWithId[]>(() =>
     getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
   const navigate = useNavigate();
@@ -30,7 +30,8 @@ export default function OrdersHome() {
             <td className="text-start">Order placed</td>
             <td className="text-start">Order Id</td>
             <td className="text-start">Total</td>
-            <td className="text-start">Payment Status</td>
+            <td className="text-start">Payment</td>
+            <td className="text-start">Delivery</td>
           </THeadRow>
         </THead>
         <tbody>
@@ -43,7 +44,8 @@ export default function OrdersHome() {
               <td>{new Date(order.createdAt).toDateString()}</td>
               <td>{order.id}</td>
               <td>{centToDollor(order.paymentIntent.amount)}</td>
-              <td>{order.paymentIntent.status}</td>
+              <td>{makeFirstLetterBig(order.paymentIntent.status)}</td>
+              <td>{makeFirstLetterBig(order.delivery.status)}</td>
             </tr>
           ))}
         </tbody>

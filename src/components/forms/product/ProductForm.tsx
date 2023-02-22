@@ -229,7 +229,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
       }
     }
 
-    setIsDragEnter(false);
+    // setIsDragEnter(false);
   };
 
   const onDragEnter = (event: React.DragEvent<HTMLDivElement>) => {

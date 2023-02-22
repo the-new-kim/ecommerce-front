@@ -8,7 +8,9 @@ import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
 import { getFirebaseDocs } from "../../../firebase/utils";
 
 export default function UsersHome() {
-  const [users] = useFirebaseDocs(() => getFirebaseDocs(userCollection));
+  const { docs: users } = useFirebaseDocs(() =>
+    getFirebaseDocs(userCollection)
+  );
   const navigate = useNavigate();
   const onClick = (id: string) => {
     navigate(`/admin/users/${id}`);

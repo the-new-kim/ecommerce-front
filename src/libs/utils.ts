@@ -28,3 +28,10 @@ export const getKeyIndex = (object: { [key: string]: any }, key?: string) => {
   if (!key) return 0;
   return Object.keys(object).indexOf(key);
 };
+
+export const makeFirstLetterBig = (text: string) => {
+  const firstLetter = text.charAt(0).toUpperCase();
+  const rest = text.slice(1).toLocaleLowerCase();
+
+  return firstLetter + rest;
+};

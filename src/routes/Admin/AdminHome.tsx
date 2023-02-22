@@ -34,15 +34,15 @@ function Card({ children, className = "" }: ICardProps) {
 }
 
 export default function AdminHome() {
-  const [topProducts] = useFirebaseDocs<IProductWithId[]>(() =>
+  const { docs: topProducts } = useFirebaseDocs<IProductWithId[]>(() =>
     getFirebaseDocs(productCollection, orderBy("sold", "desc"), limit(5))
   );
 
-  const [orders] = useFirebaseDocs<IOrderWithId[]>(() =>
+  const { docs: orders } = useFirebaseDocs<IOrderWithId[]>(() =>
     getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
 
-  const [users] = useFirebaseDocs<(IUser & { id: string })[]>(() =>
+  const { docs: users } = useFirebaseDocs<(IUser & { id: string })[]>(() =>
     getFirebaseDocs(userCollection)
   );
 

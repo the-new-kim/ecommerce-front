@@ -1,4 +1,4 @@
-import { useState } from "react";
+// import { useState } from "react";
 import { useParams } from "react-router-dom";
 import AdminHeader from "../../../components/AdminHeader";
 import Empty from "../../../components/Empty";
@@ -12,11 +12,11 @@ import { getFirebaseDoc } from "../../../firebase/utils";
 export default function ProductDetail() {
   const { id } = useParams();
 
-  const [product] = useFirebaseDocs(() =>
+  const { docs: product } = useFirebaseDocs(() =>
     getFirebaseDoc(productCollection, id!)
   );
 
-  const [edit, setEdit] = useState(false);
+  // const [edit, setEdit] = useState(false);
 
   return (
     <>
