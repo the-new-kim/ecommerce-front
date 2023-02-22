@@ -45,7 +45,11 @@ export default function PaymentForm() {
       return;
     }
 
-    if (paymentIntent.status === "succeeded") {
+    if (paymentIntent.status !== "succeeded") {
+      setMessage(`Status: ${paymentIntent.status}`);
+      setIsProcessing(false);
+      return;
+    } else {
       //1️⃣ Create new doc "order" on firestore
 
       const orderDocRef = await addDoc(orderCollection, {
@@ -81,10 +85,8 @@ export default function PaymentForm() {
 
       setMe({ ...me!, cart: { paymentIntent: null, products: [] }, orders });
 
-      navigate(`/me`);
+      return navigate(`/me`);
     }
-    setMessage(`Status: ${paymentIntent.status}`);
-    setIsProcessing(false);
   };
 
   return (

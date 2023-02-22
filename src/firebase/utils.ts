@@ -1,3 +1,4 @@
+import { UserCredential } from "firebase/auth";
 import {
   CollectionReference,
   doc,
@@ -5,9 +6,11 @@ import {
   getDocs,
   query,
   QueryConstraint,
+  setDoc,
   UpdateData,
   updateDoc,
 } from "firebase/firestore";
+import { userCollection } from "./config";
 
 export const updateFirebaseDoc = async <T>(
   collection: CollectionReference<T>,
@@ -43,6 +46,20 @@ export const getFirebaseDocs = async <T>(
       ...doc.data(),
       id: doc.id,
     };
+  });
+};
+
+export const createUserDoc = async (userCredential: UserCredential) => {
+  await setDoc(doc(userCollection, userCredential.user.uid), {
+    isAdmin: false,
+    wishlist: [],
+    cart: {
+      paymentIntent: null,
+      products: [],
+    },
+    orders: [],
+    address: null,
+    shipping: null,
   });
 };
 

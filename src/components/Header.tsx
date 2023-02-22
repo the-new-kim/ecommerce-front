@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Gear,
   Heart,
@@ -56,23 +57,6 @@ export default function Header() {
 
       <nav>
         <ul className="flex [&>*]:ml-3 justify-end items-center text-2xl">
-          <li className="h-full flex items-center relative">
-            <div className="h-full absolute top-0 right-0 flex items-center">
-              {searchOpen && (
-                <form
-                  className="flex justify-center items-center"
-                  onSubmit={handleSubmit(onValid)}
-                >
-                  <input
-                    {...register("keyword")}
-                    placeholder="Search"
-                    type="text"
-                    className="text-center text-sm px-3 border-b-[1px] border-black py-1 focus:outline-none"
-                  />
-                </form>
-              )}
-            </div>
-          </li>
           <li>
             <MagnifyingGlass
               className="cursor-pointer"
@@ -91,7 +75,10 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link to="/cart" className="relative">
+            <Link
+              to="/cart"
+              className="relative flex justify-center items-center"
+            >
               <ShoppingCart />
               {me && !!me.cart.products.length && (
                 <small className="absolute text-xs -top-1 -right-1 bg-black text-white shadow-md p-2 w-3 h-3 flex justify-center items-center rounded-full">
@@ -109,6 +96,32 @@ export default function Header() {
           )}
         </ul>
       </nav>
+
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            initial={{ y: "-200%", opacity: 0 }}
+            animate={{ y: "0%", opacity: 1 }}
+            exit={{ y: "-200%", opacity: 0 }}
+            transition={{
+              type: "tween",
+            }}
+            className="absolute top-full left-0 w-full flex items-center justify-center bg-white pb-3 shadow-md -z-10"
+          >
+            <form
+              className="flex justify-center items-center w-full max-w-2xl px-3"
+              onSubmit={handleSubmit(onValid)}
+            >
+              <input
+                {...register("keyword")}
+                placeholder="Search"
+                type="text"
+                className="text-center w-full text-sm px-3 border-b-[1px] border-black py-1 focus:outline-none"
+              />
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

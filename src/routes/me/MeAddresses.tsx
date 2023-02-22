@@ -16,21 +16,32 @@ export default function MeAddresses() {
         Address book
       </Heading>
       <div className="border-[1px] border-black p-3 flex flex-col">
-        <div>{me?.shipping?.name}</div>
-        <div>{me?.email}</div>
-        <div>{me?.shipping?.phone}</div>
-        <div>
-          {me?.shipping?.address.line1}, {me?.shipping?.address.line2}
-        </div>
-        <div>
-          {me?.shipping?.address.postal_code}, {me?.shipping?.address.city}
-        </div>
-        <div>
-          {me?.shipping?.address.state}, {me?.shipping?.address.country}
-        </div>
-        <Button className="mt-5" onClick={() => setShowModal(true)}>
-          Edit
-        </Button>
+        {me?.shipping ? (
+          <>
+            <div>{me?.shipping?.name}</div>
+            <div>{me?.email}</div>
+            <div>{me?.shipping?.phone}</div>
+            <div>
+              {me?.shipping?.address.line1}, {me?.shipping?.address.line2}
+            </div>
+            <div>
+              {me?.shipping?.address.postal_code}, {me?.shipping?.address.city}
+            </div>
+            <div>
+              {me?.shipping?.address.state}, {me?.shipping?.address.country}
+            </div>
+            <Button className="mt-5" onClick={() => setShowModal(true)}>
+              Edit
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="text-center">No data</div>
+            <Button className="mt-5" onClick={() => setShowModal(true)}>
+              Add
+            </Button>
+          </>
+        )}
       </div>
 
       {showModal && (

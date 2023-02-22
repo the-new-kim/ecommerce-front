@@ -2,15 +2,16 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+
 import { useForm } from "react-hook-form";
-import { firebaseAuth, userCollection } from "../../firebase/config";
+import { firebaseAuth } from "../../firebase/config";
 import { useState } from "react";
 import Message from "../Message";
 import Form from "../elements/form/Form";
 import Label from "../elements/form/Label";
 import Input from "../elements/form/Input";
 import FieldErrorMessage from "../elements/form/FieldErrorMessage";
+import { createUserDoc } from "../../firebase/utils";
 
 interface IRegisterForm {
   email: string;
@@ -40,23 +41,9 @@ export default function RegisterForm() {
         password
       );
 
-      // await updateProfile(userCredential.user, {
-      //   displayName: name,
-      // });
-
       // 2️⃣ Create new user doc
 
-      await setDoc(doc(userCollection, userCredential.user.uid), {
-        isAdmin: false,
-        wishlist: [],
-        cart: {
-          paymentIntent: null,
-          products: [],
-        },
-        orders: [],
-        address: null,
-        shipping: null,
-      });
+      await createUserDoc(userCredential);
 
       // 3️⃣ Login
       await signInWithEmailAndPassword(firebaseAuth, email, password);

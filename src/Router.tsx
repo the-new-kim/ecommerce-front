@@ -114,19 +114,22 @@ const globalRoutes: RouteObject[] = [
 ];
 
 const router = (me: IUserAtom | null) => {
-  return createBrowserRouter([
-    {
-      path: "/",
-      element: <Layout />,
-      errorElement: <NotFound />,
-      children: [
-        ...globalRoutes,
-        // ...(me ? protectedRoutes : publicOnlyRoutes),
-        ...(me?.isAdmin ? adminOnlyRoutes : []),
-      ],
-    },
-    !!me?.cart.products.length ? checkoutRout : {},
-  ]);
+  return createBrowserRouter(
+    [
+      {
+        path: "/",
+        element: <Layout />,
+        errorElement: <NotFound />,
+        children: [
+          ...globalRoutes,
+          // ...(me ? protectedRoutes : publicOnlyRoutes),
+          ...(me?.isAdmin ? adminOnlyRoutes : []),
+        ],
+      },
+      !!me?.cart.products.length ? checkoutRout : {},
+    ],
+    { basename: process.env.PUBLIC_URL }
+  );
 };
 
 export default router;

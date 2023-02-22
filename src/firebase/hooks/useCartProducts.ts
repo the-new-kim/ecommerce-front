@@ -35,9 +35,13 @@ export default function useCartProducts(
 
       setTotalAmount(
         cartProducts.length
-          ? myCart
-              .map((product) => product.price * product.quantity)
-              .reduce((accumulator, currentValue) => accumulator + currentValue)
+          ? Math.round(
+              myCart
+                .map((product) => product.price * product.quantity)
+                .reduce(
+                  (accumulator, currentValue) => accumulator + currentValue
+                )
+            )
           : 0
       );
       setProducts(myCart);

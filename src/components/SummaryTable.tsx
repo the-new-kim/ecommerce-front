@@ -17,7 +17,7 @@ export default function SummaryTable({ products, totalAmount }: ISummaryTable) {
           <TBodyRow key={product.id} className="border-none">
             <td className="w-20">
               <div className="relative w-full aspect-square">
-                <div className="overflow-hidden rounded-md w-full h-full shadow-md">
+                <div className="overflow-hidden rounded-md max-w-full max-h-full shadow-md">
                   <img
                     className="object-cover w-full h-full"
                     src={product.imageUrls[0]}

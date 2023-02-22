@@ -55,7 +55,9 @@ function App() {
     if (!me) return;
     onAuthStateChanged(firebaseAuth, async (user) => {
       if (!user) return;
-      console.log("💥💥💥💥State changed💥💥💥💥");
+
+      const userExists = await getFirebaseDoc(userCollection, user.uid);
+      if (!userExists) return;
 
       const userCopy = JSON.parse(JSON.stringify(user)) as User;
 
