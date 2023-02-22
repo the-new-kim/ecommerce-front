@@ -24,7 +24,6 @@
     "react-hook-form": "^7.43.0",
     "react-player": "^2.11.2",
     "react-router-dom": "^6.8.0",
-    "react-scripts": "5.0.1",
     "react-toastify": "^9.1.1",
     "recoil": "^0.7.6",
     "typescript": "^4.9.5",
@@ -60,7 +59,8 @@
   "devDependencies": {
     "@types/react-beautiful-dnd": "^13.1.3",
     "@types/uuid": "^9.0.0",
-    "tailwindcss": "^3.2.4"
+    "tailwindcss": "^3.2.4",
+    "react-scripts": "5.0.1"
   },
   "homepage": "https://the-new-kim.github.io/ecommerce-front/"
 }

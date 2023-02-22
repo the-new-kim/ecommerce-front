@@ -81,7 +81,7 @@ export default function Header() {
             >
               <ShoppingCart />
               {me && !!me.cart.products.length && (
-                <small className="absolute text-xs -top-1 -right-1 bg-black text-white shadow-md p-2 w-3 h-3 flex justify-center items-center rounded-full">
+                <small className="absolute text-xs -top-1 -right-1 bg-black text-white p-2 w-3 h-3 flex justify-center items-center rounded-full">
                   {me.cart.products.length}
                 </small>
               )}

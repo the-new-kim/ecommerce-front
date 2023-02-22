@@ -87,10 +87,6 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
         const newQuantity = product.quantity + increament;
 
         if (newQuantity < 1 || newQuantity > productDoc.quantity) {
-          console.log(
-            "NEW QUANTITY CAN NOT BE BIGGER THAN PRODUCT QUANTITY OR LESS THAN 1 ❌❌❌"
-          );
-
           return product;
         } else {
           product.quantity = newQuantity;
@@ -114,9 +110,9 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
     <TBodyRow className="group">
       <td>
         <div className="flex justify-start items-center">
-          <span className="relative w-24 max-w-[40%] mr-5 overflow-hidden">
+          <span className="relative w-24 max-w-[40%] aspect-square mr-5 overflow-hidden shadow-md rounded-md">
             <img
-              className="object-contain w-full h-full"
+              className="object-cover w-full h-full"
               src={cartProduct.imageUrls[0]}
               alt={cartProduct.title}
             />
