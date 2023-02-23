@@ -1,4 +1,4 @@
-import { AddressBook, EnvelopeSimple, Phone } from "phosphor-react";
+import { AddressBook, Phone } from "phosphor-react";
 import useCartProducts from "../firebase/hooks/useCartProducts";
 import { EDeliveryStatus, IOrder, IShipping } from "../firebase/types";
 import { getKeyByValue, getKeyIndex, makeFirstLetterBig } from "../libs/utils";

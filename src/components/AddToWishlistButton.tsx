@@ -28,7 +28,7 @@ export default function AddToWishlistButton({
     setWeight(onList ? "fill" : "thin");
   }, [onList]);
 
-  const onClick = async () => {
+  const onClick = () => {
     if (!me) return;
 
     setMe((oldMe) => {

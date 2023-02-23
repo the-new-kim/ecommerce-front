@@ -11,19 +11,23 @@ import { getFirebaseDoc } from "../../../firebase/utils";
 export default function OrderDetail() {
   const { id } = useParams();
 
-  const { data: order, refetch } = useQuery(["order", id], () =>
-    getFirebaseDoc(orderCollection, id)
-  );
+  const {
+    data: order,
+    isLoading,
+    error,
+  } = useQuery(["order", id], () => getFirebaseDoc(orderCollection, id));
+
+  if (error) return <Empty>{`${error}`}</Empty>;
 
   return (
     <>
-      {!order ? (
-        <Empty>Order with ID "{id}" does not exist</Empty>
+      {!order || isLoading ? (
+        <Empty>Loading...</Empty>
       ) : (
         <>
           <AdminHeader title="Order detail" />
           <OrderCard order={order} />
-          <OrderForm defaultValue={order} refetch={refetch} />
+          <OrderForm defaultValue={order} />
         </>
       )}
     </>

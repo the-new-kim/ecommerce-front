@@ -11,7 +11,9 @@ import {
   UpdateData,
   updateDoc,
 } from "firebase/firestore";
+import { IProductWithId } from "../routes/Cart";
 import { productCollection, userCollection } from "./config";
+import { ICartProduct } from "./types";
 
 export const errorMessage = (error: unknown) => {
   let message;
@@ -82,25 +84,51 @@ export const createUserDoc = async (userCredential: UserCredential) => {
   });
 };
 
-export const getFireDoc = ({
-  queryKey,
-}: QueryFunctionContext<[string, string | undefined]>) => {
-  const [collectionType, id] = queryKey;
+export const getWishlistProducts = async (wishlist: string[] | undefined) => {
+  const products: IProductWithId[] = [];
 
-  let collection: CollectionReference | undefined;
+  if (!wishlist) return products;
 
-  switch (collectionType) {
-    case "product":
-      collection = productCollection;
-      break;
+  for (let i = 0; i < wishlist.length; i++) {
+    const id = wishlist[i];
+    const foundProduct = await getFirebaseDoc(productCollection, id);
+    if (!foundProduct) return;
+
+    products.push(foundProduct);
   }
 
-  if (!collection || !id) return;
-
-  return getFirebaseDoc(collection, id);
-
-  // console.log(collectionType, productId);
+  return products;
 };
+
+export const getCartProducts = async (
+  cartProducts: ICartProduct[] | undefined
+) => {
+  let products: IProductWithId[] = [];
+
+  if (!cartProducts) return products;
+
+  for (let i = 0; i < cartProducts.length; i++) {
+    const { id, quantity } = cartProducts[i];
+    const foundProduct = await getFirebaseDoc(productCollection, id);
+
+    if (foundProduct) {
+      const cartProduct = {
+        ...foundProduct,
+        quantity,
+      };
+      products.push(cartProduct);
+    }
+  }
+
+  return products;
+};
+
+export const getProductsTotalAmount = (products: IProductWithId[]) =>
+  Math.round(
+    products
+      .map((product) => product.price * product.quantity)
+      .reduce((accumulator, currentValue) => accumulator + currentValue)
+  );
 
 ///////////
 ///////////

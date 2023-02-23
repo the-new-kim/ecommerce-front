@@ -3,10 +3,8 @@ import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { productCollection } from "../firebase/config";
 import { getFirebaseDoc } from "../firebase/utils";
-
 import { userAtom } from "../libs/atoms";
 import { centToDollor } from "../libs/utils";
-
 import TBodyRow from "./table/TBodyRow";
 import { IProductWithId } from "../routes/Cart";
 import useViewportSize from "../libs/hooks/useViewportSize";
@@ -54,7 +52,11 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
   } = useViewportSize();
   const [me, setMe] = useRecoilState(userAtom);
 
-  const { data: productDoc } = useQuery(["product", cartProduct.id], () =>
+  const {
+    data: productDoc,
+    isLoading,
+    error,
+  } = useQuery(["product", cartProduct.id], () =>
     getFirebaseDoc(productCollection, cartProduct.id)
   );
 

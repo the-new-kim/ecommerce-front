@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import Heading from "./elements/typos/Heading";
 
 interface IEmptyProps {
   children: ReactNode;

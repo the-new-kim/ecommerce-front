@@ -1,12 +1,8 @@
-import { orderBy } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { orderCollection } from "../../firebase/config";
-import { getFirebaseDocs } from "../../firebase/utils";
-
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { centToDollor } from "../../libs/utils";
-import { useQuery } from "@tanstack/react-query";
+import { IOrderWithId } from "../OrderCard";
 
 const getLastMonthes = () => {
   const currentDate = new Date();
@@ -27,11 +23,11 @@ const getLastMonthes = () => {
   return lastMonths;
 };
 
-export default function RevenueChart() {
-  const { data: orders } = useQuery(["orders"], () =>
-    getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
-  );
+interface IRevenueCahrtProps {
+  orders: IOrderWithId[];
+}
 
+export default function RevenueChart({ orders }: IRevenueCahrtProps) {
   const [options] = useState<ApexOptions>({
     chart: {
       id: "basic-bar",

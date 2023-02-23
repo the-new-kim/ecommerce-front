@@ -3,7 +3,7 @@
 ## global
 
 - / .........................(✅)
-- /cart .....................(✅)
+- /cart .....................(👷‍♀️)
 - /wishlist .................(✅)
 - /search ...................(✅)
 - /products/:id .............(✅)
@@ -36,12 +36,13 @@
 
 - [x] Beautiful dnd for images
 - [x] Multiple files upload
-- [ ] Admin Menu
+- [ ] Admin Menu (Responsive)
 - [x] Wishlist
-- [x] Cart
+- [ ] Cart (Refactoring..., replacing useCartProducts...)
 - [x] Payment(stripe)
 - [x] Form component
-- [ ] Handle loading
+- [ ] Handle loading (Tanstack query & Loading page)
+- [ ] Container for wishlist & search
 
 ### Charts
 

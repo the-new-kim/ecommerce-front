@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { addDoc } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { firebaseStorage, productCollection } from "../../../firebase/config";
@@ -47,7 +47,6 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isDirty, dirtyFields },
   } = useForm<IProductWithId>();
 
@@ -228,8 +227,6 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
         reader.readAsDataURL(file);
       }
     }
-
-    // setIsDragEnter(false);
   };
 
   const onDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
@@ -239,17 +236,6 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
     if (isDragEnter) return;
     setIsDragEnter(true);
   };
-  const onDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
-    // event.preventDefault();
-    // event.stopPropagation();
-    // console.log("DRAG LEAVE");
-    // if (!isDragEnter) return;
-    // setIsDragEnter(false);
-  };
-
-  useEffect(() => {
-    console.log("DRAG ENTER", isDragEnter);
-  }, [isDragEnter]);
 
   return (
     <>

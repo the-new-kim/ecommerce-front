@@ -1,11 +1,7 @@
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { orderCollection } from "../../firebase/config";
-import { EDeliveryStatus, IDelivery, IOrder } from "../../firebase/types";
+import { EDeliveryStatus, IDelivery } from "../../firebase/types";
 import { updateFirebaseDoc } from "../../firebase/utils";
 import { makeFirstLetterBig } from "../../libs/utils";
 import Form from "../elements/form/Form";
@@ -15,70 +11,36 @@ import { IOrderWithId } from "../OrderCard";
 
 interface IOrderFormProps {
   defaultValue: IOrderWithId;
-  refetch: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<
-    QueryObserverResult<
-      | (IOrder & {
-          id: string;
-        })
-      | undefined,
-      unknown
-    >
-  >;
 }
 
-export default function OrderForm({ defaultValue, refetch }: IOrderFormProps) {
+export default function OrderForm({ defaultValue }: IOrderFormProps) {
   const {
     register,
     handleSubmit,
-    watch,
-    setError,
     formState: { errors },
   } = useForm<IDelivery>();
 
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async ({ status, trackingCode }: IDelivery) => {
+      const updateData = {
+        ...defaultValue,
+        delivery: {
+          status,
+          trackingCode,
+        },
+      };
+      await updateFirebaseDoc(orderCollection, defaultValue.id, updateData);
+      return updateData;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["order", data.id], data);
+    },
+  });
+
   const onValid = async ({ status, trackingCode }: IDelivery) => {
-    // let trackingCodeRequired = false;
-
-    // switch (status) {
-    //   case EDeliveryStatus.ORDERED:
-    //     trackingCode = null;
-    //     break;
-    //   case EDeliveryStatus.SHIPPED:
-    //     trackingCodeRequired = true;
-    //     break;
-    //   case EDeliveryStatus.DELIVERED:
-    //     break;
-    // }
-
-    // if (trackingCodeRequired && !trackingCode) {
-    //   console.log("set errors and do something");
-    //   // set errors
-    //   // stop
-    // } else {
-    //   // update
-    //   console.log("alles ok goahead");
-
-    //   await updateFirebaseDoc(orderCollection, defaultValue.id, {
-    //     ...defaultValue,
-    //     delivery: {
-    //       status,
-    //       trackingCode,
-    //     },
-    //   });
-
-    //   refetch();
-    // }
-
-    await updateFirebaseDoc(orderCollection, defaultValue.id, {
-      ...defaultValue,
-      delivery: {
-        status,
-        trackingCode,
-      },
-    });
-
-    refetch();
+    mutation.mutate({ status, trackingCode });
   };
 
   return (

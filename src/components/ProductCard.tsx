@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { centToDollor } from "../libs/utils";
 import { IProductWithId } from "../routes/Cart";
@@ -10,11 +11,14 @@ interface IProductCardProps {
 
 export default function ProductCard({ product }: IProductCardProps) {
   return (
-    <div className="flex flex-col justify-center items-center [&>*]:mb-3 w-full relative group">
-      {/* <div
-        className="absolute top-0 left-0 w-full h-[20%] bg-gradient-to-b from-[rgba(255,255,255,0.2)] to-transparent pointer-events-none 
-      opacity-0 group-hover:opacity-100 duration-300 transition-opacity z-10"
-      /> */}
+    <motion.div
+      key={product.id}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      layout
+      className="flex flex-col justify-center items-center [&>*]:mb-3 w-full relative group"
+    >
       <div className="absolute z-10 top-3 right-3 text-3xl cursor-pointer">
         <AddToWishlistButton product={product} />
       </div>
@@ -35,6 +39,6 @@ export default function ProductCard({ product }: IProductCardProps) {
 
         <AddToCartButton product={product} />
       </div>
-    </div>
+    </motion.div>
   );
 }
