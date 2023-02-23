@@ -5,7 +5,7 @@ import { productCollection } from "../firebase/config";
 
 import { centToDollor } from "../libs/utils";
 
-import { getFirebaseDoc } from "../firebase/utils";
+import { getFirebaseDoc, getFireDoc } from "../firebase/utils";
 import Heading from "../components/elements/typos/Heading";
 
 import ReviewSection from "../components/review/ReviewSection";
@@ -13,14 +13,19 @@ import ReviewStars from "../components/review/ReviewStars";
 import useViewportSize from "../libs/hooks/useViewportSize";
 import Empty from "../components/Empty";
 import AddToCartButton from "../components/AddToCartButton";
-import useFirebaseDocs from "../firebase/hooks/useFirebaseDocs";
+
 import AddToWishlistButton from "../components/AddToWishlistButton";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Product() {
   const { productId } = useParams();
 
-  const { docs: product } = useFirebaseDocs(() =>
-    getFirebaseDoc(productCollection, productId!)
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useQuery(["product", productId], () =>
+    getFirebaseDoc(productCollection, productId)
   );
 
   const {

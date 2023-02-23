@@ -1,10 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import { limit, orderBy } from "firebase/firestore";
 import { Package, ShoppingBag, Users } from "phosphor-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RevenueChart from "../../components/charts/RevenueChart";
 import Heading from "../../components/elements/typos/Heading";
-import { IOrderWithId } from "../../components/OrderCard";
 import Table from "../../components/table/Table";
 import TBodyRow from "../../components/table/TBodyRow";
 import THead from "../../components/table/THead";
@@ -14,11 +14,8 @@ import {
   productCollection,
   userCollection,
 } from "../../firebase/config";
-import useFirebaseDocs from "../../firebase/hooks/useFirebaseDocs";
-import { IUser } from "../../firebase/types";
 import { getFirebaseDocs } from "../../firebase/utils";
 import { centToDollor } from "../../libs/utils";
-import { IProductWithId } from "../Cart";
 
 interface ICardProps {
   children: ReactNode;
@@ -34,15 +31,15 @@ function Card({ children, className = "" }: ICardProps) {
 }
 
 export default function AdminHome() {
-  const { docs: topProducts } = useFirebaseDocs<IProductWithId[]>(() =>
+  const { data: topProducts } = useQuery(["topProducts"], () =>
     getFirebaseDocs(productCollection, orderBy("sold", "desc"), limit(5))
   );
 
-  const { docs: orders } = useFirebaseDocs<IOrderWithId[]>(() =>
+  const { data: orders } = useQuery(["totalOrders"], () =>
     getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
 
-  const { docs: users } = useFirebaseDocs<(IUser & { id: string })[]>(() =>
+  const { data: users } = useQuery(["users"], () =>
     getFirebaseDocs(userCollection)
   );
 

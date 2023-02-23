@@ -5,6 +5,8 @@
   "dependencies": {
     "@stripe/react-stripe-js": "^1.16.4",
     "@stripe/stripe-js": "^1.46.0",
+    "@tanstack/react-query": "^4.24.10",
+    "@tanstack/react-query-devtools": "^4.24.10",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -59,8 +61,8 @@
   "devDependencies": {
     "@types/react-beautiful-dnd": "^13.1.3",
     "@types/uuid": "^9.0.0",
-    "tailwindcss": "^3.2.4",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "tailwindcss": "^3.2.4"
   },
   "homepage": "https://the-new-kim.github.io/ecommerce-front/"
 }

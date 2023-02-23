@@ -1,20 +1,20 @@
+import { useQuery } from "@tanstack/react-query";
 import { orderBy } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../../components/AdminHeader";
-import { IOrderWithId } from "../../../components/OrderCard";
 import Table from "../../../components/table/Table";
 import THead from "../../../components/table/THead";
 import THeadRow from "../../../components/table/THeadRow";
 import { orderCollection } from "../../../firebase/config";
-import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
 
 import { getFirebaseDocs } from "../../../firebase/utils";
 import { centToDollor, makeFirstLetterBig } from "../../../libs/utils";
 
 export default function OrdersHome() {
-  const { docs: orders } = useFirebaseDocs<IOrderWithId[]>(() =>
+  const { data: orders } = useQuery(["orders"], () =>
     getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
+
   const navigate = useNavigate();
 
   const onClick = (id: string) => {

@@ -1,6 +1,7 @@
 import { centToDollor } from "../libs/utils";
 import { IProductWithId } from "../routes/Cart";
 import Heading from "./elements/typos/Heading";
+import SquareImage from "./SquareImage";
 import Table from "./table/Table";
 import TBodyRow from "./table/TBodyRow";
 
@@ -16,11 +17,13 @@ export default function SummaryTable({ products, totalAmount }: ISummaryTable) {
         {products.map((product) => (
           <TBodyRow key={product.id} className="border-none">
             <td className="w-20">
-              <div className="relative w-full aspect-square">
-                <div className="overflow-hidden rounded-md max-w-full max-h-full shadow-md">
-                  <img className="object-cover" src={product.imageUrls[0]} />
-                </div>
-                <small className="absolute -top-1 -right-1 bg-white shadow-md p-2 w-3 h-3 flex justify-center items-center rounded-full">
+              <div className="relative">
+                <SquareImage
+                  src={product.imageUrls[0]}
+                  alt={product.title}
+                  className="rounded-md overflow-hidden shadow-md"
+                />
+                <small className="absolute -top-1 -right-1 bg-black text-white p-2 w-3 h-3 flex justify-center items-center rounded-full">
                   {product.quantity}
                 </small>
               </div>
@@ -31,7 +34,7 @@ export default function SummaryTable({ products, totalAmount }: ISummaryTable) {
             </td>
           </TBodyRow>
         ))}
-        <TBodyRow className="border-b-0 border-t-[1px]">
+        <TBodyRow className="!border-b-0 border-t-[1px]">
           <td>
             <Heading tagName="h5">Total</Heading>
           </td>

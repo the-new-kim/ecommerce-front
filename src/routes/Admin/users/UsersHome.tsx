@@ -1,16 +1,17 @@
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import AdminHeader from "../../../components/AdminHeader";
 import Table from "../../../components/table/Table";
 import THead from "../../../components/table/THead";
 import THeadRow from "../../../components/table/THeadRow";
 import { userCollection } from "../../../firebase/config";
-import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
 import { getFirebaseDocs } from "../../../firebase/utils";
 
 export default function UsersHome() {
-  const { docs: users } = useFirebaseDocs(() =>
+  const { data: users } = useQuery(["users"], () =>
     getFirebaseDocs(userCollection)
   );
+
   const navigate = useNavigate();
   const onClick = (id: string) => {
     navigate(`/admin/users/${id}`);

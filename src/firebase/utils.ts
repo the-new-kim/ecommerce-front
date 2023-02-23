@@ -1,3 +1,4 @@
+import { QueryFunctionContext } from "@tanstack/react-query";
 import { UserCredential } from "firebase/auth";
 import {
   CollectionReference,
@@ -10,7 +11,17 @@ import {
   UpdateData,
   updateDoc,
 } from "firebase/firestore";
-import { userCollection } from "./config";
+import { productCollection, userCollection } from "./config";
+
+export const errorMessage = (error: unknown) => {
+  let message;
+  if (error instanceof Error) {
+    message = error.message;
+  } else {
+    message = error + "";
+  }
+  throw new Error(message);
+};
 
 export const updateFirebaseDoc = async <T>(
   collection: CollectionReference<T>,
@@ -23,30 +34,38 @@ export const updateFirebaseDoc = async <T>(
 
 export const getFirebaseDoc = async <T>(
   collection: CollectionReference<T>,
-  id: string
+  id: string | undefined
 ) => {
-  const docRef = doc(collection, id);
-  const docSnap = await getDoc(docRef);
+  try {
+    const docRef = doc(collection, id);
+    const docSnap = await getDoc(docRef);
 
-  if (!docSnap.exists()) return;
+    if (!docSnap.exists()) throw new Error(`No document with id "${id}" found`);
 
-  return { ...docSnap.data(), id: docSnap.id };
+    return { ...docSnap.data(), id: docSnap.id };
+  } catch (error) {
+    errorMessage(error);
+  }
 };
 
 export const getFirebaseDocs = async <T>(
   collection: CollectionReference<T>,
   ...queryConstraints: QueryConstraint[]
 ) => {
-  const q = query(collection, ...queryConstraints);
+  try {
+    const q = query(collection, ...queryConstraints);
 
-  const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(q);
 
-  return querySnapshot.docs.map((doc) => {
-    return {
-      ...doc.data(),
-      id: doc.id,
-    };
-  });
+    return querySnapshot.docs.map((doc) => {
+      return {
+        ...doc.data(),
+        id: doc.id,
+      };
+    });
+  } catch (error) {
+    errorMessage(error);
+  }
 };
 
 export const createUserDoc = async (userCredential: UserCredential) => {
@@ -61,6 +80,26 @@ export const createUserDoc = async (userCredential: UserCredential) => {
     address: null,
     shipping: null,
   });
+};
+
+export const getFireDoc = ({
+  queryKey,
+}: QueryFunctionContext<[string, string | undefined]>) => {
+  const [collectionType, id] = queryKey;
+
+  let collection: CollectionReference | undefined;
+
+  switch (collectionType) {
+    case "product":
+      collection = productCollection;
+      break;
+  }
+
+  if (!collection || !id) return;
+
+  return getFirebaseDoc(collection, id);
+
+  // console.log(collectionType, productId);
 };
 
 ///////////

@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { orderBy, where } from "firebase/firestore";
 
 import { useRecoilValue } from "recoil";
@@ -5,7 +6,6 @@ import Heading from "../../components/elements/typos/Heading";
 import Empty from "../../components/Empty";
 import OrderCard from "../../components/OrderCard";
 import { orderCollection } from "../../firebase/config";
-import useFirebaseDocs from "../../firebase/hooks/useFirebaseDocs";
 
 import { getFirebaseDocs } from "../../firebase/utils";
 import { userAtom } from "../../libs/atoms";
@@ -13,7 +13,7 @@ import { userAtom } from "../../libs/atoms";
 export default function MeOrders() {
   const me = useRecoilValue(userAtom);
 
-  const { docs: myOrders } = useFirebaseDocs(() =>
+  const { data: myOrders } = useQuery(["myOrders", me?.id], () =>
     getFirebaseDocs(
       orderCollection,
       where("orderer", "==", me!.id),

@@ -1,33 +1,35 @@
 // import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import AdminHeader from "../../../components/AdminHeader";
 import Empty from "../../../components/Empty";
 
 import ProductForm from "../../../components/forms/product/ProductForm";
 import { productCollection } from "../../../firebase/config";
-import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
 
 import { getFirebaseDoc } from "../../../firebase/utils";
 
 export default function ProductDetail() {
   const { id } = useParams();
 
-  const { docs: product } = useFirebaseDocs(() =>
-    getFirebaseDoc(productCollection, id!)
-  );
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useQuery(["product", id], () => getFirebaseDoc(productCollection, id!));
 
-  // const [edit, setEdit] = useState(false);
+  console.log("Loading", isLoading);
+  console.log("ERROR", error);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <Empty>{`${error}`}</Empty>;
 
   return (
     <>
-      {!product ? (
-        <Empty>No product found with ID "{id}"</Empty>
-      ) : (
-        <div className="w-full flex flex-col">
-          <AdminHeader title={`Edit Product: ${product.title}`} />
-          <ProductForm defaultValue={product} />
-        </div>
-      )}
+      <div className="w-full flex flex-col">
+        <AdminHeader title={`Edit Product: ${product?.title}`} />
+        <ProductForm defaultValue={product} />
+      </div>
     </>
   );
 }

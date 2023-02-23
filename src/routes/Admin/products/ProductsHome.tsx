@@ -1,13 +1,15 @@
+import { useQuery } from "@tanstack/react-query";
+import { orderBy } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import AdminHeader from "../../../components/AdminHeader";
 import Button from "../../../components/elements/Button";
+import SquareImage from "../../../components/SquareImage";
 import Table from "../../../components/table/Table";
 import TBodyRow from "../../../components/table/TBodyRow";
 import THead from "../../../components/table/THead";
 import THeadRow from "../../../components/table/THeadRow";
 import { productCollection } from "../../../firebase/config";
-import useFirebaseDocs from "../../../firebase/hooks/useFirebaseDocs";
 
 import { getFirebaseDocs } from "../../../firebase/utils";
 import { headerHeightAtom } from "../../../libs/atoms";
@@ -15,8 +17,9 @@ import { centToDollor } from "../../../libs/utils";
 
 export default function ProductsHome() {
   const headerHeight = useRecoilValue(headerHeightAtom);
-  const { docs: products } = useFirebaseDocs(() =>
-    getFirebaseDocs(productCollection)
+
+  const { data: products } = useQuery(["products"], () =>
+    getFirebaseDocs(productCollection, orderBy("createdAt", "desc"))
   );
 
   const navigate = useNavigate();
@@ -55,17 +58,7 @@ export default function ProductsHome() {
                 onClick={() => onClick(product.id)}
               >
                 <td>
-                  <div
-                    className="relative w-20 h-full flex justify-center items-center"
-                    // className="relative w-20 max-w-[40%] aspect-square mr-3 overflow-hidden"
-                  >
-                    <img
-                      className="object-cover aspect-square"
-                      // className="object-cover w-full h-full"
-                      src={product.imageUrls[0]}
-                      alt={product.title}
-                    />
-                  </div>
+                  <SquareImage src={product.imageUrls[0]} alt={product.title} />
                 </td>
                 <td className="group-hover:underline">{product.title}</td>
                 <td>{centToDollor(product.price)}</td>

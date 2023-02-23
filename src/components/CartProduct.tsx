@@ -2,7 +2,6 @@ import { Minus, Plus, Trash } from "phosphor-react";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { productCollection } from "../firebase/config";
-import useFirebaseDocs from "../firebase/hooks/useFirebaseDocs";
 import { getFirebaseDoc } from "../firebase/utils";
 
 import { userAtom } from "../libs/atoms";
@@ -11,6 +10,8 @@ import { centToDollor } from "../libs/utils";
 import TBodyRow from "./table/TBodyRow";
 import { IProductWithId } from "../routes/Cart";
 import useViewportSize from "../libs/hooks/useViewportSize";
+import SquareImage from "./SquareImage";
+import { useQuery } from "@tanstack/react-query";
 
 interface ICartProductProps {
   cartProduct: IProductWithId;
@@ -18,7 +19,7 @@ interface ICartProductProps {
 
 function CartProductTitle({ cartProduct }: ICartProductProps) {
   return (
-    <span className="hover:underline ">
+    <span className="hover:underline ml-3">
       <Link to={`/products/${cartProduct.id}`}>{cartProduct.title}</Link>
     </span>
   );
@@ -52,7 +53,8 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
     mediaQuery: { md },
   } = useViewportSize();
   const [me, setMe] = useRecoilState(userAtom);
-  const { docs: productDoc } = useFirebaseDocs(() =>
+
+  const { data: productDoc } = useQuery(["product", cartProduct.id], () =>
     getFirebaseDoc(productCollection, cartProduct.id)
   );
 
@@ -110,11 +112,11 @@ export default function CartProduct({ cartProduct }: ICartProductProps) {
     <TBodyRow className="group">
       <td>
         <div className="flex justify-start items-center">
-          <div className="relative w-24 max-w-[40%] max-h-full aspect-square mr-5 overflow-hidden shadow-md rounded-md flex justify-center items-center">
-            <img
-              className="object-contain"
+          <div className="relative">
+            <SquareImage
               src={cartProduct.imageUrls[0]}
               alt={cartProduct.title}
+              className="shadow-md"
             />
             <button
               onClick={() => deleteFromCart(cartProduct.id)}

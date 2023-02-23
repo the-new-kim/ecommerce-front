@@ -1,6 +1,11 @@
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { orderCollection } from "../../firebase/config";
-import { EDeliveryStatus, IDelivery } from "../../firebase/types";
+import { EDeliveryStatus, IDelivery, IOrder } from "../../firebase/types";
 import { updateFirebaseDoc } from "../../firebase/utils";
 import { makeFirstLetterBig } from "../../libs/utils";
 import Form from "../elements/form/Form";
@@ -10,10 +15,20 @@ import { IOrderWithId } from "../OrderCard";
 
 interface IOrderFormProps {
   defaultValue: IOrderWithId;
-  fetcher: () => Promise<void>;
+  refetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<
+    QueryObserverResult<
+      | (IOrder & {
+          id: string;
+        })
+      | undefined,
+      unknown
+    >
+  >;
 }
 
-export default function OrderForm({ defaultValue, fetcher }: IOrderFormProps) {
+export default function OrderForm({ defaultValue, refetch }: IOrderFormProps) {
   const {
     register,
     handleSubmit,
@@ -52,7 +67,7 @@ export default function OrderForm({ defaultValue, fetcher }: IOrderFormProps) {
     //     },
     //   });
 
-    //   fetcher();
+    //   refetch();
     // }
 
     await updateFirebaseDoc(orderCollection, defaultValue.id, {
@@ -63,7 +78,7 @@ export default function OrderForm({ defaultValue, fetcher }: IOrderFormProps) {
       },
     });
 
-    fetcher();
+    refetch();
   };
 
   return (

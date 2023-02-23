@@ -7,7 +7,7 @@
 - /wishlist .................(✅)
 - /search ...................(✅)
 - /products/:id .............(✅)
-- /auth .....................(👷‍♀️)
+- /auth .....................(✅)
 
 ## checkout
 
@@ -35,16 +35,17 @@
 ### Todos...
 
 - [x] Beautiful dnd for images
-- [ ] Multiple files upload
+- [x] Multiple files upload
 - [ ] Admin Menu
-- [ ] Wishlist
+- [x] Wishlist
 - [x] Cart
 - [x] Payment(stripe)
-- [ ] Form component
+- [x] Form component
+- [ ] Handle loading
 
-### Chart
+### Charts
 
-- [ ] Revenue
+- [x] Revenue
 - [ ] Product sold
 - [ ] Customer count
 
