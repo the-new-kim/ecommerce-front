@@ -1,9 +1,4 @@
-import {
-  AnimatePresence,
-  AnimateSharedLayout,
-  LayoutGroup,
-  motion,
-} from "framer-motion";
+import { AnimatePresence, LayoutGroup, motion, useScroll } from "framer-motion";
 import {
   Gear,
   Heart,
@@ -24,6 +19,8 @@ interface ISearchForm {
 }
 
 export default function Header() {
+  const { scrollY } = useScroll();
+
   const me = useRecoilValue(userAtom);
   const setHeaderHeight = useSetRecoilState(headerHeightAtom);
   const navigate = useNavigate();
@@ -54,86 +51,83 @@ export default function Header() {
   }, [showing, setFocus]);
 
   return (
-    <AnimateSharedLayout>
-      <motion.header
-        key="header"
-        layoutId="header"
-        layout
-        ref={ref}
-        initial={false}
-        className="fixed inset-x-0 z-50 bg-white p-5 shadow-md"
-      >
-        <motion.div layout className="flex justify-between items-center ">
-          <Link to="/" className="font-gloock">
-            Toy shop
-          </Link>
+    <header
+      ref={ref}
+      className="fixed inset-x-0 w-full z-50 bg-white shadow-md h-fit [&>*]:p-5"
+    >
+      <div className="flex justify-between items-center ">
+        <Link to="/" className="font-gloock">
+          Toy shop
+        </Link>
 
-          <nav>
-            <ul className="flex [&>*]:ml-3 justify-end items-center text-2xl">
-              <li>
-                <span ref={btnRef}>
-                  <MagnifyingGlass className="cursor-pointer" />
-                </span>
-              </li>
+        <nav>
+          <ul className="flex [&>*]:ml-3 justify-end items-center text-2xl">
+            <li>
+              <span ref={btnRef}>
+                <MagnifyingGlass className="cursor-pointer" />
+              </span>
+            </li>
 
-              <li>
-                <Link to="/wishlist">
-                  <Heart />
-                </Link>
-              </li>
-              <li>
-                <Link to={me ? "/me" : "/auth"}>
-                  <User />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/cart"
-                  className="relative flex justify-center items-center"
-                >
-                  <ShoppingCart />
-                  {me && !!me.cart.products.length && (
-                    <small className="absolute text-xs -top-1 -right-1 bg-black text-white p-2 w-3 h-3 flex justify-center items-center rounded-full">
-                      {me.cart.products.length}
-                    </small>
-                  )}
-                </Link>
-              </li>
-              {me?.isAdmin && (
-                <li>
-                  <Link to="/admin">
-                    <Gear />
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </nav>
-        </motion.div>
-        <AnimatePresence mode="wait">
-          {showing && (
-            <motion.div
-              ref={menuRef}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="w-full flex items-center justify-center mt-5"
-              layout
-            >
-              <form
-                className="flex justify-center items-center w-full max-w-2xl px-3"
-                onSubmit={handleSubmit(onValid)}
+            <li>
+              <Link to="/wishlist">
+                <Heart />
+              </Link>
+            </li>
+            <li>
+              <Link to={me ? "/me" : "/auth"}>
+                <User />
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/cart"
+                className="relative flex justify-center items-center"
               >
-                <input
-                  {...register("keyword")}
-                  placeholder="Search"
-                  type="text"
-                  className="text-center w-full text-sm px-3 border-b-[1px] border-black py-1 focus:outline-none"
-                />
-              </form>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.header>
-    </AnimateSharedLayout>
+                <ShoppingCart />
+                {me && !!me.cart.products.length && (
+                  <small className="absolute text-xs -top-1 -right-1 bg-black text-white p-2 w-3 h-3 flex justify-center items-center rounded-full">
+                    {me.cart.products.length}
+                  </small>
+                )}
+              </Link>
+            </li>
+            {me?.isAdmin && (
+              <li>
+                <Link to="/admin">
+                  <Gear />
+                </Link>
+              </li>
+            )}
+          </ul>
+        </nav>
+      </div>
+      <AnimatePresence mode="wait">
+        {showing && (
+          <motion.div
+            ref={menuRef}
+            initial={{ opacity: 0, scaleY: 0 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            exit={{ opacity: 0, scaleY: 0 }}
+            style={{ originY: 0 }}
+            className="absolute top-full left-0 w-full flex items-center justify-center bg-white shadow-md !pt-0"
+          >
+            <form
+              className="flex justify-center items-center w-full max-w-2xl px-3"
+              onSubmit={handleSubmit(onValid)}
+            >
+              <input
+                {...register("keyword")}
+                placeholder="Search"
+                type="text"
+                className="text-center w-full text-sm px-3 border-b-[1px] border-black py-1 focus:outline-none rounded-none"
+              />
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* TO HIDE THE BACKGROUND OF ABOVE HEADER WHEN SCROLLING UP */}
+      <div className="absolute w-full h-[200%] bg-white bottom-full" />
+    </header>
   );
 }

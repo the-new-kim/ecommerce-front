@@ -10,7 +10,8 @@ import { RouterProvider } from "react-router-dom";
 import router from "./router";
 import { AnimatePresence, motion } from "framer-motion";
 
-import Loading from "./components/Loading";
+import InitLoader from "./components/loaders/InitLoader";
+import { fadeInOutVariants } from "./libs/variants";
 
 function App() {
   const [firebaseInit, setFirebaseInit] = useState(false);
@@ -82,14 +83,15 @@ function App() {
       {firebaseInit && introEnded ? (
         <motion.div
           key="main"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          variants={fadeInOutVariants}
+          initial="fadeOut"
+          animate="fadeIn"
+          exit="fadeOut"
         >
           <RouterProvider router={router(me)} />
         </motion.div>
       ) : (
-        <Loading key="loading" setState={setIntroEnded} text="Toy shop" />
+        <InitLoader key="loading" setState={setIntroEnded} text="Toy shop" />
       )}
     </AnimatePresence>
   );

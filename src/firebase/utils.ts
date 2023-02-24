@@ -1,6 +1,6 @@
-import { QueryFunctionContext } from "@tanstack/react-query";
 import { UserCredential } from "firebase/auth";
 import {
+  addDoc,
   CollectionReference,
   doc,
   getDoc,
@@ -10,6 +10,7 @@ import {
   setDoc,
   UpdateData,
   updateDoc,
+  WithFieldValue,
 } from "firebase/firestore";
 import { IProductWithId } from "../routes/Cart";
 import { productCollection, userCollection } from "./config";
@@ -23,6 +24,29 @@ export const errorMessage = (error: unknown) => {
     message = error + "";
   }
   throw new Error(message);
+};
+
+export const addFirebaseDoc = async <T>(
+  collection: CollectionReference<T>,
+  data: WithFieldValue<T>
+) => {
+  try {
+    await addDoc(collection, data);
+  } catch (error) {
+    errorMessage(error);
+  }
+};
+
+export const setFirebaseDoc = async <T>(
+  collection: CollectionReference<T>,
+  id: string,
+  data: WithFieldValue<T>
+) => {
+  try {
+    await setDoc(doc(collection, id), data);
+  } catch (error) {
+    errorMessage(error);
+  }
 };
 
 export const updateFirebaseDoc = async <T>(

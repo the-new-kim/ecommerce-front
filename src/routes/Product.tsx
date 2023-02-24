@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { headerHeightAtom } from "../libs/atoms";
-import { productCollection } from "../firebase/config";
+import { productCollection, reviewCollection } from "../firebase/config";
 import { centToDollor } from "../libs/utils";
-import { getFirebaseDoc } from "../firebase/utils";
+import { getFirebaseDoc, getFirebaseDocs } from "../firebase/utils";
 import Heading from "../components/elements/typos/Heading";
 import ReviewSection from "../components/review/ReviewSection";
 import ReviewStars from "../components/review/ReviewStars";
@@ -13,6 +13,9 @@ import AddToCartButton from "../components/AddToCartButton";
 
 import AddToWishlistButton from "../components/AddToWishlistButton";
 import { useQuery } from "@tanstack/react-query";
+import Spinner from "../components/loaders/Spinner";
+import { where } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 export default function Product() {
   const { productId } = useParams();
@@ -26,67 +29,98 @@ export default function Product() {
   );
 
   const {
+    data: reviews,
+    isLoading: reviewsLoading,
+    error: reviewsError,
+    refetch: reviewsRefetch,
+  } = useQuery(["reviews", productId], () =>
+    getFirebaseDocs(reviewCollection, where("product", "==", productId))
+  );
+
+  const [averageRating, setAverageRating] = useState<number>();
+
+  const {
     mediaQuery: { md },
   } = useViewportSize();
 
   const headerHeight = useRecoilValue(headerHeightAtom);
 
-  if (error) return <Empty>{`${error}`}</Empty>;
+  useEffect(() => {
+    if (!reviews || !reviews.length) return;
+    const ratings = reviews.map((review) => review.rating);
+
+    const total = ratings.reduce(
+      (accumulator, currentValue) => accumulator + currentValue
+    );
+    setAverageRating(total / reviews.length);
+  }, [reviews]);
+
+  if (error || reviewsError) return <Empty>{`${error}`}</Empty>;
+
+  if (isLoading || !product || !productId || reviewsLoading || !reviews)
+    return (
+      <Empty>
+        <Spinner />
+      </Empty>
+    );
 
   return (
     <>
-      {isLoading || !product ? (
-        <div className="w-screen h-screen fixed top-0 left-0 flex justify-center items-center">
-          Loading...
+      <section className="relative flex flex-col md:grid md:grid-cols-2">
+        {/* IMAGE */}
+        <div>
+          {product.imageUrls.map((imageUrl, index) => (
+            <img key={"img" + index} src={imageUrl} alt={product.title} />
+          ))}
         </div>
-      ) : (
-        <>
-          <section className="relative flex flex-col md:grid md:grid-cols-2">
-            {/* IMAGE */}
+
+        {/* PRODUCT INFO */}
+        <div
+          style={{
+            top: md ? headerHeight : 0,
+            height: md ? `calc(100vh - ${headerHeight}px)` : "100%",
+          }}
+          className="md:sticky flex flex-col justify-center items-center p-5"
+        >
+          <div className="[&>*]:mb-5 md:max-w-sm">
             <div>
-              {product.imageUrls.map((imageUrl, index) => (
-                <img key={"img" + index} src={imageUrl} alt={product.title} />
-              ))}
-            </div>
-
-            {/* PRODUCT INFO */}
-            <div
-              style={{
-                top: md ? headerHeight : 0,
-                height: md ? `calc(100vh - ${headerHeight}px)` : "100%",
-              }}
-              className="md:sticky flex flex-col justify-center items-center p-5"
-            >
-              <div className="[&>*]:mb-5 md:max-w-sm">
-                <div>
-                  <Heading tagName="h3">{product.title}</Heading>
-                  <div className="flex justify-start items-center [&>*]:mr-3">
-                    <ReviewStars rating={Math.round(Math.random() * 5)} />
-                    <span>63 Reviews</span>
-                  </div>
-                </div>
-
-                <div>
-                  <div>{centToDollor(product.price)}</div>
-                  <div>
-                    Availability: {product.quantity ? "In Stock" : "Sold out"}{" "}
-                  </div>
-                </div>
-
-                <div className="flex justify-start items-center [&>*]:mr-3">
-                  <AddToCartButton product={product} />
-                  <Heading tagName="h2">
-                    <AddToWishlistButton product={product} />
-                  </Heading>
-                </div>
-
-                <p>{product.description}</p>
+              <Heading tagName="h3">{product.title}</Heading>
+              <div className="flex justify-start items-center [&>*]:mr-3">
+                <ReviewStars rating={averageRating} />
+                {!!reviews?.length && (
+                  <span>
+                    {reviews.length +
+                      " Review" +
+                      (reviews.length > 1 ? "s" : "")}
+                  </span>
+                )}
               </div>
             </div>
-          </section>
-          <ReviewSection />
-        </>
-      )}
+
+            <div>
+              <div>{centToDollor(product.price)}</div>
+              <div>
+                Availability: {product.quantity ? "In Stock" : "Sold out"}{" "}
+              </div>
+            </div>
+
+            <div className="flex justify-start items-center [&>*]:mr-3">
+              <AddToCartButton product={product} />
+              <Heading tagName="h2">
+                <AddToWishlistButton product={product} />
+              </Heading>
+            </div>
+
+            <p>{product.description}</p>
+          </div>
+        </div>
+      </section>
+      <ReviewSection
+        reviews={reviews}
+        // isLoading={reviewsLoading}
+        // error={reviewsError}
+        averageRating={averageRating}
+      />
     </>
   );
 }

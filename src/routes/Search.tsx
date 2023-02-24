@@ -30,7 +30,7 @@ export default function Search() {
       <Heading tagName="h3" className="mb-5">
         Search results for '{keyword}'
       </Heading>
-      <div className="p-5 w-full h-full flex flex-col justify-start items-center flex-grow">
+      <div className="w-full h-full flex flex-col justify-start items-center flex-grow">
         <>
           {isLoading || !products ? (
             <GridSection>

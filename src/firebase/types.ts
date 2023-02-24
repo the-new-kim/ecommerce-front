@@ -69,3 +69,15 @@ export interface IShipping {
   name: string;
   phone: string;
 }
+
+export interface IReview {
+  product: string;
+  owner: string;
+  title: string;
+  text: string;
+  rating: number;
+}
+
+export interface IReviewWithId extends IReview {
+  id: string;
+}

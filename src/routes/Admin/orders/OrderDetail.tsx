@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import AdminHeader from "../../../components/AdminHeader";
 import Empty from "../../../components/Empty";
 import OrderForm from "../../../components/forms/OrderForm";
+import Spinner from "../../../components/loaders/Spinner";
 import OrderCard from "../../../components/OrderCard";
 import { orderCollection } from "../../../firebase/config";
 
@@ -18,18 +19,18 @@ export default function OrderDetail() {
   } = useQuery(["order", id], () => getFirebaseDoc(orderCollection, id));
 
   if (error) return <Empty>{`${error}`}</Empty>;
+  if (!order || isLoading)
+    return (
+      <Empty>
+        <Spinner />
+      </Empty>
+    );
 
   return (
     <>
-      {!order || isLoading ? (
-        <Empty>Loading...</Empty>
-      ) : (
-        <>
-          <AdminHeader title="Order detail" />
-          <OrderCard order={order} />
-          <OrderForm defaultValue={order} />
-        </>
-      )}
+      <AdminHeader title="Order detail" />
+      <OrderCard order={order} />
+      <OrderForm defaultValue={order} />
     </>
   );
 }

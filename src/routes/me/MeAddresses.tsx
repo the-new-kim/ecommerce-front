@@ -5,6 +5,7 @@ import Heading from "../../components/elements/typos/Heading";
 import ShippingInformationForm from "../../components/forms/ShippingInformationForm";
 import Modal from "../../components/Modal";
 import { userAtom } from "../../libs/atoms";
+import { motion } from "framer-motion";
 
 export default function MeAddresses() {
   const [showModal, setShowModal] = useState(false);
@@ -15,7 +16,10 @@ export default function MeAddresses() {
       <Heading tagName="h3" className="mb-5">
         Address book
       </Heading>
-      <div className="border-[1px] border-black p-3 flex flex-col">
+      <motion.div
+        layoutId="address"
+        className="border-[1px] border-black p-3 flex flex-col"
+      >
         {me?.shipping ? (
           <>
             <div>{me?.shipping?.name}</div>
@@ -42,13 +46,11 @@ export default function MeAddresses() {
             </Button>
           </>
         )}
-      </div>
+      </motion.div>
 
-      {showModal && (
-        <Modal setState={setShowModal}>
-          <ShippingInformationForm onValidAction={() => setShowModal(false)} />
-        </Modal>
-      )}
+      <Modal setShowing={setShowModal} showing={showModal} layoutId="address">
+        <ShippingInformationForm onValidAction={() => setShowModal(false)} />
+      </Modal>
     </div>
   );
 }

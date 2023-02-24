@@ -11,7 +11,7 @@ export default function Empty({ children }: IEmptyProps) {
     text-xl
     "
     >
-      <div className="mb-16">{children}</div>
+      <div className="py-[10vh]">{children}</div>
     </div>
   );
 }

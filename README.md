@@ -36,13 +36,19 @@
 
 - [x] Beautiful dnd for images
 - [x] Multiple files upload
-- [ ] Admin Menu (Responsive)
+- [x] Admin Menu (Responsive)
 - [x] Wishlist
 - [ ] Cart (Refactoring..., replacing useCartProducts...)
 - [x] Payment(stripe)
 - [x] Form component
-- [ ] Handle loading (Tanstack query & Loading page)
+- [x] Handle loading (Tanstack query & Loading page)
 - [ ] Container for wishlist & search
+
+### Extra todos...
+
+- [ ] Category or Hashtags
+- [ ] Product reviews & rating
+- [ ] Clean types
 
 ### Charts
 

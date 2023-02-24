@@ -4,22 +4,29 @@ import { IUserAtom } from "./libs/atoms";
 
 import Layout from "./Layout";
 import NotFound from "./routes/NotFound";
+
 import Home from "./routes/Home";
-import User from "./routes/User";
 import Auth from "./routes/Auth";
 import Cart from "./routes/Cart";
 import Wishlist from "./routes/Wishlist";
 import Search from "./routes/Search";
 import Product from "./routes/Product";
+
 import AdminHome from "./routes/admin/AdminHome";
-import ProductsHome from "./routes/admin/products/ProductsHome";
 import AdminLayout from "./routes/admin/AdminLayout";
+
 import Settings from "./routes/admin/Settings";
+
+import ProductsHome from "./routes/admin/products/ProductsHome";
+import ProductDetail from "./routes/admin/products/ProductDetail";
 import CreateProduct from "./routes/admin/products/CreateProduct";
+
 import UsersHome from "./routes/admin/users/UsersHome";
+import EditUser from "./routes/admin/users/EditUser";
+
 import OrdersHome from "./routes/admin/orders/OrdersHome";
 import OrderDetail from "./routes/admin/orders/OrderDetail";
-import EditUser from "./routes/admin/users/EditUser";
+
 import CheckoutLayout from "./routes/checkout/CheckoutLayout";
 import CheckoutInformation from "./routes/checkout/CheckoutInformation";
 import CheckoutShipping from "./routes/checkout/CheckoutShipping";
@@ -28,7 +35,6 @@ import CheckoutPayment from "./routes/checkout/CheckoutPayment";
 import MeLayout from "./routes/me/MeLayout";
 import MeOrders from "./routes/me/MeOrders";
 import MeAddresses from "./routes/me/MeAddresses";
-import ProductDetail from "./routes/admin/products/ProductDetail";
 
 const adminOnlyRoutes: RouteObject[] = [
   {
@@ -61,7 +67,6 @@ const adminOnlyRoutes: RouteObject[] = [
       { path: "settings", element: <Settings /> },
     ],
   },
-  { path: "users/:id", element: <User /> },
 ];
 
 const meRoutes: RouteObject[] = [

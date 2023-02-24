@@ -1,9 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { orderBy } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { ArrowRight } from "phosphor-react";
+import { Link, useNavigate } from "react-router-dom";
+
 import AdminHeader from "../../../components/AdminHeader";
 import Button from "../../../components/elements/Button";
+import Empty from "../../../components/Empty";
+import Spinner from "../../../components/loaders/Spinner";
 import SquareImage from "../../../components/SquareImage";
 import Table from "../../../components/table/Table";
 import TBodyRow from "../../../components/table/TBodyRow";
@@ -12,13 +15,14 @@ import THeadRow from "../../../components/table/THeadRow";
 import { productCollection } from "../../../firebase/config";
 
 import { getFirebaseDocs } from "../../../firebase/utils";
-import { headerHeightAtom } from "../../../libs/atoms";
-import { centToDollor } from "../../../libs/utils";
+import { centToDollor, cls } from "../../../libs/utils";
 
 export default function ProductsHome() {
-  const headerHeight = useRecoilValue(headerHeightAtom);
-
-  const { data: products } = useQuery(["products"], () =>
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useQuery(["products"], () =>
     getFirebaseDocs(productCollection, orderBy("createdAt", "desc"))
   );
 
@@ -28,18 +32,39 @@ export default function ProductsHome() {
     navigate(`/admin/products/${id}`);
   };
 
+  if (error) return <Empty>{`${error}`}</Empty>;
+
+  if (isLoading || !products)
+    return (
+      <Empty>
+        <Spinner />
+      </Empty>
+    );
+
+  if (!products.length)
+    return (
+      <Empty>
+        <div className="flex justify-center items-center flex-col">
+          No products yet <br />
+          <Link
+            to="/admin/products/create"
+            className="flex justify-center items-center"
+          >
+            Create new one <ArrowRight />
+          </Link>
+        </div>
+      </Empty>
+    );
+
   return (
     <>
       <AdminHeader title="Products">
         <Button link="/admin/products/create">Create</Button>
       </AdminHeader>
 
-      {products && products.length ? (
-        <Table className="border-[1px] border-black">
-          <THead
-            className="bg-black text-white sticky z-10"
-            style={{ top: headerHeight }}
-          >
+      <figure className="w-full overflow-x-scroll border-[1px] border-black">
+        <Table>
+          <THead className="bg-black text-white">
             <THeadRow>
               <td className="text-start">Image</td>
               <td className="text-start">Title</td>
@@ -51,10 +76,13 @@ export default function ProductsHome() {
           </THead>
 
           <tbody>
-            {products.map((product) => (
+            {products.map((product, index) => (
               <TBodyRow
                 key={product.id}
-                className="cursor-pointer group"
+                className={
+                  "cursor-pointer group " +
+                  cls(index === products.length - 1 ? "!border-b-0" : "")
+                }
                 onClick={() => onClick(product.id)}
               >
                 <td>
@@ -69,9 +97,7 @@ export default function ProductsHome() {
             ))}
           </tbody>
         </Table>
-      ) : (
-        <div>No products</div>
-      )}
+      </figure>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RevenueChart from "../../components/charts/RevenueChart";
 import Heading from "../../components/elements/typos/Heading";
+import Spinner from "../../components/loaders/Spinner";
 import Table from "../../components/table/Table";
 import TBodyRow from "../../components/table/TBodyRow";
 import THead from "../../components/table/THead";
@@ -20,46 +21,70 @@ import { centToDollor } from "../../libs/utils";
 interface ICardProps {
   children: ReactNode;
   className?: string;
+  isLoading: boolean;
+  error?: unknown;
 }
 
 interface IGridCardProps {
   children: ReactNode;
   text: string | number;
+  isLoading: boolean;
+  error?: unknown;
 }
 
-function GridCard({ children, text }: IGridCardProps) {
+function GridCard({ children, text, isLoading, error }: IGridCardProps) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col justify-between">
       <div className="flex items-center mb-3">{children}</div>
-      <Heading tagName="h3" className="!font-roboto">
-        {text}
-      </Heading>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <Heading tagName="h3" className="!font-roboto">
+          {error ? `${error}` : text}
+        </Heading>
+      )}
     </div>
   );
 }
 
-function Card({ children, className = "" }: ICardProps) {
+function Card({ children, className = "", isLoading, error }: ICardProps) {
   return (
     <div className={"p-5 border-[1px] border-black " + className}>
-      {children}
+      {isLoading ? (
+        <div className="w-full flex justify-center items-center">
+          <Spinner />
+        </div>
+      ) : error ? (
+        `${error}`
+      ) : (
+        children
+      )}
     </div>
   );
 }
 
 export default function AdminHome() {
-  const { data: topProducts, isLoading: topProductsLoading } = useQuery(
-    ["topProducts"],
-    () => getFirebaseDocs(productCollection, orderBy("sold", "desc"), limit(5))
+  const {
+    data: topProducts,
+    isLoading: topProductsLoading,
+    error: topProductsError,
+  } = useQuery(["topProducts"], () =>
+    getFirebaseDocs(productCollection, orderBy("sold", "desc"), limit(5))
   );
 
-  const { data: orders, isLoading: ordersLoading } = useQuery(
-    ["totalOrders"],
-    () => getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
+  const {
+    data: orders,
+    isLoading: ordersLoading,
+    error: ordersError,
+  } = useQuery(["totalOrders"], () =>
+    getFirebaseDocs(orderCollection, orderBy("createdAt", "desc"))
   );
 
-  const { data: users, isLoading: usersLoading } = useQuery(["users"], () =>
-    getFirebaseDocs(userCollection)
-  );
+  const {
+    data: users,
+    isLoading: usersLoading,
+    error: usersError,
+  } = useQuery(["users"], () => getFirebaseDocs(userCollection));
 
   const [totalSales, setTotalSeles] = useState(0);
 
@@ -86,40 +111,54 @@ export default function AdminHome() {
       </Heading>
       <div className="w-full grid grid-cols-3 bg-black border-black border-[1px] gap-[1px] [&>*]:bg-white [&>*]:p-5 mb-5">
         {/* TOTAL SALES */}
-        <GridCard text={centToDollor(totalSales)}>
-          <ShoppingBag className="mr-2" />
+        <GridCard
+          text={centToDollor(totalSales)}
+          isLoading={ordersLoading}
+          error={ordersError}
+        >
+          <ShoppingBag className="mr-2 hidden md:block" />
           Total sales
         </GridCard>
 
         {/* TOTAL ORDERS */}
-        <GridCard text={orders?.length || 0}>
-          <Package className="mr-2" />
+        <GridCard
+          text={orders?.length || 0}
+          isLoading={ordersLoading}
+          error={ordersError}
+        >
+          <Package className="mr-2 hidden md:block" />
           Total orders
         </GridCard>
 
         {/* USERS */}
-        <GridCard text={users?.length || 0}>
-          <Users className="mr-2" />
+        <GridCard
+          text={users?.length || 0}
+          isLoading={usersLoading}
+          error={usersError}
+        >
+          <Users className="mr-2 hidden md:block" />
           Users
         </GridCard>
       </div>
 
       {/* REVENUE */}
-      <Card className="mb-5 w-full flex flex-col">
+      <Card
+        className="mb-5 w-full flex flex-col"
+        isLoading={ordersLoading}
+        error={ordersError}
+      >
         <Heading tagName="h5">Revenue</Heading>
-        {!orders || ordersLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <RevenueChart orders={orders} />
-        )}
+        {orders && <RevenueChart orders={orders} />}
       </Card>
 
       {/* TOP PRODUCTS */}
-      <Card className="w-full">
+      <Card
+        className="w-full"
+        isLoading={topProductsLoading}
+        error={topProductsError}
+      >
         <Heading tagName="h5">Top products</Heading>
-        {!topProducts || topProductsLoading ? (
-          <div>Loading...</div>
-        ) : (
+        {topProducts && (
           <Table>
             <THead>
               <THeadRow>

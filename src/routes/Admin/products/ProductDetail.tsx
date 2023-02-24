@@ -5,6 +5,7 @@ import AdminHeader from "../../../components/AdminHeader";
 import Empty from "../../../components/Empty";
 
 import ProductForm from "../../../components/forms/product/ProductForm";
+import Spinner from "../../../components/loaders/Spinner";
 import { productCollection } from "../../../firebase/config";
 
 import { getFirebaseDoc } from "../../../firebase/utils";
@@ -18,11 +19,14 @@ export default function ProductDetail() {
     error,
   } = useQuery(["product", id], () => getFirebaseDoc(productCollection, id!));
 
-  console.log("Loading", isLoading);
-  console.log("ERROR", error);
-
-  if (isLoading) return <div>Loading...</div>;
   if (error) return <Empty>{`${error}`}</Empty>;
+
+  if (isLoading)
+    return (
+      <Empty>
+        <Spinner />
+      </Empty>
+    );
 
   return (
     <>

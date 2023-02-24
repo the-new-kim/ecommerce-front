@@ -5,7 +5,7 @@ import { userAtom } from "../libs/atoms";
 
 import { IProductWithId } from "../routes/Cart";
 import Button from "./elements/Button";
-import AddedToCartMessage from "./messages/AddedToCartMessage";
+import AddedToCartMessage from "./toasts/AddedToCartMessage";
 
 interface IAddToCartButtonProps {
   product: IProductWithId;

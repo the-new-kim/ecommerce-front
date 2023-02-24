@@ -1,29 +1,37 @@
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { userCollection } from "../../firebase/config";
+import { getFirebaseDoc } from "../../firebase/utils";
 import Heading from "../elements/typos/Heading";
 import ReviewStars from "./ReviewStars";
 
 interface IUserReviewProps {
-  name: string;
-  avatar: string;
+  owner: string;
   rating: number;
   title: string;
   text: string;
 }
 
 export default function UserReview({
-  name,
-  avatar,
+  owner,
   rating,
   title,
   text,
 }: IUserReviewProps) {
+  const { data, isLoading, error } = useQuery(["user", owner], () =>
+    getFirebaseDoc(userCollection, owner)
+  );
+
+  console.log(data);
+
   return (
-    <div className="flex flex-col justify-center items-center md:grid md:grid-cols-12 mb-10">
+    <div className="flex flex-col justify-center items-center w-full md:grid md:grid-cols-12 mb-10">
       {/* AVATAR & NAME */}
       <div className="md:col-span-2 md:mr-3 mb-3 md:mb-0 flex flex-col justify-center items-center">
-        <div className="w-16 h-16 rounded-full overflow-hidden">
-          <img className="w-full h-full object-cover" src={avatar} />
+        <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-200">
+          {/* <img className="w-full h-full object-cover" src={avatar} /> */}
         </div>
-        <div>{name}</div>
+        <div className="">asdf</div>
       </div>
       {/* TITLE & TEXT */}
       <div className="md:col-span-10 flex flex-col items-center md:items-start">

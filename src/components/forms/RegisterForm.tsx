@@ -4,14 +4,14 @@ import {
 } from "firebase/auth";
 
 import { useForm } from "react-hook-form";
-import { firebaseAuth } from "../../firebase/config";
+import { firebaseAuth, userCollection } from "../../firebase/config";
 import { useState } from "react";
 import Message from "../Message";
 import Form from "../elements/form/Form";
 import Label from "../elements/form/Label";
 import Input from "../elements/form/Input";
 import FieldErrorMessage from "../elements/form/FieldErrorMessage";
-import { createUserDoc } from "../../firebase/utils";
+import { createUserDoc, setFirebaseDoc } from "../../firebase/utils";
 
 interface IRegisterForm {
   email: string;
@@ -43,7 +43,23 @@ export default function RegisterForm() {
 
       // 2️⃣ Create new user doc
 
-      await createUserDoc(userCredential);
+      console.log("USER CREDENTIAL", userCredential.user);
+
+      // await createUserDoc(userCredential);
+
+      const userData = {
+        isAdmin: false,
+        wishlist: [],
+        cart: {
+          paymentIntent: null,
+          products: [],
+        },
+        orders: [],
+        address: null,
+        shipping: null,
+      };
+
+      await setFirebaseDoc(userCollection, userCredential.user.uid, userData);
 
       // 3️⃣ Login
       await signInWithEmailAndPassword(firebaseAuth, email, password);

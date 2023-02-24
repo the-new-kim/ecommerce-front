@@ -8,6 +8,7 @@ import Empty from "../components/Empty";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCartProducts, getProductsTotalAmount } from "../firebase/utils";
 import { useEffect } from "react";
+import Spinner from "../components/loaders/Spinner";
 
 export interface IProductWithId extends IProduct {
   id: string;
@@ -47,13 +48,21 @@ export default function Cart() {
 
   if (error) return <Empty>{`${error}`}</Empty>;
 
+  if (isLoading || !cartProducts)
+    return (
+      <Empty>
+        <Spinner />
+      </Empty>
+    );
+
   return (
     <div className="p-5 h-full flex flex-col w-full">
       <Heading tagName="h3" className="mb-5">
         Cart
       </Heading>
-      {isLoading || !cartProducts ? (
-        <div>laoding</div>
+
+      {!cartProducts.length ? (
+        <Empty>Your cart is empty</Empty>
       ) : (
         <>
           <CartProducts

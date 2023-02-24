@@ -35,3 +35,9 @@ export const makeFirstLetterBig = (text: string) => {
 
   return firstLetter + rest;
 };
+
+export const getNumber = (value: any) => {
+  const parsed = parseInt(value);
+  if (isNaN(parsed)) return 0;
+  return parsed;
+};

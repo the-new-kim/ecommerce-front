@@ -37,7 +37,7 @@ export default function Wishlist() {
       </Heading>
 
       {/* BODY */}
-      <div className="p-5 w-full h-full flex flex-col justify-start items-center flex-grow">
+      <div className="w-full h-full flex flex-col justify-start items-center flex-grow">
         <>
           {isLoading || !products ? (
             <GridSection>
