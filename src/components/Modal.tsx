@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "phosphor-react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { fadeInOutVariants } from "../libs/variants";
 
 interface IModalProps {
@@ -25,6 +25,20 @@ export default function Modal({
   ) => {
     event.stopPropagation();
   };
+
+  useEffect(() => {
+    if (!showing) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.code === "Escape") {
+        setShowing(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showing]);
 
   return (
     <AnimatePresence>

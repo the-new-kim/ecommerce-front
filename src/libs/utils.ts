@@ -1,4 +1,4 @@
-import { IAddress } from "../firebase/types";
+import { IAddress, IReviewWithId } from "../firebase/types";
 
 export function cls(...classnames: string[]) {
   return classnames.join(" ");
@@ -40,4 +40,17 @@ export const anyToNumber = (value: any) => {
   const parsed = parseInt(value);
   if (isNaN(parsed)) return 0;
   return parsed;
+};
+
+export const calculateReviewsAverageRating = (
+  reviews: IReviewWithId[] | undefined
+) => {
+  if (!reviews || !reviews.length) return;
+
+  const ratings = reviews.map((review) => review.rating);
+
+  const total = ratings.reduce(
+    (accumulator, currentValue) => accumulator + currentValue
+  );
+  return total / reviews.length;
 };

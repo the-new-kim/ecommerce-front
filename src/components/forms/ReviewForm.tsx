@@ -3,26 +3,25 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { reviewCollection } from "../../firebase/config";
 
+import { reviewCollection } from "../../firebase/config";
 import { IReview, IReviewWithId } from "../../firebase/types";
-import { addFirebaseDoc, updateFirebaseDoc } from "../../firebase/utils";
+import { setFirebaseDoc, updateFirebaseDoc } from "../../firebase/utils";
 
 import { userAtom } from "../../libs/atoms";
 import { anyToNumber, cls } from "../../libs/utils";
-import Button from "../elements/Button";
-
-import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 
 import Form from "../elements/form/Form";
 import Input from "../elements/form/Input";
 import Label from "../elements/form/Label";
 import TextArea from "../elements/form/TextArea";
+import FieldErrorMessage from "../elements/form/FieldErrorMessage";
+import Button from "../elements/Button";
 
 import ReviewStars from "../review/ReviewStars";
 
 interface IReviewFormProps {
-  defaultValue?: IReviewWithId;
+  defaultValue?: IReviewWithId | null;
   setShowing?: React.Dispatch<React.SetStateAction<boolean>>;
   submitValue?: string;
   reviews: IReviewWithId[];
@@ -48,18 +47,25 @@ export default function ReviewForm({
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (review: IReviewWithId) => {
+    mutationFn: async (myReview: IReviewWithId) => {
+      // console.log("myReview:::", myReview);
+
       const reviewIndex = reviews.findIndex(
-        (oldReview) => oldReview.id === review.id
+        (oldReview) => oldReview.id === myReview.id
       );
 
-      if (reviewIndex < 0) return [...reviews, review];
-
+      if (reviewIndex < 0) {
+        console.log("review not exists in reviews...");
+        return [...reviews, myReview];
+      }
       const newReviews = [...reviews];
-      newReviews.splice(reviewIndex, 1, review);
+
+      newReviews.splice(reviewIndex, 1, myReview);
+
       return newReviews;
     },
-    onSuccess: (data) => {
+    onSuccess: (data, context) => {
+      queryClient.setQueryData(["myReview", productId], context);
       queryClient.setQueryData(["reviews", productId], data);
     },
   });
@@ -73,9 +79,13 @@ export default function ReviewForm({
   }, [me, productId]);
 
   const onCreateNewReview = async (validData: IReview) => {
-    console.log("CREATE!", validData);
+    // await addFirebaseDoc(reviewCollection, {
+    //   ...validData,
+    //   rating: anyToNumber(validData.rating),
+    // });
+    const newId = `${productId}r${reviews.length}`;
 
-    await addFirebaseDoc(reviewCollection, {
+    await setFirebaseDoc(reviewCollection, newId, {
       ...validData,
       rating: anyToNumber(validData.rating),
     });
@@ -83,7 +93,7 @@ export default function ReviewForm({
     mutation.mutate({
       ...validData,
       rating: anyToNumber(validData.rating),
-      id: "new",
+      id: newId,
     });
 
     if (setShowing) {
@@ -92,8 +102,6 @@ export default function ReviewForm({
   };
 
   const onUpdateReview = async (validData: IReview, id: string) => {
-    console.log("UPDATE!", validData, id);
-
     await updateFirebaseDoc(reviewCollection, id, {
       ...validData,
       rating: anyToNumber(validData.rating),
@@ -168,6 +176,7 @@ export default function ReviewForm({
               className="absolute top-0 left-0 w-full opacity-0 cursor-ew-resize disabled:cursor-not-allowed"
               type="range"
               max="5"
+              min="1"
               step="1"
               defaultValue={rating}
               {...register("rating", {

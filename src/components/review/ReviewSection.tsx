@@ -14,20 +14,28 @@ import UserReview from "./UserReview";
 interface IReviewSectionProps {
   reviews: IReviewWithId[];
   averageRating?: number;
+  productId: string;
 }
 
 export default function ReviewSection({
   reviews,
   averageRating,
+  productId,
 }: IReviewSectionProps) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const me = useRecoilValue(userAtom);
-  const [myReview, setMyReview] = useState<IReviewWithId>();
+  // const [myReview, setMyReview] = useState<IReviewWithId>();
 
-  useEffect(() => {
-    if (!me) return;
-    setMyReview(reviews.find((review) => review.owner === me.id));
-  }, [me]);
+  const { data: myReview } = useQuery(["myReview", productId], () => {
+    const foundReview = reviews.find((review) => review.owner === me?.id);
+
+    return foundReview || null;
+  });
+
+  // useEffect(() => {
+  //   if (!me) return;
+  //   setMyReview(reviews.find((review) => review.owner === me.id));
+  // }, [me]);
 
   const toggleShowReviewForm = () => {
     setShowReviewForm((prev) => !prev);
@@ -48,7 +56,7 @@ export default function ReviewSection({
               <div className="flex justify-start items-center">
                 {typeof averageRating !== "undefined" && (
                   <div className="bg-orange-400 py-1 px-3 text-white mr-3">
-                    {averageRating}
+                    {averageRating} adfsaf
                   </div>
                 )}
                 <ReviewStars rating={averageRating} />
@@ -101,7 +109,7 @@ export default function ReviewSection({
                 className="flex justify-start items-center text-sm"
                 link={toggleShowReviewForm}
               >
-                <PencilSimple />{" "}
+                <PencilSimple />
                 <span className="ml-3">
                   {myReview ? "Edit my review" : "Write a review"}
                 </span>

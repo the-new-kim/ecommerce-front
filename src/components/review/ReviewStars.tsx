@@ -21,7 +21,12 @@ export default function ReviewStars({ rating, className }: IReviewStarsProps) {
         <Star
           key={"star" + index}
           weight={
-            (rating && index <= rating - 1) || !rating ? "fill" : "regular"
+            // (index <= rating - 1) || !rating ? "fill" : "regular"
+            typeof rating === "undefined"
+              ? "fill"
+              : rating > index
+              ? "fill"
+              : "regular"
           }
         />
       ))}

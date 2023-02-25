@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { headerHeightAtom } from "../libs/atoms";
 import { productCollection, reviewCollection } from "../firebase/config";
-import { centToDollor } from "../libs/utils";
+import { calculateReviewsAverageRating, centToDollor } from "../libs/utils";
 import { getFirebaseDoc, getFirebaseDocs } from "../firebase/utils";
 import Heading from "../components/elements/typos/Heading";
 import ReviewSection from "../components/review/ReviewSection";
@@ -32,12 +32,11 @@ export default function Product() {
     data: reviews,
     isLoading: reviewsLoading,
     error: reviewsError,
-    refetch: reviewsRefetch,
   } = useQuery(["reviews", productId], () =>
     getFirebaseDocs(reviewCollection, where("product", "==", productId))
   );
 
-  const [averageRating, setAverageRating] = useState<number>();
+  // const [averageRating, setAverageRating] = useState<number>();
 
   const {
     mediaQuery: { md },
@@ -45,15 +44,18 @@ export default function Product() {
 
   const headerHeight = useRecoilValue(headerHeightAtom);
 
-  useEffect(() => {
-    if (!reviews || !reviews.length) return;
-    const ratings = reviews.map((review) => review.rating);
+  // useEffect(() => {
+  //   if (!reviews || !reviews.length) return;
+  //   console.log("REVIEWS CHANGED", reviews);
+  //   const ratings = reviews.map((review) => review.rating);
 
-    const total = ratings.reduce(
-      (accumulator, currentValue) => accumulator + currentValue
-    );
-    setAverageRating(total / reviews.length);
-  }, [reviews]);
+  //   const total = ratings.reduce(
+  //     (accumulator, currentValue) => accumulator + currentValue
+  //   );
+  //   setAverageRating(total / reviews.length);
+
+  //   console.log(total / reviews.length);
+  // }, [reviews]);
 
   if (error || reviewsError) return <Empty>{`${error}`}</Empty>;
 
@@ -86,7 +88,7 @@ export default function Product() {
             <div>
               <Heading tagName="h3">{product.title}</Heading>
               <div className="flex justify-start items-center [&>*]:mr-3">
-                <ReviewStars rating={averageRating} />
+                <ReviewStars rating={calculateReviewsAverageRating(reviews)} />
                 {!!reviews?.length && (
                   <span>
                     {reviews.length +
@@ -117,9 +119,8 @@ export default function Product() {
       </section>
       <ReviewSection
         reviews={reviews}
-        // isLoading={reviewsLoading}
-        // error={reviewsError}
-        averageRating={averageRating}
+        productId={productId}
+        averageRating={calculateReviewsAverageRating(reviews)}
       />
     </>
   );
