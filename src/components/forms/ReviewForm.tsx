@@ -1,37 +1,38 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { where } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { reviewCollection } from "../../firebase/config";
+
 import { IReview, IReviewWithId } from "../../firebase/types";
-import {
-  addFirebaseDoc,
-  getFirebaseDocs,
-  updateFirebaseDoc,
-} from "../../firebase/utils";
+import { addFirebaseDoc, updateFirebaseDoc } from "../../firebase/utils";
+
 import { userAtom } from "../../libs/atoms";
-import { getNumber } from "../../libs/utils";
+import { anyToNumber, cls } from "../../libs/utils";
+import Button from "../elements/Button";
+
 import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 
 import Form from "../elements/form/Form";
 import Input from "../elements/form/Input";
 import Label from "../elements/form/Label";
 import TextArea from "../elements/form/TextArea";
-import Spinner from "../loaders/Spinner";
+
 import ReviewStars from "../review/ReviewStars";
 
 interface IReviewFormProps {
   defaultValue?: IReviewWithId;
   setShowing?: React.Dispatch<React.SetStateAction<boolean>>;
   submitValue?: string;
+  reviews: IReviewWithId[];
 }
 
 export default function ReviewForm({
   defaultValue,
   setShowing,
   submitValue,
+  reviews,
 }: IReviewFormProps) {
   const {
     register,
@@ -41,128 +42,164 @@ export default function ReviewForm({
 
   const { productId } = useParams();
   const me = useRecoilValue(userAtom);
+
+  const [disabled, setDisabled] = useState(false);
+  const [rating, setRating] = useState(defaultValue ? defaultValue.rating : 5);
+
   const queryClient = useQueryClient();
-
-  const [rating, setRating] = useState(3);
-
-  //   const mutation = useMutation({
-  //     mutationFn: async ({ status, trackingCode }: IReviewWithId) => {
-  //       const updateData = {
-  //         ...defaultValue,
-  //         delivery: {
-  //           status,
-  //           trackingCode,
-  //         },
-  //       };
-  //       await updateFirebaseDoc(orderCollection, defaultValue.id, updateData);
-  //       return updateData;
-  //     },
-  //     onSuccess: (data) => {
-  //       queryClient.setQueryData(["order", data.id], data);
-  //     },
-  //   });
-
-  const onValid = async (validData: IReview) => {
-    // console.log(title, text, rating);
-
-    console.log(validData);
-    if (!defaultValue) {
-      //1️⃣ Check if user already wrote a review about this product
-
-      const foundDoc = await getFirebaseDocs(
-        reviewCollection,
-        where("owner", "==", validData.owner)
+  const mutation = useMutation({
+    mutationFn: async (review: IReviewWithId) => {
+      const reviewIndex = reviews.findIndex(
+        (oldReview) => oldReview.id === review.id
       );
 
-      if (foundDoc && foundDoc.length) {
-        if (setShowing) setShowing(false);
-        return;
-      }
+      if (reviewIndex < 0) return [...reviews, review];
 
-      //create new
+      const newReviews = [...reviews];
+      newReviews.splice(reviewIndex, 1, review);
+      return newReviews;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["reviews", productId], data);
+    },
+  });
 
-      await addFirebaseDoc(reviewCollection, {
-        ...validData,
-        rating: getNumber(validData.rating),
-      });
+  useEffect(() => {
+    if (!me || !productId) {
+      setDisabled(true);
     } else {
-      // update
-      await updateFirebaseDoc(reviewCollection, defaultValue.id, {
-        ...validData,
-        rating: getNumber(validData.rating),
-      });
+      setDisabled(false);
     }
-    // mutation.mutate({ status, trackingCode });
+  }, [me, productId]);
 
-    if (setShowing) setShowing(false);
-    return;
+  const onCreateNewReview = async (validData: IReview) => {
+    console.log("CREATE!", validData);
+
+    await addFirebaseDoc(reviewCollection, {
+      ...validData,
+      rating: anyToNumber(validData.rating),
+    });
+
+    mutation.mutate({
+      ...validData,
+      rating: anyToNumber(validData.rating),
+      id: "new",
+    });
+
+    if (setShowing) {
+      setShowing(false);
+    }
   };
 
-  // if (!productId || !me) return <Spinner />;
+  const onUpdateReview = async (validData: IReview, id: string) => {
+    console.log("UPDATE!", validData, id);
+
+    await updateFirebaseDoc(reviewCollection, id, {
+      ...validData,
+      rating: anyToNumber(validData.rating),
+    });
+
+    mutation.mutate({
+      ...validData,
+      rating: anyToNumber(validData.rating),
+      id,
+    });
+
+    if (setShowing) {
+      setShowing(false);
+    }
+  };
 
   return (
-    <Form onSubmit={handleSubmit(onValid)} className="w-full">
-      <Label>
-        Title
-        <Input
-          type="text"
-          placeholder="Title"
-          defaultValue={defaultValue?.title || ""}
-          {...register("title", { required: "This field is required" })}
-          hasError={errors.title}
-        />
-        {errors.title && (
-          <FieldErrorMessage>{errors.title.message}</FieldErrorMessage>
+    <div className="w-full">
+      <Form
+        onSubmit={handleSubmit(
+          !defaultValue
+            ? onCreateNewReview
+            : (e) => onUpdateReview(e, defaultValue.id)
         )}
-      </Label>
-      <Label>
-        Text
-        <TextArea
-          placeholder="Text"
-          defaultValue={defaultValue?.text || ""}
-          {...register("text", { required: "This field is required" })}
-          hasError={errors.text}
-        />
-        {errors.text && (
-          <FieldErrorMessage>{errors.text.message}</FieldErrorMessage>
-        )}
-      </Label>
-
-      <input
-        className="hidden"
-        defaultValue={productId}
-        {...register("product", { required: true })}
-      />
-
-      <input
-        className="hidden"
-        // defaultValue={me.id}
-        {...register("owner", { required: true })}
-      />
-
-      <label className="mb-2">
-        <div>Rating</div>
-
-        <div className="relative inline-block text-xl mt-1">
-          <input
-            className="absolute top-0 left-0 w-full opacity-0"
-            type="range"
-            max="5"
-            step="1"
-            defaultValue={defaultValue?.rating || 3}
-            {...register("rating", {
-              //   required: "This field is required",
-              onChange(event) {
-                setRating(event.target.value);
-              },
-            })}
+        className={"w-full " + cls(disabled ? "opacity-30" : "opacity-100")}
+      >
+        <Label>
+          Title
+          <Input
+            type="text"
+            placeholder="Title"
+            defaultValue={defaultValue?.title || ""}
+            {...register("title", { required: "This field is required" })}
+            hasError={errors.title}
+            disabled={disabled}
           />
-          <ReviewStars rating={rating} className="w-full" />
+          {errors.title && (
+            <FieldErrorMessage>{errors.title.message}</FieldErrorMessage>
+          )}
+        </Label>
+        <Label>
+          Text
+          <TextArea
+            placeholder="Text"
+            defaultValue={defaultValue?.text || ""}
+            {...register("text", { required: "This field is required" })}
+            hasError={errors.text}
+            disabled={disabled}
+          />
+          {errors.text && (
+            <FieldErrorMessage>{errors.text.message}</FieldErrorMessage>
+          )}
+        </Label>
+
+        <input
+          className="hidden"
+          defaultValue={productId}
+          {...register("product", { required: true })}
+        />
+
+        <input
+          className="hidden"
+          defaultValue={me?.id}
+          {...register("owner", { required: true })}
+        />
+
+        <label className="mb-2">
+          <div>Rating</div>
+
+          <div className="relative inline-block text-xl mt-1">
+            <input
+              className="absolute top-0 left-0 w-full opacity-0 cursor-ew-resize disabled:cursor-not-allowed"
+              type="range"
+              max="5"
+              step="1"
+              defaultValue={rating}
+              {...register("rating", {
+                //   required: "This field is required",
+                onChange(event) {
+                  setRating(event.target.value);
+                },
+              })}
+              disabled={disabled}
+            />
+            <ReviewStars rating={rating} className="w-full" />
+            {errors.rating && (
+              <FieldErrorMessage>{errors.rating.message}</FieldErrorMessage>
+            )}
+          </div>
+        </label>
+        <div className="flex justify-end items-center">
+          <Input
+            type="submit"
+            value={submitValue || "Submit review"}
+            disabled={disabled}
+          />
         </div>
-      </label>
-      <div className="flex justify-end items-center">
-        <Input type="submit" value={submitValue || "Submit review"} />
-      </div>
-    </Form>
+      </Form>
+
+      {disabled && (
+        <div className="absolute inset-0 flex justify-center items-center w-full h-full">
+          <Button link="/auth" className=" bg-black text-white p-5">
+            Please Login first to leave a review
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }

@@ -12,6 +12,7 @@ import Label from "../elements/form/Label";
 import Input from "../elements/form/Input";
 import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 import { createUserDoc, setFirebaseDoc } from "../../firebase/utils";
+import { IUser } from "../../firebase/types";
 
 interface IRegisterForm {
   email: string;
@@ -43,23 +44,9 @@ export default function RegisterForm() {
 
       // 2️⃣ Create new user doc
 
-      console.log("USER CREDENTIAL", userCredential.user);
+      // console.log("USER CREDENTIAL", userCredential.user);
 
       // await createUserDoc(userCredential);
-
-      const userData = {
-        isAdmin: false,
-        wishlist: [],
-        cart: {
-          paymentIntent: null,
-          products: [],
-        },
-        orders: [],
-        address: null,
-        shipping: null,
-      };
-
-      await setFirebaseDoc(userCollection, userCredential.user.uid, userData);
 
       // 3️⃣ Login
       await signInWithEmailAndPassword(firebaseAuth, email, password);

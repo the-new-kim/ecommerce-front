@@ -14,6 +14,7 @@ import { firebaseAuth, userCollection } from "../firebase/config";
 import Button from "../components/elements/Button";
 import { GithubLogo, GoogleLogo } from "phosphor-react";
 import { createUserDoc, getFirebaseDoc } from "../firebase/utils";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -42,10 +43,16 @@ export default function Auth() {
     try {
       const userCredential = await signInWithPopup(firebaseAuth, provider);
 
-      const userExists = await getFirebaseDoc(
-        userCollection,
-        userCredential.user.uid
-      );
+      // const userExists = await getFirebaseDoc(
+      //   userCollection,
+      //   userCredential.user.uid
+      // );
+
+      const docRef = doc(userCollection, userCredential.user.uid);
+      const docSnap = await getDoc(docRef);
+
+      const userExists = docSnap.exists();
+
       if (!userExists) await createUserDoc(userCredential);
     } catch (error) {
       console.log("ERROR::::", error);

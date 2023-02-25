@@ -43,11 +43,12 @@
 - [x] Form component
 - [x] Handle loading (Tanstack query & Loading page)
 - [ ] Container for wishlist & search
+- [x] Signin & Signup... better logic...
 
 ### Extra todos...
 
 - [ ] Category or Hashtags
-- [ ] Product reviews & rating
+- [x] Product reviews & rating
 - [ ] Clean types
 
 ### Charts

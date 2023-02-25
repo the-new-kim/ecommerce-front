@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import { TPaymentStatusTypes } from "../api/paymentIntents";
 
 export interface IUser {
@@ -7,6 +8,10 @@ export interface IUser {
   orders: string[];
   address: IAddress | null;
   shipping: IShipping | null;
+  displayName: User["displayName"];
+  photoURL: User["photoURL"];
+  email: User["email"];
+  phoneNumber: User["phoneNumber"];
 }
 
 export interface ICart {

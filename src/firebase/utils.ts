@@ -14,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { IProductWithId } from "../routes/Cart";
 import { productCollection, userCollection } from "./config";
-import { ICartProduct } from "./types";
+import { ICartProduct, IUser } from "./types";
 
 export const errorMessage = (error: unknown) => {
   let message;
@@ -95,7 +95,15 @@ export const getFirebaseDocs = async <T>(
 };
 
 export const createUserDoc = async (userCredential: UserCredential) => {
-  await setDoc(doc(userCollection, userCredential.user.uid), {
+  const {
+    user: { displayName, email, phoneNumber, photoURL },
+  } = userCredential;
+
+  const userData: IUser = {
+    displayName,
+    email,
+    phoneNumber,
+    photoURL,
     isAdmin: false,
     wishlist: [],
     cart: {
@@ -105,7 +113,9 @@ export const createUserDoc = async (userCredential: UserCredential) => {
     orders: [],
     address: null,
     shipping: null,
-  });
+  };
+
+  await setDoc(doc(userCollection, userCredential.user.uid), userData);
 };
 
 export const getWishlistProducts = async (wishlist: string[] | undefined) => {

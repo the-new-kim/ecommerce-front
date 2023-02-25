@@ -2,79 +2,79 @@ import { onAuthStateChanged, User } from "firebase/auth";
 
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { IUserAtom, userAtom } from "./libs/atoms";
+import { userAtom } from "./libs/atoms";
 import { firebaseAuth, userCollection } from "./firebase/config";
 
-import { getFirebaseDoc, updateFirebaseDoc } from "./firebase/utils";
+import { updateFirebaseDoc } from "./firebase/utils";
 import { RouterProvider } from "react-router-dom";
 import router from "./router";
 import { AnimatePresence, motion } from "framer-motion";
 
 import InitLoader from "./components/loaders/InitLoader";
 import { fadeInOutVariants } from "./libs/variants";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { IUser } from "./firebase/types";
 
 function App() {
   const [firebaseInit, setFirebaseInit] = useState(false);
-  const [me, setUser] = useRecoilState(userAtom);
+  const [me, setMe] = useRecoilState(userAtom);
   const [introEnded, setIntroEnded] = useState(false);
 
   useEffect(() => {
+    console.log("ME::::", me);
+
     onAuthStateChanged(firebaseAuth, async (user) => {
       if (user) {
-        const userCopy = JSON.parse(JSON.stringify(user)) as User; //https://github.com/firebase/firebase-js-sdk/issues/5722 📝 Firebase Recoil Issue...
+        const { uid, displayName, email, phoneNumber, photoURL } = JSON.parse(
+          JSON.stringify(user)
+        ) as User; //https://github.com/firebase/firebase-js-sdk/issues/5722 📝 Firebase Recoil Issue...
+        if (!me) {
+          //1️⃣ SignIn or Registration
 
-        const userDoc = await getFirebaseDoc(userCollection, userCopy.uid);
+          const docRef = doc(userCollection, uid);
+          const docSnap = await getDoc(docRef);
 
-        if (userDoc) {
-          const { isAdmin, wishlist, cart, orders, address, shipping } =
-            userDoc;
+          const userDocExists = docSnap.exists();
+          if (userDocExists) {
+            //1️⃣-1️⃣ setMe if userDoc exists
 
-          const me: IUserAtom = {
-            id: userCopy.uid,
-            displayName: userCopy.displayName,
-            photoURL: userCopy.photoURL,
-            email: userCopy.email,
-            phoneNumber: userCopy.phoneNumber,
-            isAdmin,
-            wishlist,
-            cart,
-            orders,
-            address,
-            shipping,
-          };
+            setMe({
+              ...docSnap.data(),
+              id: docSnap.id,
+            });
+          } else {
+            //1️⃣-2️⃣ create user doc
 
-          setUser(me);
+            const newUserDocData: IUser = {
+              displayName: displayName || null,
+              email: email || null,
+              phoneNumber: phoneNumber || null,
+              photoURL: photoURL || null,
+              isAdmin: false,
+              wishlist: [],
+              cart: {
+                paymentIntent: null,
+                products: [],
+              },
+              orders: [],
+              address: null,
+              shipping: null,
+            };
+
+            await setDoc(doc(userCollection, uid), newUserDocData);
+            setMe({ ...newUserDocData, id: uid });
+          }
         } else {
-          firebaseAuth.signOut();
+          //2️⃣ Update User doc
+
+          await updateFirebaseDoc(userCollection, uid, {
+            ...me,
+          });
         }
       } else {
-        setUser(null);
+        setMe(null);
       }
-
       setFirebaseInit(true);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!me) return;
-    onAuthStateChanged(firebaseAuth, async (user) => {
-      if (!user) return;
-
-      const userExists = await getFirebaseDoc(userCollection, user.uid);
-      if (!userExists) return;
-
-      const userCopy = JSON.parse(JSON.stringify(user)) as User;
-
-      const { isAdmin, wishlist, cart, orders, address, shipping } = me;
-
-      await updateFirebaseDoc(userCollection, userCopy.uid, {
-        isAdmin,
-        wishlist,
-        cart,
-        orders,
-        address,
-        shipping,
-      });
     });
   }, [me]);
 

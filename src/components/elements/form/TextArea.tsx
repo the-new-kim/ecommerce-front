@@ -17,7 +17,8 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, IInputProps>(
         ? "border-red-500 focus:border-red-500"
         : "border-black focus:border-sky-400"
     )}
-    mt-1 px-3 py-2 bg-white border placeholder-slate-400 focus:outline-none w-full sm:text-sm rounded-none`}
+    mt-1 px-3 py-2 bg-white border placeholder-slate-400 focus:outline-none w-full sm:text-sm rounded-none
+    disabled:bg-slate-200 disabled:cursor-not-allowed`}
     />
   )
 );
