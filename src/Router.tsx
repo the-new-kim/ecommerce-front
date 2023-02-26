@@ -84,20 +84,42 @@ const meRoutes: RouteObject[] = [
   },
 ];
 
-const checkoutRout: RouteObject = {
-  path: "checkout",
-  element: <CheckoutLayout />,
-  children: [
-    { path: "information", element: <CheckoutInformation />, index: true },
-    {
-      path: "shipping",
-      element: <CheckoutShipping />,
-    },
-    {
-      path: "payment",
-      element: <CheckoutPayment />,
-    },
-  ],
+// const checkoutRout: RouteObject = {
+//   path: "checkout",
+//   element: <CheckoutLayout />,
+//   children: [
+//     { path: "information", element: <CheckoutInformation />, index: true },
+//     {
+//       path: "shipping",
+//       element: <CheckoutShipping />,
+//     },
+//     {
+//       path: "payment",
+//       element: <CheckoutPayment />,
+//     },
+//   ],
+// };
+
+const checkoutRoutes = (me: IUserAtom): RouteObject => {
+  const information = {
+    path: "information",
+    element: <CheckoutInformation />,
+    index: true,
+  };
+  const shipping = {
+    path: "shipping",
+    element: <CheckoutShipping />,
+  };
+  const payment = {
+    path: "payment",
+    element: <CheckoutPayment />,
+  };
+
+  return {
+    path: "checkout",
+    element: <CheckoutLayout />,
+    children: [information, shipping, me.shipping ? payment : {}],
+  };
 };
 
 const globalRoutes: RouteObject[] = [
@@ -131,7 +153,7 @@ const router = (me: IUserAtom | null) => {
           ...(me?.isAdmin ? adminOnlyRoutes : []),
         ],
       },
-      !!me?.cart.products.length ? checkoutRout : {},
+      !!me?.cart.products.length ? checkoutRoutes(me) : {},
     ],
     { basename: process.env.PUBLIC_URL }
   );

@@ -20,7 +20,7 @@ export const checkoutOptionAtom = atom<object | null>({
   default: null,
 });
 
-export const pageLoadingAtom = atom<boolean>({
-  key: "pageLoadingState",
+export const fireworksAtom = atom<boolean>({
+  key: "fireworksState",
   default: false,
 });

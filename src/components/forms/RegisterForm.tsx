@@ -13,6 +13,7 @@ import Input from "../elements/form/Input";
 import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 import { createUserDoc, setFirebaseDoc } from "../../firebase/utils";
 import { IUser } from "../../firebase/types";
+import PageLoader from "../loaders/PageLoader";
 
 interface IRegisterForm {
   email: string;
@@ -64,7 +65,8 @@ export default function RegisterForm() {
 
   return (
     <>
-      {creating && <Message>Creating account...</Message>}
+      <PageLoader showing={creating}>Creating account...</PageLoader>
+
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Label>
           Email

@@ -7,18 +7,21 @@ import { addDoc, increment } from "firebase/firestore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { orderCollection, productCollection } from "../../firebase/config";
 import { EDeliveryStatus } from "../../firebase/types";
 import { updateFirebaseDoc } from "../../firebase/utils";
-import { userAtom } from "../../libs/atoms";
+import { fireworksAtom, userAtom } from "../../libs/atoms";
 import Button from "../elements/Button";
+import FieldErrorMessage from "../elements/form/FieldErrorMessage";
+import PageLoader from "../loaders/PageLoader";
 
 export default function PaymentForm() {
   const navigate = useNavigate();
   const [me, setMe] = useRecoilState(userAtom);
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState<string>();
+  const setFireworksShowing = useSetRecoilState(fireworksAtom);
 
   const stripe = useStripe();
   const elements = useElements();
@@ -48,6 +51,7 @@ export default function PaymentForm() {
     if (paymentIntent.status !== "succeeded") {
       setMessage(`Status: ${paymentIntent.status}`);
       setIsProcessing(false);
+
       return;
     } else {
       //1️⃣ Create new doc "order" on firestore
@@ -82,6 +86,7 @@ export default function PaymentForm() {
       const orders = [orderDocRef.id, ...me!.orders];
 
       toast("Thank you for your order!");
+      setFireworksShowing(true);
 
       setMe({ ...me!, cart: { paymentIntent: null, products: [] }, orders });
 
@@ -100,7 +105,8 @@ export default function PaymentForm() {
           {isProcessing ? "Processing..." : "Pay now"}
         </Button>
       </form>
-      {message && <div>{message}</div>}
+      {message && <FieldErrorMessage>{message}</FieldErrorMessage>}
+      <PageLoader showing={isProcessing}>Processing...</PageLoader>
     </>
   );
 }

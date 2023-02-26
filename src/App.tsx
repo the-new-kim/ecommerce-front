@@ -1,8 +1,8 @@
 import { onAuthStateChanged, User } from "firebase/auth";
 
 import { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
-import { userAtom } from "./libs/atoms";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { fireworksAtom, userAtom } from "./libs/atoms";
 import { firebaseAuth, userCollection } from "./firebase/config";
 
 import { updateFirebaseDoc } from "./firebase/utils";

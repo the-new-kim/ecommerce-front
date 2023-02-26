@@ -5,7 +5,7 @@ import CartProducts from "../components/CartProducts";
 import Button from "../components/elements/Button";
 import Heading from "../components/elements/typos/Heading";
 import Empty from "../components/Empty";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getCartProducts, getProductsTotalAmount } from "../firebase/utils";
 import { useEffect } from "react";
 import Spinner from "../components/loaders/Spinner";
@@ -31,16 +31,6 @@ export default function Cart() {
   } = useQuery(["cartProducts", me?.id], () =>
     getCartProducts(me?.cart.products)
   );
-
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    // mutationFn:  () => {
-    // },
-    // onSuccess: (data) => {
-    //   queryClient.setQueryData(["order", data.id], data);
-    // },
-  });
 
   useEffect(() => {
     refetch();
