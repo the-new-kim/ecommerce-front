@@ -13,7 +13,6 @@ import { EDeliveryStatus } from "../../firebase/types";
 import { updateFirebaseDoc } from "../../firebase/utils";
 import { fireworksAtom, userAtom } from "../../libs/atoms";
 import Button from "../elements/Button";
-import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 import PageLoader from "../loaders/PageLoader";
 
 export default function PaymentForm() {
@@ -105,7 +104,7 @@ export default function PaymentForm() {
           {isProcessing ? "Processing..." : "Pay now"}
         </Button>
       </form>
-      {message && <FieldErrorMessage>{message}</FieldErrorMessage>}
+      {message && <div>{message}</div>}
       <PageLoader showing={isProcessing}>Processing...</PageLoader>
     </>
   );

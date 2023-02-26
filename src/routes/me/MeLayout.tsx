@@ -8,6 +8,7 @@ export default function MeLayout() {
 
   const onLogoutClick = () => {
     signOut(firebaseAuth);
+
     navigage("/");
   };
 

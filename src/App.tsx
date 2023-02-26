@@ -1,4 +1,4 @@
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
 
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -34,6 +34,8 @@ function App() {
           const docRef = doc(userCollection, uid);
           const docSnap = await getDoc(docRef);
 
+          console.log("USER DOC::::", docSnap);
+
           const userDocExists = docSnap.exists();
           if (userDocExists) {
             //1️⃣-1️⃣ setMe if userDoc exists
@@ -67,11 +69,14 @@ function App() {
         } else {
           //2️⃣ Update User doc
 
-          await updateFirebaseDoc(userCollection, uid, {
-            ...me,
-          });
+          if (me.id === uid) {
+            await updateFirebaseDoc(userCollection, uid, {
+              ...me,
+            });
+          }
         }
       } else {
+        signOut(firebaseAuth);
         setMe(null);
       }
       setFirebaseInit(true);

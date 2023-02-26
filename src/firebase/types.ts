@@ -81,6 +81,8 @@ export interface IReview {
   title: string;
   text: string;
   rating: number;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface IReviewWithId extends IReview {
