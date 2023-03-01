@@ -11,6 +11,7 @@ import ProductCard from "../components/ProductCard";
 import Empty from "../components/Empty";
 import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
+import SEO from "../components/SEO";
 
 export default function Wishlist() {
   const me = useRecoilValue(userAtom);
@@ -29,41 +30,44 @@ export default function Wishlist() {
   if (error) return <Empty>{`${error}`}</Empty>;
 
   return (
-    <div className="p-5 h-full flex flex-col w-full">
-      {/* TITLE */}
+    <>
+      <SEO pageTitle="Wishlist" />
+      <div className="p-5 h-full flex flex-col w-full">
+        {/* TITLE */}
 
-      <Heading tagName="h3" className="mb-5">
-        Wishlist
-      </Heading>
+        <Heading tagName="h3" className="mb-5">
+          Wishlist
+        </Heading>
 
-      {/* BODY */}
-      <div className="w-full h-full flex flex-col justify-start items-center flex-grow">
-        <>
-          {isLoading || !products ? (
-            <GridSection>
-              {Array.from(Array(12)).map((_, index) => (
-                <ProductSkeleton key={"skeleton" + index} />
-              ))}
-            </GridSection>
-          ) : (
-            <>
-              {!products.length ? (
-                <>
-                  <Empty>You currently don't have any favorites</Empty>
-                </>
-              ) : (
-                <GridSection>
-                  <AnimatePresence>
-                    {products.map((product) => (
-                      <ProductCard key={product.id} product={product} />
-                    ))}
-                  </AnimatePresence>
-                </GridSection>
-              )}
-            </>
-          )}
-        </>
+        {/* BODY */}
+        <div className="w-full h-full flex flex-col justify-start items-center flex-grow">
+          <>
+            {isLoading || !products ? (
+              <GridSection>
+                {Array.from(Array(12)).map((_, index) => (
+                  <ProductSkeleton key={"skeleton" + index} />
+                ))}
+              </GridSection>
+            ) : (
+              <>
+                {!products.length ? (
+                  <>
+                    <Empty>You currently don't have any favorites</Empty>
+                  </>
+                ) : (
+                  <GridSection>
+                    <AnimatePresence>
+                      {products.map((product) => (
+                        <ProductCard key={product.id} product={product} />
+                      ))}
+                    </AnimatePresence>
+                  </GridSection>
+                )}
+              </>
+            )}
+          </>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

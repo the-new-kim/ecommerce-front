@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCartProducts, getProductsTotalAmount } from "../firebase/utils";
 import { useEffect } from "react";
 import Spinner from "../components/loaders/Spinner";
+import SEO from "../components/SEO";
 
 export interface IProductWithId extends IProduct {
   id: string;
@@ -46,25 +47,28 @@ export default function Cart() {
     );
 
   return (
-    <div className="p-5 h-full flex flex-col w-full">
-      <Heading tagName="h3" className="mb-5">
-        Cart
-      </Heading>
+    <>
+      <SEO pageTitle="Cart" />
+      <div className="p-5 h-full flex flex-col w-full">
+        <Heading tagName="h3" className="mb-5">
+          Cart
+        </Heading>
 
-      {!cartProducts.length ? (
-        <Empty>Your cart is empty</Empty>
-      ) : (
-        <>
-          <CartProducts
-            cartProducts={cartProducts}
-            totalAmount={getProductsTotalAmount(cartProducts)}
-          />
+        {!cartProducts.length ? (
+          <Empty>Your cart is empty</Empty>
+        ) : (
+          <>
+            <CartProducts
+              cartProducts={cartProducts}
+              totalAmount={getProductsTotalAmount(cartProducts)}
+            />
 
-          <div className="flex justify-end mt-5">
-            <Button link="/checkout/information">Checkout</Button>
-          </div>
-        </>
-      )}
-    </div>
+            <div className="flex justify-end mt-5">
+              <Button link="/checkout/information">Checkout</Button>
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 }

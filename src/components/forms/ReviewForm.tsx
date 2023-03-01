@@ -56,7 +56,7 @@ export default function ReviewForm({
 
       if (reviewIndex < 0) {
         console.log("review not exists in reviews...");
-        return [...reviews, myReview];
+        return [myReview, ...reviews];
       }
       const newReviews = [...reviews];
 
@@ -155,19 +155,27 @@ export default function ReviewForm({
             <FieldErrorMessage>{errors.text.message}</FieldErrorMessage>
           )}
         </Label>
+        <div className="hidden">
+          <input
+            defaultValue={productId}
+            {...register("product", { required: true })}
+          />
 
-        <input
-          className="hidden"
-          defaultValue={productId}
-          {...register("product", { required: true })}
-        />
+          <input
+            defaultValue={me?.id}
+            {...register("owner", { required: true })}
+          />
 
-        <input
-          className="hidden"
-          defaultValue={me?.id}
-          {...register("owner", { required: true })}
-        />
+          <input
+            defaultValue={defaultValue?.createdAt || Date.now()}
+            {...register("createdAt", { required: true })}
+          />
 
+          <input
+            defaultValue={Date.now()}
+            {...register("updatedAt", { required: true })}
+          />
+        </div>
         <label className="mb-2">
           <div>Rating</div>
 

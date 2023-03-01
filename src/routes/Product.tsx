@@ -10,12 +10,13 @@ import ReviewStars from "../components/review/ReviewStars";
 import useViewportSize from "../libs/hooks/useViewportSize";
 import Empty from "../components/Empty";
 import AddToCartButton from "../components/AddToCartButton";
+import { Helmet } from "react-helmet";
 
 import AddToWishlistButton from "../components/AddToWishlistButton";
 import { useQuery } from "@tanstack/react-query";
 import Spinner from "../components/loaders/Spinner";
-import { where } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { orderBy, where } from "firebase/firestore";
+import SEO from "../components/SEO";
 
 export default function Product() {
   const { productId } = useParams();
@@ -33,29 +34,18 @@ export default function Product() {
     isLoading: reviewsLoading,
     error: reviewsError,
   } = useQuery(["reviews", productId], () =>
-    getFirebaseDocs(reviewCollection, where("product", "==", productId))
+    getFirebaseDocs(
+      reviewCollection,
+      where("product", "==", productId),
+      orderBy("updatedAt", "desc")
+    )
   );
-
-  // const [averageRating, setAverageRating] = useState<number>();
 
   const {
     mediaQuery: { md },
   } = useViewportSize();
 
   const headerHeight = useRecoilValue(headerHeightAtom);
-
-  // useEffect(() => {
-  //   if (!reviews || !reviews.length) return;
-  //   console.log("REVIEWS CHANGED", reviews);
-  //   const ratings = reviews.map((review) => review.rating);
-
-  //   const total = ratings.reduce(
-  //     (accumulator, currentValue) => accumulator + currentValue
-  //   );
-  //   setAverageRating(total / reviews.length);
-
-  //   console.log(total / reviews.length);
-  // }, [reviews]);
 
   if (error || reviewsError) return <Empty>{`${error}`}</Empty>;
 
@@ -68,6 +58,7 @@ export default function Product() {
 
   return (
     <>
+      <SEO pageTitle={product.title} />
       <section className="relative flex flex-col md:grid md:grid-cols-2">
         {/* IMAGE */}
         <div>

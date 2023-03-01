@@ -45,6 +45,7 @@
 - [x] Handle loading (Tanstack query & Loading page)
 - [ ] Container for wishlist & search
 - [x] Signin & Signup... better logic...
+- [ ] Firebase functions
 
 ### Extra todos...
 

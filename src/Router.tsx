@@ -84,22 +84,6 @@ const meRoutes: RouteObject[] = [
   },
 ];
 
-// const checkoutRout: RouteObject = {
-//   path: "checkout",
-//   element: <CheckoutLayout />,
-//   children: [
-//     { path: "information", element: <CheckoutInformation />, index: true },
-//     {
-//       path: "shipping",
-//       element: <CheckoutShipping />,
-//     },
-//     {
-//       path: "payment",
-//       element: <CheckoutPayment />,
-//     },
-//   ],
-// };
-
 const checkoutRoutes = (me: IUserAtom): RouteObject => {
   const information = {
     path: "information",

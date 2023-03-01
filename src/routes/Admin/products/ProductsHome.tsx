@@ -13,8 +13,9 @@ import TBodyRow from "../../../components/table/TBodyRow";
 import THead from "../../../components/table/THead";
 import THeadRow from "../../../components/table/THeadRow";
 import { productCollection } from "../../../firebase/config";
+import { IProduct } from "../../../firebase/types";
 
-import { getFirebaseDocs } from "../../../firebase/utils";
+import { getFirebaseDocs, updateFirebaseDoc } from "../../../firebase/utils";
 import { centToDollor, cls } from "../../../libs/utils";
 
 export default function ProductsHome() {
@@ -56,11 +57,24 @@ export default function ProductsHome() {
       </Empty>
     );
 
+  const onResetSoldClick = async () => {
+    for (let i = 0; i < products.length; i++) {
+      const { id } = products[i];
+      const currentProduct: IProduct & { id?: string } = { ...products[i] };
+      delete currentProduct["id"];
+
+      await updateFirebaseDoc(productCollection, id, { ...currentProduct });
+    }
+
+    console.log("reset compelete!");
+  };
+
   return (
     <>
       <AdminHeader title="Products">
         <Button link="/admin/products/create">Create</Button>
       </AdminHeader>
+      <div onClick={onResetSoldClick}>Reset sold</div>
 
       <figure className="w-full overflow-x-scroll border-[1px] border-black">
         <Table>
