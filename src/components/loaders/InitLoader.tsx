@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Dispatch, SetStateAction } from "react";
 import { fadeInOutVariants } from "../../libs/variants";
 import Heading from "../elements/typos/Heading";
-import SplitText from "../SplitText";
+import SplitTextAnimation from "../SplitTextAnimation";
 
 interface ILoadingProps {
   text: string;
@@ -20,7 +20,7 @@ export default function InitLoader({ text, setState }: ILoadingProps) {
       className="w-full h-screen bg-white fixed top-0 left-0 flex justify-center items-center"
     >
       <Heading>
-        <SplitText text={text} setState={setState} />
+        <SplitTextAnimation text={text} setState={setState} />
       </Heading>
     </motion.div>
   );

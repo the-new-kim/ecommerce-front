@@ -1,15 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { orderBy, where } from "firebase/firestore";
+import { AnimatePresence } from "framer-motion";
 
 import { useRecoilValue } from "recoil";
 import Heading from "../../components/elements/typos/Heading";
 import Empty from "../../components/Empty";
+import FireWorks from "../../components/Fireworks";
 import Spinner from "../../components/loaders/Spinner";
 import OrderCard from "../../components/OrderCard";
 import { orderCollection } from "../../firebase/config";
 
 import { getFirebaseDocs } from "../../firebase/utils";
-import { userAtom } from "../../libs/atoms";
+import { fireworksAtom, userAtom } from "../../libs/atoms";
 
 export default function MeOrders() {
   const me = useRecoilValue(userAtom);
@@ -26,6 +28,8 @@ export default function MeOrders() {
     )
   );
 
+  const showFireworks = useRecoilValue(fireworksAtom);
+
   if (error) return <Empty>{`${error}`}</Empty>;
 
   if (isLoading || !myOrders)
@@ -36,15 +40,18 @@ export default function MeOrders() {
     );
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <Heading tagName="h3" className="mb-5">
-        Order history
-      </Heading>
-      {!!myOrders.length ? (
-        myOrders.map((order) => <OrderCard key={order.id} order={order} />)
-      ) : (
-        <Empty>You haven't placed any orders yet</Empty>
-      )}
-    </div>
+    <>
+      <div className="w-full h-full flex flex-col">
+        <Heading tagName="h3" className="mb-5">
+          Order history
+        </Heading>
+        {!!myOrders.length ? (
+          myOrders.map((order) => <OrderCard key={order.id} order={order} />)
+        ) : (
+          <Empty>You haven't placed any orders yet</Empty>
+        )}
+      </div>
+      <AnimatePresence>{showFireworks && <FireWorks />}</AnimatePresence>
+    </>
   );
 }

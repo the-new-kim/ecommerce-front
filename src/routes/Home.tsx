@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { orderBy } from "firebase/firestore";
-import { Helmet } from "react-helmet";
 import Empty from "../components/Empty";
 import GridSection from "../components/GridSection";
+
 import ProductCard from "../components/ProductCard";
 import ProductSkeleton from "../components/ProductSkeleton";
 import SEO from "../components/SEO";
+
 import { productCollection } from "../firebase/config";
 import { getFirebaseDocs } from "../firebase/utils";
 

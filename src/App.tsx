@@ -34,8 +34,6 @@ function App() {
           const docRef = doc(userCollection, uid);
           const docSnap = await getDoc(docRef);
 
-          console.log("USER DOC::::", docSnap);
-
           const userDocExists = docSnap.exists();
           if (userDocExists) {
             //1️⃣-1️⃣ setMe if userDoc exists

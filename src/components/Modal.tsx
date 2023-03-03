@@ -57,7 +57,7 @@ export default function Modal({
             className="absolute top-0 left-0 right-0 bottom-0 m-auto max-w-2xl w-full max-h-fit bg-white p-5 z-50"
           >
             <header className="mb-5 w-full flex justify-end items-center">
-              <X onClick={closeModal} className="cursor-pointer" />
+              <X onClick={closeModal} className="cursor-pointer z-50" />
             </header>
             {children}
           </motion.div>

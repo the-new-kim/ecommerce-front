@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import { reviewCollection } from "../../firebase/config";
 import { IReview, IReviewWithId } from "../../firebase/types";
@@ -19,6 +19,11 @@ import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 import Button from "../elements/Button";
 
 import ReviewStars from "../review/ReviewStars";
+
+interface IForm {
+  review: IReview;
+  username: string;
+}
 
 interface IReviewFormProps {
   defaultValue?: IReviewWithId | null;
@@ -37,10 +42,10 @@ export default function ReviewForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IReview>();
+  } = useForm<IForm>();
 
   const { productId } = useParams();
-  const me = useRecoilValue(userAtom);
+  const [me, setMe] = useRecoilState(userAtom);
 
   const [disabled, setDisabled] = useState(false);
   const [rating, setRating] = useState(defaultValue ? defaultValue.rating : 5);
@@ -78,21 +83,24 @@ export default function ReviewForm({
     }
   }, [me, productId]);
 
-  const onCreateNewReview = async (validData: IReview) => {
-    // await addFirebaseDoc(reviewCollection, {
-    //   ...validData,
-    //   rating: anyToNumber(validData.rating),
-    // });
-    const newId = `${productId}r${reviews.length}`;
+  const onCreateNewReview = async (validData: IForm) => {
+    if (!me?.displayName) {
+      setMe((prev) => {
+        if (!prev) return prev;
+        return { ...prev, displayName: validData.username };
+      });
+    }
+
+    const newId = `${productId}${me?.id}`;
 
     await setFirebaseDoc(reviewCollection, newId, {
-      ...validData,
-      rating: anyToNumber(validData.rating),
+      ...validData.review,
+      rating: anyToNumber(validData.review.rating),
     });
 
     mutation.mutate({
-      ...validData,
-      rating: anyToNumber(validData.rating),
+      ...validData.review,
+      rating: anyToNumber(validData.review.rating),
       id: newId,
     });
 
@@ -101,15 +109,15 @@ export default function ReviewForm({
     }
   };
 
-  const onUpdateReview = async (validData: IReview, id: string) => {
+  const onUpdateReview = async (validData: IForm, id: string) => {
     await updateFirebaseDoc(reviewCollection, id, {
-      ...validData,
-      rating: anyToNumber(validData.rating),
+      ...validData.review,
+      rating: anyToNumber(validData.review.rating),
     });
 
     mutation.mutate({
-      ...validData,
-      rating: anyToNumber(validData.rating),
+      ...validData.review,
+      rating: anyToNumber(validData.review.rating),
       id,
     });
 
@@ -134,12 +142,14 @@ export default function ReviewForm({
             type="text"
             placeholder="Title"
             defaultValue={defaultValue?.title || ""}
-            {...register("title", { required: "This field is required" })}
-            hasError={errors.title}
+            {...register("review.title", {
+              required: "This field is required",
+            })}
+            hasError={errors.review?.title}
             disabled={disabled}
           />
-          {errors.title && (
-            <FieldErrorMessage>{errors.title.message}</FieldErrorMessage>
+          {errors.review?.title && (
+            <FieldErrorMessage>{errors.review.title.message}</FieldErrorMessage>
           )}
         </Label>
         <Label>
@@ -147,35 +157,57 @@ export default function ReviewForm({
           <TextArea
             placeholder="Text"
             defaultValue={defaultValue?.text || ""}
-            {...register("text", { required: "This field is required" })}
-            hasError={errors.text}
+            {...register("review.text", { required: "This field is required" })}
+            hasError={errors.review?.text}
             disabled={disabled}
           />
-          {errors.text && (
-            <FieldErrorMessage>{errors.text.message}</FieldErrorMessage>
+          {errors.review?.text && (
+            <FieldErrorMessage>{errors.review.text.message}</FieldErrorMessage>
           )}
         </Label>
-        <div className="hidden">
+
+        <>
           <input
+            type="hidden"
             defaultValue={productId}
-            {...register("product", { required: true })}
+            {...register("review.product", { required: true })}
           />
 
           <input
+            type="hidden"
             defaultValue={me?.id}
-            {...register("owner", { required: true })}
+            {...register("review.owner", { required: true })}
           />
 
           <input
+            type="hidden"
             defaultValue={defaultValue?.createdAt || Date.now()}
-            {...register("createdAt", { required: true })}
+            {...register("review.createdAt", { required: true })}
           />
 
           <input
+            type="hidden"
             defaultValue={Date.now()}
-            {...register("updatedAt", { required: true })}
+            {...register("review.updatedAt", { required: true })}
           />
-        </div>
+        </>
+
+        {!me?.displayName && (
+          <Label>
+            Username
+            <Input
+              hasError={errors.username}
+              {...register("username", {
+                required: me?.displayName ? false : "This field is required",
+              })}
+              placeholder="Username"
+            />
+            {errors.username && (
+              <FieldErrorMessage>{errors.username.message}</FieldErrorMessage>
+            )}
+          </Label>
+        )}
+
         <label className="mb-2">
           <div>Rating</div>
 
@@ -187,7 +219,7 @@ export default function ReviewForm({
               min="1"
               step="1"
               defaultValue={rating}
-              {...register("rating", {
+              {...register("review.rating", {
                 //   required: "This field is required",
                 onChange(event) {
                   setRating(event.target.value);
@@ -196,8 +228,10 @@ export default function ReviewForm({
               disabled={disabled}
             />
             <ReviewStars rating={rating} className="w-full" />
-            {errors.rating && (
-              <FieldErrorMessage>{errors.rating.message}</FieldErrorMessage>
+            {errors.review?.rating && (
+              <FieldErrorMessage>
+                {errors.review.rating.message}
+              </FieldErrorMessage>
             )}
           </div>
         </label>

@@ -54,11 +54,10 @@ export default function ReviewSection({
         "
             >
               <div className="flex justify-start items-center">
-                {typeof averageRating !== "undefined" && (
-                  <div className="bg-orange-400 py-1 px-3 text-white mr-3">
-                    {averageRating} adfsaf
-                  </div>
-                )}
+                <div className="bg-orange-400 py-1 px-3 text-white mr-3">
+                  {averageRating}
+                </div>
+
                 <ReviewStars rating={averageRating} />
               </div>
               <small>{`Based on ${reviews.length} review${

@@ -1,22 +1,24 @@
+import { useState } from "react";
+
+import { useForm } from "react-hook-form";
+import { firebaseAuth } from "../../firebase/config";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  getAuth,
+  updateProfile,
 } from "firebase/auth";
 
-import { useForm } from "react-hook-form";
-import { firebaseAuth, userCollection } from "../../firebase/config";
-import { useState } from "react";
-import Message from "../Message";
 import Form from "../elements/form/Form";
 import Label from "../elements/form/Label";
 import Input from "../elements/form/Input";
 import FieldErrorMessage from "../elements/form/FieldErrorMessage";
-import { createUserDoc, setFirebaseDoc } from "../../firebase/utils";
-import { IUser } from "../../firebase/types";
+
 import PageLoader from "../loaders/PageLoader";
 
 interface IRegisterForm {
   email: string;
+  username: string;
   password: string;
   passwordRepeat: string;
 }
@@ -32,7 +34,7 @@ export default function RegisterForm() {
     formState: { errors },
   } = useForm<IRegisterForm>();
 
-  const onSubmit = async ({ email, password }: IRegisterForm) => {
+  const onSubmit = async ({ email, password, username }: IRegisterForm) => {
     setCreating(true);
 
     try {
@@ -42,6 +44,14 @@ export default function RegisterForm() {
         email,
         password
       );
+
+      const auth = getAuth();
+
+      await updateProfile(userCredential.user, {
+        displayName: username,
+      });
+
+      console.log("CURRENT USER:::", auth.currentUser);
 
       // 2️⃣ Create new user doc
 
@@ -77,6 +87,18 @@ export default function RegisterForm() {
           />
           {errors.email && (
             <FieldErrorMessage>{errors.email.message}</FieldErrorMessage>
+          )}
+        </Label>
+
+        <Label>
+          Username
+          <Input
+            hasError={!!errors.username}
+            type="text"
+            {...register("username", { required: "This field is required" })}
+          />
+          {errors.username && (
+            <FieldErrorMessage>{errors.username.message}</FieldErrorMessage>
           )}
         </Label>
 

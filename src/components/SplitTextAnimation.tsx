@@ -1,4 +1,4 @@
-import { motion, Variant, Variants } from "framer-motion";
+import { motion, Transition, Variant, Variants } from "framer-motion";
 import { cls } from "../libs/utils";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
@@ -35,17 +35,17 @@ const childVariants: Variants = {
   },
 };
 
-interface ISplitTextProps {
+interface ISplitTextAnimationProps {
   text: string;
-
   setState?: Dispatch<SetStateAction<boolean>>;
+  transition?: Transition;
 }
 
-export default function SplitText({
+export default function SplitTextAnimation({
   text,
-
   setState,
-}: ISplitTextProps) {
+  transition,
+}: ISplitTextAnimationProps) {
   const [animationEnded, setAnimationEnded] = useState(false);
 
   useEffect(() => {
@@ -63,6 +63,7 @@ export default function SplitText({
       initial="initial"
       animate="animate"
       exit="exit"
+      transition={transition}
     >
       {text.split("").map((letter, index) => (
         <div key={"text" + index} className="inline-block h-full">
