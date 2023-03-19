@@ -37,18 +37,16 @@ export default function useViewportSize() {
   });
 
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => {
-        setSize({
-          width: window.innerWidth,
-          height: window.innerHeight,
-        });
-        setMediaQuery({
-          md: trueOrFalse("md", window.innerWidth),
-        });
-      }, 200);
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+      setMediaQuery({
+        md: trueOrFalse("md", window.innerWidth),
+      });
+
+      console.log(window.innerWidth);
     };
 
     window.addEventListener("resize", handleResize);

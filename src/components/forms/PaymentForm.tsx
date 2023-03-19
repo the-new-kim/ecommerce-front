@@ -3,6 +3,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
+import { useQueryClient } from "@tanstack/react-query";
 import { addDoc, increment } from "firebase/firestore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +25,8 @@ export default function PaymentForm() {
 
   const stripe = useStripe();
   const elements = useElements();
+
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -79,7 +82,10 @@ export default function PaymentForm() {
           quantity: increment(-quantity),
           sold: increment(quantity),
         });
+
+        await queryClient.refetchQueries({ queryKey: ["product", id] });
       }
+      await queryClient.refetchQueries({ queryKey: ["products"] });
 
       //3️⃣ Empty cart & set order from user
       const orders = [orderDocRef.id, ...me!.orders];
@@ -97,9 +103,7 @@ export default function PaymentForm() {
     <>
       <form onSubmit={handleSubmit}>
         <PaymentElement />
-        {/* <button disabled={isProcessing} className="p-3 bg-blue-200 mt-5">
-          {isProcessing ? "Processing..." : "Pay now"}
-        </button> */}
+
         <Button disabled={isProcessing} className="my-5">
           {isProcessing ? "Processing..." : "Pay now"}
         </Button>

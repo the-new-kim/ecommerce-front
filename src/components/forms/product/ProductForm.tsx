@@ -72,6 +72,7 @@ export default function ProductForm({ defaultValue }: IProductFormProps) {
             attachments[i],
             "data_url"
           );
+
           const downloadUrl = await getDownloadURL(response.ref);
           imageUrls.push(downloadUrl);
         }
