@@ -1,8 +1,8 @@
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 
 import { useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { fireworksAtom, userAtom } from "./libs/atoms";
+import { useRecoilState } from "recoil";
+import { userAtom } from "./libs/atoms";
 import { firebaseAuth, userCollection } from "./firebase/config";
 
 import { updateFirebaseDoc } from "./firebase/utils";
@@ -21,9 +21,7 @@ function App() {
   const [introEnded, setIntroEnded] = useState(false);
 
   useEffect(() => {
-    console.log("ME::::", me);
-
-    onAuthStateChanged(firebaseAuth, async (user) => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
       if (user) {
         const { uid, displayName, email, phoneNumber, photoURL } = JSON.parse(
           JSON.stringify(user)
@@ -79,6 +77,8 @@ function App() {
       }
       setFirebaseInit(true);
     });
+
+    return () => unsubscribe();
   }, [me]);
 
   return (

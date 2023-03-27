@@ -24,3 +24,13 @@ export const fireworksAtom = atom<boolean>({
   key: "fireworksState",
   default: false,
 });
+
+export const cartAtom = atom({
+  key: "cartState",
+  default: null,
+});
+
+export const wishlistAtom = atom({
+  key: "wishlistState",
+  default: null,
+});

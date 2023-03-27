@@ -51,9 +51,11 @@ export default function SplitTextAnimation({
   useEffect(() => {
     if (!setState) return;
 
-    setTimeout(() => {
+    const timeoutID = setTimeout(() => {
       setState(true);
     }, 2000);
+
+    return () => clearTimeout(timeoutID);
   }, [animationEnded, setState]);
 
   return (

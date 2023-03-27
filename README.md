@@ -1,4 +1,57 @@
+# Ecommerce Template
+
 ![alt text](https://res.cloudinary.com/dx06ztif0/image/upload/v1679067043/1_nxj8sj.gif)
+
+`React`
+`Typescript`
+`Firebase`
+`Recoil`
+`Tanstack quey`
+`Apexcharts`
+`Tailwind CSS`
+`React hook form`
+`React player`
+`React router dom`
+`Framer motion`
+
+## [View Live](https://the-new-kim.github.io/ecommerce-front/) 👈
+
+- [English](#en)
+- [한국어](#kr)
+
+# EN
+
+## Project Overview:
+
+Ecommerce Template built with React, Firebase, and Stripe. Recoil was introduced to manage the global state on the client side. The top-level component detects changes in customer state using events such as Firebase's onAuthStateChanged and updates accordingly, reducing unnecessary repetitions in child components. Data caching was implemented using React Query. When there is a change in state, the refetch or mutation function is triggered to minimize unnecessary requests to the server
+
+## What I did:
+
+- Payment using Stripe
+- Products:
+  - Search by product name
+  - Reviews
+- Customers:
+  - Sign in, Sign out, Edit profile
+  - Wishlist, Cart, Checkout, Order history
+- Admin panel:
+  - Dashboard: Visualization of data using graphs for sales performance, order status, and other metrics.
+  - Products: registration and modification of products, addition of image files using drag and drop, and other related functionalities.
+  - Orders: Reporting and updating of order status.
+
+## Conclusion:
+
+- Became proficient in using Firebase Auth and Firestore
+- Implemented animations using Lottie files
+
+## What’s next?:
+
+- Introduce Google Cloud Functions
+- Packaging commonly used Components and Hooks into packages
+- Deep research on payment-related security
+- Improvements to Firestore rules
+
+# KR
 
 ## Project Overview:
 
@@ -29,3 +82,7 @@ React + Firebase + Stripe 를 이용한 Ecommerce Template. Client side의 전�
 - 자주 사용하는 Components와 Hooks 의 Package화
 - 결제관련 보안에 대한 깊은 연구
 - Firestore rules 개선 등
+
+## Gallery:
+
+![gallery1](https://res.cloudinary.com/dx06ztif0/image/upload/v1679066290/Screen_Recording_2023-03-18_at_0.11.27_2_wxiakp.gif)

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { PencilSimple, Star } from "phosphor-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { IReviewWithId } from "../../firebase/types";
 import { userAtom } from "../../libs/atoms";
@@ -24,18 +24,12 @@ export default function ReviewSection({
 }: IReviewSectionProps) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const me = useRecoilValue(userAtom);
-  // const [myReview, setMyReview] = useState<IReviewWithId>();
 
   const { data: myReview } = useQuery(["myReview", productId], () => {
     const foundReview = reviews.find((review) => review.owner === me?.id);
 
     return foundReview || null;
   });
-
-  // useEffect(() => {
-  //   if (!me) return;
-  //   setMyReview(reviews.find((review) => review.owner === me.id));
-  // }, [me]);
 
   const toggleShowReviewForm = () => {
     setShowReviewForm((prev) => !prev);

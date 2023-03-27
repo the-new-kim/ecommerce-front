@@ -1,4 +1,4 @@
-import { AnimatePresence, LayoutGroup, motion, useScroll } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Gear,
   Heart,
@@ -19,8 +19,6 @@ interface ISearchForm {
 }
 
 export default function Header() {
-  const { scrollY } = useScroll();
-
   const me = useRecoilValue(userAtom);
   const setHeaderHeight = useSetRecoilState(headerHeightAtom);
   const navigate = useNavigate();
@@ -38,7 +36,8 @@ export default function Header() {
   useEffect(() => {
     if (clientHeight === 0) return;
     setHeaderHeight(clientHeight);
-  }, [clientHeight]);
+    console.log(clientHeight);
+  }, [clientHeight, setHeaderHeight]);
 
   const onValid = ({ keyword }: ISearchForm) => {
     navigate(`/search?keyword=${keyword}`);

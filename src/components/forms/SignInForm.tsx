@@ -2,7 +2,9 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import { firebaseAuth } from "../../firebase/config";
+import { userAtom } from "../../libs/atoms";
 import FieldErrorMessage from "../elements/form/FieldErrorMessage";
 import Form from "../elements/form/Form";
 import Input from "../elements/form/Input";
@@ -15,6 +17,7 @@ interface ISignInForm {
 
 export default function SignInForm() {
   const navigate = useNavigate();
+  const setMe = useRecoilState(userAtom);
 
   const {
     register,

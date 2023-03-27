@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
@@ -26,12 +25,8 @@ export default function ShippingInformationForm({
   const {
     register,
     handleSubmit,
-    watch,
-    setError,
     formState: { errors, isDirty },
   } = useForm<IShipping>();
-
-  useEffect(() => {}, []);
 
   const onValid = async ({ name, phone, address }: IShipping) => {
     if (isDirty) {

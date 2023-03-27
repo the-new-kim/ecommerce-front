@@ -10,7 +10,6 @@ import ReviewStars from "../components/review/ReviewStars";
 import useViewportSize from "../libs/hooks/useViewportSize";
 import Empty from "../components/Empty";
 import AddToCartButton from "../components/AddToCartButton";
-import { Helmet } from "react-helmet";
 
 import AddToWishlistButton from "../components/AddToWishlistButton";
 import { useQuery } from "@tanstack/react-query";

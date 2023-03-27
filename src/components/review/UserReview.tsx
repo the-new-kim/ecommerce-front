@@ -1,9 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useRecoilValue } from "recoil";
 import { userCollection } from "../../firebase/config";
 import { getFirebaseDoc } from "../../firebase/utils";
-import { userAtom } from "../../libs/atoms";
 import Heading from "../elements/typos/Heading";
 import Spinner from "../loaders/Spinner";
 import ReviewStars from "./ReviewStars";
@@ -24,8 +21,6 @@ export default function UserReview({
   const { data, isLoading, error } = useQuery(["user", owner], () =>
     getFirebaseDoc(userCollection, owner)
   );
-
-  const me = useRecoilValue(userAtom);
 
   if (!data || isLoading)
     return (
